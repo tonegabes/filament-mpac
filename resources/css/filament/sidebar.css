@@ -1,35 +1,54 @@
 .fi-sidebar {
-  @apply bg-white/80 border-0 shadow-sm dark:bg-slate-900/90;
+  @apply bg-white/80 border-0 shadow-sm dark:bg-gray-950;
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
+
 .fi-sidebar:not(.fi-sidebar-open) {
   @apply w-[56px];
 }
+
 .fi-sidebar-nav {
   @apply p-0 border-r;
-  border-color: var(--border-color-base);
   scrollbar-gutter: unset !important;
+  border-color: var(--border-color);
 }
+
 .fi-sidebar-nav-groups {
   @apply gap-y-0 mx-0 mb-16;
 }
+
 .fi-sidebar-nav-groups .fi-sidebar-group {
   @apply border-b p-2 gap-0;
-  border-color: var(--border-color-base);
+  border-color: var(--border-color);
 }
+
 .fi-sidebar-nav-groups .fi-sidebar-group .fi-sidebar-group-items {
   @apply p-0;
 }
+
 .fi-sidebar-nav-groups .fi-sidebar-group .fi-sidebar-group-button {
   /* @apply border-b; */
 }
+
 .fi-sidebar-item {
   /* @apply border; */
 }
+
 .fi-sidebar-item-button {
   @apply rounded-md p-2;
 }
+
 .fi-sidebar-item-active > .fi-sidebar-item-button {
   @apply bg-white drop-shadow dark:bg-gray-800;
+}
+
+/* Dark mode */
+
+:is(.dark .fi-sidebar-nav) {
+  border-color: var(--border-color-dark);
+}
+
+:is(.dark .fi-sidebar-nav-groups .fi-sidebar-group) {
+  border-color: var(--border-color-dark);
 }
