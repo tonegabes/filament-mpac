@@ -6,9 +6,11 @@ use App\Enums\NavGroups;
 use App\Enums\Permissions\SystemPermissions;
 use App\Settings\SystemSettings;
 use BackedEnum;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\SettingsPage;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
@@ -30,32 +32,76 @@ class ManageSystem extends SettingsPage
 
     public static function canAccess(): bool
     {
-        return true;
-        // return auth()->user()->can(SystemPermissions::SystemSettingsManage);
+        return auth()->user()?->can(SystemPermissions::SystemSettingsManage) ?? false;
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->columns(1)
+            ->columns(2)
             ->components([
-                Section::make()->schema([
-                    TextInput::make('app_name')
-                        ->label('Nome do Sistema')
-                        ->helperText('Nome do sistema que será exibido no painel de controle.')
-                        ->maxLength(255)
-                        ->required(),
-                ]),
+                Fieldset::make()
+                    ->columns(1)
+                    ->extraAttributes([
+                        'class' => 'border-none p-0',
+                    ])
+                    ->schema([
+                        Section::make('Nome')
+                            ->schema([
+                                TextInput::make('app_name')
+                                    ->label('Nome do Sistema')
+                                    ->maxLength(255)
+                                    ->columnSpanFull()
+                                    ->required(),
 
-                Section::make()->schema([
-                    Toggle::make('enable_registration')
-                        ->label('Habilitar Registro no Sistema')
-                        ->helperText('Se habilitado, os usuários poderão se registrar no sistema.')
-                        ->onIcon(Phosphor::Check)
-                        ->offIcon(Phosphor::X)
-                        ->inline(false)
-                        ->required(),
-                ]),
+                                Toggle::make('show_name_in_topbar')
+                                    ->label('Exibir na barra de navegação')
+                                    ->onIcon(Phosphor::Check)
+                                    ->offIcon(Phosphor::X)
+                                    ->columnSpanFull()
+                                    ->required(),
+                            ]),
+
+                        Section::make('Registro')->schema([
+                            Toggle::make('enable_registration')
+                                ->label('Habilitar Registro no Sistema')
+                                ->helperText('Se habilitado, os usuários poderão se registrar no sistema.')
+                                ->onIcon(Phosphor::Check)
+                                ->offIcon(Phosphor::X)
+                                ->columnSpanFull()
+                                ->required(),
+                        ]),
+                    ]),
+
+                Section::make('Logos')
+                    ->columns(2)
+                    ->schema([
+                        FileUpload::make('app_logo_light')
+                            ->label('Modo Claro')
+                            ->disk('public')
+                            ->directory(SystemSettings::LOGO_DIRECTORY)
+                            ->preserveFilenames()
+                            ->imageEditor(),
+
+                        FileUpload::make('app_logo_dark')
+                            ->label('Modo Escuro')
+                            ->disk('public')
+                            ->directory(SystemSettings::LOGO_DIRECTORY)
+                            ->preserveFilenames()
+                            ->imageEditor(),
+
+                        Toggle::make('show_logo_in_topbar')
+                            ->label('Exibir na barra de navegação')
+                            ->onIcon(Phosphor::Check)
+                            ->offIcon(Phosphor::X)
+                            ->columnSpanFull()
+                            ->required(),
+                    ]),
             ]);
+    }
+
+    public function afterSave(): void
+    {
+        SystemSettings::cleanLogoDirectory();
     }
 }

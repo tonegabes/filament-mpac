@@ -14,14 +14,22 @@ class BrandLogomark extends Component
 
     public string $darkLogo;
 
+    public bool $showLogo;
+
+    public bool $showName;
+
     /**
      * Initialize component properties.
      */
     public function mount(): void
     {
-        $this->appName = app(SystemSettings::class)->app_name;
-        $this->lightLogo = 'images/logo.png';
-        $this->darkLogo = 'images/logo-dark.png';
+        $settings = app(SystemSettings::class);
+
+        $this->appName = $settings->app_name;
+        $this->lightLogo = $settings->getAppLogoLight();
+        $this->darkLogo = $settings->getAppLogoDark();
+        $this->showLogo = $settings->show_logo_in_topbar;
+        $this->showName = $settings->show_name_in_topbar;
     }
 
     /**
