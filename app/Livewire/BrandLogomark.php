@@ -10,14 +10,23 @@ class BrandLogomark extends Component
 {
     public string $appName;
 
-    public string $appLogo;
+    public string $lightLogo;
 
+    public string $darkLogo;
+
+    /**
+     * Initialize component properties.
+     */
     public function mount(): void
     {
         $this->appName = app(SystemSettings::class)->app_name;
-        $this->appLogo = 'images/logo.png';
+        $this->lightLogo = 'images/logo.png';
+        $this->darkLogo = 'images/logo-dark.png';
     }
 
+    /**
+     * Render the component view.
+     */
     public function render(): View
     {
         return view('livewire.brand-logomark');
