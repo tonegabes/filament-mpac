@@ -1,23 +1,32 @@
-@use('App\Settings\SystemSettings')
+@php
+    use App\Settings\SystemSettings;
 
+    $settings = app(SystemSettings::class);
+@endphp
 
 <x-filament-panels::layout.base>
-
     <div class="fi-simple-layout">
 
-        <div class="fi-simple-main-ctn flex-col">
+        <div class="flex flex-col w-xl h-fit my-auto">
 
-            <h1>{{ app(SystemSettings::class)->app_name; }}</h1>
+            <a href="/" class="flex flex-col items-center gap-8">
+                @if ($settings->show_logo_in_topbar)
+                    <img src="{{ $settings->getAppLogoLight() }}" alt="Logo" class="h-6 w-auto">
+                @endif
+
+                @if ($settings->show_name_in_topbar)
+                    <h1 class="text-2xl font-semibold">{{ $settings->app_name; }}</h1>
+                @endif
+            </a>
 
             <main class="fi-simple-main">
                 {{ $slot }}
             </main>
 
-            <div class="text-sm text-zinc-400">
-                © {{ date('Y') }} - Ministério Público do Estado do Acre -
-                {{ config('app.version') }}
-            </div>
-
+            <footer class="text-sm mx-auto tracking-wide text-black/50">
+                © {{ date('Y') }} - Ministério Público do Estado do Acre - {{ config('app.version') }}
+            </footer>
         </div>
+
     </div>
 </x-filament-panels::layout.base>

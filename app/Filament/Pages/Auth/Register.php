@@ -18,9 +18,12 @@ class Register extends VendorRegister
      */
     protected function handleRegistration(array $data): Model
     {
+        $data['username'] = $data['email'];
+        $data['is_active'] = true;
+
         /** @var User $user */
         $user = $this->getUserModel()::create($data);
-        $user->assignRole(Roles::Guest);
+        $user->assignRole(Roles::Operator);
 
         return $user;
     }

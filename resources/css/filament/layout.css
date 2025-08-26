@@ -1,7 +1,7 @@
-.fi-simple-main-ctn {
-  @apply bg-amber-300;
-}
+/* .fi-simple-main-ctn {
+  @apply ;
+} */
 
 .fi-simple-main {
-  @apply max-w-md mx-auto;
+  @apply my-5;
 }

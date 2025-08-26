@@ -7,6 +7,8 @@ use App\Enums\NavGroups;
 use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
+use App\Filament\Pages\Auth\ResetPassword\RequestResetPassword;
+use App\Filament\Pages\Auth\ResetPassword\ResetPassword;
 use App\Settings\SystemSettings;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -125,7 +127,10 @@ class AdminPanelProvider extends PanelProvider
 
         if ($canRegister) {
             $panel->registration(Register::class)
-                // ->passwordReset(PasswordReset::class) // TODO: Add password reset page
+                ->passwordReset(
+                    requestAction: RequestResetPassword::class,
+                    resetAction: ResetPassword::class,
+                )
             ;
         }
 
