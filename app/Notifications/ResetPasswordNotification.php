@@ -18,7 +18,7 @@ class ResetPasswordNotification extends ResetPassword
      */
     protected function buildMailMessage($url)
     {
-        $count = Config::string('auth.passwords.' . Config::string('auth.defaults.passwords') . '.expire');
+        $count = Config::integer('auth.passwords.' . Config::string('auth.defaults.passwords') . '.expire');
 
         return (new MailMessage)
             ->subject('Redefinição de senha')

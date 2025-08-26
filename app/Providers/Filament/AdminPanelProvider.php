@@ -129,7 +129,7 @@ class AdminPanelProvider extends PanelProvider
             $panel->registration(Register::class)
                 ->passwordReset(
                     ResetPasswordRequest::class,
-                    resetAction: ResetPasswordAction::class,
+                    ResetPasswordAction::class,
                 )
             ;
         }
