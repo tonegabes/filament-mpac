@@ -13,8 +13,7 @@ final class LdapAuthService
 
     public function __construct()
     {
-        /** @var string $domain */
-        $domain = Config::get('auth.ldap.email_domain', '');
+        $domain = Config::string('auth.ldap.email_domain', '');
         $this->emailDomain = $domain;
     }
 

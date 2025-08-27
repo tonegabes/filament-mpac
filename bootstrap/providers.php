@@ -6,4 +6,5 @@ return [
     App\Providers\Filament\AdminPanelProvider::class,
     App\Providers\Filament\BaseIconsProvider::class,
     App\Providers\Filament\RenderHooksProvider::class,
+    App\Providers\Filament\OverrideNotificationsProvider::class,
 ];
