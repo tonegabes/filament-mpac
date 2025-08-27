@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Settings;
 
+use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
 use BackedEnum;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +24,13 @@ class SystemSettings extends Settings
 
     public ?string $app_logo_dark = null;
 
+    public ?string $auth_page_layout = null;
+
+    public ?string $auth_page_background = null;
+
     public bool $enable_registration = false;
+
+    public string $footer_text = 'Ministério Público do Estado do Acre';
 
     /**
      * Return the group name for the settings.
@@ -72,5 +79,21 @@ class SystemSettings extends Settings
         foreach ($filesToDelete as $file) {
             Storage::disk('public')->delete($file);
         }
+    }
+
+    /**
+     * Get the default page layout.
+     */
+    public function getAppLayout(): string
+    {
+        return $this->auth_page_layout ?? PageLayouts::FullPage->value;
+    }
+
+    /**
+     * Get the auth page background.
+     */
+    public function getAuthPageBackground(): string
+    {
+        return $this->auth_page_background ? Storage::url($this->auth_page_background) : asset('images/background.avif');
     }
 }

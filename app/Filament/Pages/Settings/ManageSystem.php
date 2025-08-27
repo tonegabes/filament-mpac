@@ -3,10 +3,12 @@
 namespace App\Filament\Pages\Settings;
 
 use App\Enums\NavGroups;
+use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
 use App\Settings\SystemSettings;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\SettingsPage;
@@ -71,6 +73,27 @@ class ManageSystem extends SettingsPage
                                 ->columnSpanFull()
                                 ->required(),
                         ]),
+
+                        Section::make('Login')->schema([
+                            Select::make('auth_page_layout')
+                                ->label('Layout da página de login')
+                                ->options([
+                                    PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
+                                    PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
+                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
+                                ])
+                                ->columnSpanFull()
+                                ->required(),
+
+                            FileUpload::make('auth_page_background')
+                                ->label('Imagem de fundo')
+                                ->disk('public')
+                                ->directory(SystemSettings::LOGO_DIRECTORY)
+                                ->preserveFilenames()
+                                ->image()
+                                ->imageEditor()
+                                ->columnSpanFull(),
+                        ]),
                     ]),
 
                 Section::make('Logos')
@@ -81,6 +104,7 @@ class ManageSystem extends SettingsPage
                             ->disk('public')
                             ->directory(SystemSettings::LOGO_DIRECTORY)
                             ->preserveFilenames()
+                            ->image()
                             ->imageEditor(),
 
                         FileUpload::make('app_logo_dark')
@@ -88,6 +112,7 @@ class ManageSystem extends SettingsPage
                             ->disk('public')
                             ->directory(SystemSettings::LOGO_DIRECTORY)
                             ->preserveFilenames()
+                            ->image()
                             ->imageEditor(),
 
                         Toggle::make('show_logo_in_topbar')

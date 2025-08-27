@@ -19,6 +19,8 @@
     Times, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco;
 
+  --color-primary: var(--color-indigo-500);
+
   --border-color: var(--color-gray-200);
   --border-color-dark: var(--color-gray-800);
 }

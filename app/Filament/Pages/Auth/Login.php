@@ -7,6 +7,7 @@ namespace App\Filament\Pages\Auth;
 use App\Models\User;
 use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
+use App\Settings\SystemSettings;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\MultiFactor\Contracts\HasBeforeChallengeHook;
@@ -54,7 +55,7 @@ class Login extends VendorLogin
      */
     public function getLayout(): string
     {
-        return 'layouts.auth';
+        return app(SystemSettings::class)->getAppLayout();
     }
 
     /**
