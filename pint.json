@@ -37,6 +37,7 @@
     "constant_case": { "case": "lower" },
     "declare_equal_normalize": true,
     "declare_parentheses": true,
+    "declare_strict_types": true,
     "fully_qualified_strict_types": true,
     "general_phpdoc_tag_rename": true,
     "heredoc_to_nowdoc": true,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers\Filament;
 
 use Agencetwogether\HooksHelper\HooksHelperPlugin;
@@ -69,14 +71,7 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
-            ->navigationGroups([
-                NavigationGroup::make(NavGroups::Authorization->value)
-                    ->collapsed(true),
-                NavigationGroup::make(NavGroups::Settings->value)
-                    ->collapsed(true),
-                NavigationGroup::make(NavGroups::Tools->value)
-                    ->collapsed(true),
-            ])
+            ->navigationGroups($this->configureNavigationGroups())
             ->navigationItems([
                 NavigationItem::make('Log Viewer')
                     ->group(NavGroups::Tools->value)
@@ -135,5 +130,27 @@ class AdminPanelProvider extends PanelProvider
         }
 
         return $panel;
+    }
+
+    /**
+     * Configure the navigation groups.
+     *
+     * @return array<NavigationGroup>
+     */
+    private function configureNavigationGroups(): array
+    {
+        return [
+            NavigationGroup::make(NavGroups::Files->value)
+                ->collapsed(true),
+
+            NavigationGroup::make(NavGroups::Authorization->value)
+                ->collapsed(true),
+
+            NavigationGroup::make(NavGroups::Settings->value)
+                ->collapsed(true),
+
+            NavigationGroup::make(NavGroups::Tools->value)
+                ->collapsed(true),
+        ];
     }
 }
