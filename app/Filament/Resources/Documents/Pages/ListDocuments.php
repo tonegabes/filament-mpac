@@ -2,24 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Images\Pages;
+namespace App\Filament\Resources\Documents\Pages;
 
-use App\Filament\Resources\Images\ImageResource;
+use App\Filament\Resources\Documents\DocumentResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
-class ListImages extends ListRecords
+class ListDocuments extends ListRecords
 {
-    protected static string $resource = ImageResource::class;
+    protected static string $resource = DocumentResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
             CreateAction::make()
-                ->label('Enviar imagem')
+                ->label('Enviar arquivo')
                 ->icon(Phosphor::Upload)
-                ->modal()
             ,
         ];
     }

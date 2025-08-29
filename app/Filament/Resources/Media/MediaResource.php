@@ -23,9 +23,11 @@ class MediaResource extends Resource
 {
     protected static ?string $model = Media::class;
 
-    protected static ?string $modelLabel = 'Mídia';
+    protected static ?string $modelLabel = 'Arquivo';
 
-    protected static string|BackedEnum|null $navigationIcon = Phosphor::File;
+    protected static ?string $navigationLabel = 'Todos os arquivos';
+
+    protected static string|BackedEnum|null $navigationIcon = Phosphor::Folder;
 
     protected static ?string $recordTitleAttribute = 'name';
 

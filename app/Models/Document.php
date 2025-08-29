@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Image extends Model implements HasMedia
+class Document extends Model implements HasMedia
 {
     use InteractsWithMedia;
 
-    public const COLLECTION_NAME = 'images';
-
     protected $fillable = ['name'];
+
+    public const COLLECTION_NAME = 'documents';
 
     public function registerMediaCollections(): void
     {
@@ -23,6 +23,10 @@ class Image extends Model implements HasMedia
             ->acceptsMimeTypes(self::getMimeTypeMap())
             ->useDisk(self::COLLECTION_NAME)
         ;
+
+        $this->addMediaConversion('thumb')
+            ->width(368)
+            ->height(232);
     }
 
     /**
@@ -31,14 +35,13 @@ class Image extends Model implements HasMedia
     public static function getMimeTypeMap(): array
     {
         return [
-            'image/jpeg',
-            'image/jpg',
-            'image/png',
-            'image/gif',
-            'image/webp',
-            'image/svg+xml',
-            'image/avif',
-            'image/bmp',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-powerpoint',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         ];
     }
 }
