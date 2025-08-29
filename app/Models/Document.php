@@ -44,4 +44,9 @@ class Document extends Model implements HasMedia
             'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         ];
     }
+
+    public function getUrl(): string
+    {
+        return $this->getFirstMediaUrl(self::COLLECTION_NAME);
+    }
 }

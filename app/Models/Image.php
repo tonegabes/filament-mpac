@@ -41,4 +41,9 @@ class Image extends Model implements HasMedia
             'image/bmp',
         ];
     }
+
+    public function getUrl(): string
+    {
+        return $this->getFirstMediaUrl(self::COLLECTION_NAME);
+    }
 }
