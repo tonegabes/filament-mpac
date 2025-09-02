@@ -3,15 +3,20 @@
 
     $fieldWrapperView = $getFieldWrapperView();
     $extraInputAttributeBag = $getExtraInputAttributeBag();
-    $gridDirection = $getGridDirection() ?? GridDirection::Column;
+    $gridDirection = $getGridDirection() ?? GridDirection::Row;
     $id = $getId();
     $isDisabled = $isDisabled();
     $livewireKey = $getLivewireKey();
     $statePath = $getStatePath();
     $wireModelAttribute = $applyStateBindingModifiers('wire:model');
+
 @endphp
 
-<x-dynamic-component :component="$fieldWrapperView" :field="$field">
+<x-dynamic-component
+    :component="$fieldWrapperView"
+    :field="$field"
+    class="fi-fo-radio-cards-wrp"
+>
     <div
         {{
             $getExtraAttributeBag()
@@ -35,18 +40,25 @@
             @endphp
 
             <label
-                class="fi-fo-radio-cards-label"
+                class="fi-fo-radio-cards-label group/label"
                 :class="{ 'fi-selected': $wire.{{ $statePath }} === '{{ $value }}' }"
                 for="{{ $id . '-' . $value }}"
             >
-                <div class="fi-fo-radio-cards-label-text">
-                    <p>{{ $label }}</p>
+                <div class="fi-fo-radio-cards-label-wrp">
 
-                    @if ($hasDescription($value))
-                        <p class="fi-fo-radio-cards-label-description">
-                            {{ $getDescription($value) }}
-                        </p>
+                    @if ($hasIcon($value) && ! $isIconHidden())
+                        @svg($getIcon($value), ['class' => 'fi-fo-radio-cards-label-icon'])
                     @endif
+
+                    <div class="fi-fo-radio-cards-label-text">
+                        <p>{{ $label }}</p>
+
+                        @if ($hasDescription($value) && ! $isDescriptionHidden())
+                            <p class="fi-fo-radio-cards-label-description">
+                                {{ $getDescription($value) }}
+                            </p>
+                        @endif
+                    </div>
                 </div>
 
                 <input

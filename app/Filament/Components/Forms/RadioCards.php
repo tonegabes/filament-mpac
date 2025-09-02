@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Components\Forms;
 
+use Closure;
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Contracts\CanDisableOptions;
 use Filament\Forms\Components\Field;
+use Filament\Support\Enums\GridDirection;
 
 class RadioCards extends Field implements CanDisableOptions
 {
@@ -16,6 +18,7 @@ class RadioCards extends Field implements CanDisableOptions
     use Concerns\HasDescriptions;
     use Concerns\HasExtraInputAttributes;
     use Concerns\HasGridDirection;
+    use Concerns\HasIcons;
     use Concerns\HasOptions;
 
     /**
@@ -23,36 +26,56 @@ class RadioCards extends Field implements CanDisableOptions
      */
     protected string $view = 'filament.components.forms.radio-cards';
 
-    // protected bool | Closure $isInline = false;
+    protected bool | Closure $isIconHidden = false;
 
-    //     public function boolean(?string $trueLabel = null, ?string $falseLabel = null): static
-    //     {
-    //         $this->options([
-    //             1 => $trueLabel ?? __('filament-forms::components.radio.boolean.true'),
-    //             0 => $falseLabel ?? __('filament-forms::components.radio.boolean.false'),
-    //         ]);
-    //
-    //         $this->stateCast(app(BooleanStateCast::class, ['isStoredAsInt' => true]));
-    //
-    //         return $this;
-    //     }
+    protected bool | Closure $isDescriptionHidden = false;
 
-    //     public function inline(bool | Closure $condition = true): static
-    //     {
-    //         $this->isInline = $condition;
-    //
-    //         return $this;
-    //     }
-    //
-    //     public function isInline(): bool
-    //     {
-    //         return (bool) $this->evaluate($this->isInline);
-    //     }
+    public function list(): static
+    {
+        $this->gridDirection(GridDirection::Column);
 
-    // public function getDefaultState(): mixed
-    // {
-    //     return parent::getDefaultState();
-    // }
+        return $this;
+    }
+
+    public function simple(bool | Closure $condition = true): static
+    {
+        $this->isDescriptionHidden = $condition;
+        $this->isIconHidden = $condition;
+
+        return $this;
+    }
+
+    public function isIconHidden(): bool
+    {
+        return (bool) $this->evaluate($this->isIconHidden);
+    }
+
+    public function hiddenIcon(bool | Closure $condition = true): static
+    {
+        $this->isIconHidden = $condition;
+
+        return $this;
+    }
+
+    public function isDescriptionHidden(): bool
+    {
+        return (bool) $this->evaluate($this->isDescriptionHidden);
+    }
+
+    public function hiddenDescription(bool | Closure $condition = true): static
+    {
+        $this->isDescriptionHidden = $condition;
+
+        return $this;
+    }
+
+    /**
+     * @param  array-key  $value
+     */
+    public function hasIcon($value): bool
+    {
+        return array_key_exists($value, $this->getIcons());
+    }
 
     /**
      * @return ?array<string>

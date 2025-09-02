@@ -2,7 +2,7 @@
 @import "../../vendor/filament/filament/resources/css/theme.css";
 @import "./filament/sidebar.css" layer(components);
 @import "./filament/layout.css" layer(components);
-@import "./filament/radio-cards.css" layer(components);
+@import "./filament/radio-cards.css";
 
 @source '../../app/Filament/**/*';
 @source '../../resources/views/filament/**/*';

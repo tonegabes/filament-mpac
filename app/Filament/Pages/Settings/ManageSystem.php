@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Pages\Settings;
 
 use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
+use App\Filament\Components\Forms\RadioCards;
 use App\Settings\SystemSettings;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\SettingsPage;
@@ -75,13 +77,20 @@ class ManageSystem extends SettingsPage
                         ]),
 
                         Section::make('Login')->schema([
-                            Select::make('auth_page_layout')
+                            // Select::make('auth_page_layout')
+                            //     ->label('Layout da página de login')
+                            //     ->options([
+                            //         PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
+                            //         PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
+                            //         PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
+                            //     ])
+                            //     ->columnSpanFull()
+                            //     ->required(),
+
+                            RadioCards::make('auth_page_layout')
                                 ->label('Layout da página de login')
-                                ->options([
-                                    PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
-                                    PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
-                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
-                                ])
+                                ->enum(PageLayouts::class)
+                                ->list()
                                 ->columnSpanFull()
                                 ->required(),
 

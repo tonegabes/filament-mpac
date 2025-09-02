@@ -1,5 +1,9 @@
 .fi-fo-radio-cards {
-  @apply grid grid-cols-2 gap-2;
+  @apply grid gap-2;
+
+  &:not(.fi-grid-direction-col) {
+    @apply grid-cols-2;
+  }
 
   & > .fi-grid-direction-col {
     /* @apply -mt-4; */
@@ -14,6 +18,18 @@
 
     &.fi-selected {
       @apply bg-primary/10 ring-2 ring-primary;
+
+      & .fi-fo-radio-cards-label-icon {
+        @apply fill-primary;
+      }
+    }
+
+    & > .fi-fo-radio-cards-label-wrp {
+      @apply flex items-center gap-4;
+    }
+
+    & .fi-fo-radio-cards-label-icon {
+      @apply size-10 fill-gray-400 group-hover/label:fill-primary;
     }
 
     & > .fi-radio-input {
