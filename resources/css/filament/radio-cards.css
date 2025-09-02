@@ -13,8 +13,16 @@
     }
   }
 
+  & .fi-fo-radio-cards-input-icon-semi-hidden {
+    @apply opacity-0 group-hover/label:opacity-30;
+  }
+
+  & .fi-fo-radio-cards-input-icon {
+    @apply size-6 fill-gray-400 shrink-0 transition-opacity duration-400 ease-in-out -mt-1 -mr-1;
+  }
+
   & > .fi-fo-radio-cards-label {
-    @apply flex justify-between p-4 border border-gray-200 hover:ring-2 hover:ring-primary rounded-lg cursor-pointer shadow-xs;
+    @apply flex justify-between gap-4 p-4 border border-gray-200 hover:ring-2 hover:ring-primary rounded-lg cursor-pointer shadow-xs;
 
     &.fi-selected {
       @apply bg-primary/10 ring-2 ring-primary;
@@ -22,17 +30,25 @@
       & .fi-fo-radio-cards-label-icon {
         @apply fill-primary;
       }
+
+      & .fi-fo-radio-cards-input-icon {
+        @apply opacity-100 fill-primary;
+      }
+
+      & .fi-radio-input.fi-fo-radio-cards-input-icon-semi-hidden {
+        @apply opacity-100;
+      }
     }
 
     & > .fi-fo-radio-cards-label-wrp {
-      @apply flex items-center gap-4;
+      @apply flex gap-4;
     }
 
     & .fi-fo-radio-cards-label-icon {
-      @apply size-10 fill-gray-400 group-hover/label:fill-primary;
+      @apply size-10 fill-gray-400 shrink-0 group-hover/label:fill-primary;
     }
 
-    & > .fi-radio-input {
+    & .fi-radio-input {
       @apply mt-1 shrink-0;
     }
 

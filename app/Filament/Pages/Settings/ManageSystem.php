@@ -77,19 +77,25 @@ class ManageSystem extends SettingsPage
                         ]),
 
                         Section::make('Login')->schema([
-                            // Select::make('auth_page_layout')
-                            //     ->label('Layout da página de login')
-                            //     ->options([
-                            //         PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
-                            //         PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
-                            //         PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
-                            //     ])
-                            //     ->columnSpanFull()
-                            //     ->required(),
-
                             RadioCards::make('auth_page_layout')
                                 ->label('Layout da página de login')
-                                ->enum(PageLayouts::class)
+                                ->options([
+                                    PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
+                                    PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
+                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
+                                ])
+                                ->icons([
+                                    PageLayouts::Split->value    => PageLayouts::Split->getIcon(),
+                                    PageLayouts::Centered->value => PageLayouts::Centered->getIcon(),
+                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getIcon(),
+                                ])
+                                ->descriptions([
+                                    PageLayouts::Split->value    => PageLayouts::Split->getDescription(),
+                                    PageLayouts::Centered->value => PageLayouts::Centered->getDescription(),
+                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getDescription(),
+                                ])
+                                ->semiHiddenInputIcon()
+                                ->inputIcon(Phosphor::CheckCircleFill)
                                 ->list()
                                 ->columnSpanFull()
                                 ->required(),

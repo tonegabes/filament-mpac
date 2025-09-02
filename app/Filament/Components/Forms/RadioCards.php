@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Components\Forms;
 
+use BackedEnum;
 use Closure;
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Contracts\CanDisableOptions;
 use Filament\Forms\Components\Field;
+use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Enums\GridDirection;
+use Illuminate\Contracts\Support\Htmlable;
+use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class RadioCards extends Field implements CanDisableOptions
 {
@@ -28,7 +32,13 @@ class RadioCards extends Field implements CanDisableOptions
 
     protected bool | Closure $isIconHidden = false;
 
+    protected bool | Closure $isIconSemiHidden = false;
+
     protected bool | Closure $isDescriptionHidden = false;
+
+    protected bool | Closure $isInputIconHidden = false;
+
+    protected string | BackedEnum | Htmlable | null $inputIcon = null;
 
     public function list(): static
     {
@@ -41,6 +51,51 @@ class RadioCards extends Field implements CanDisableOptions
     {
         $this->isDescriptionHidden = $condition;
         $this->isIconHidden = $condition;
+
+        return $this;
+    }
+
+    public function semiHiddenInputIcon(bool | Closure $condition = true): static
+    {
+        $this->isIconSemiHidden = $condition;
+
+        return $this;
+    }
+
+    public function isIconSemiHidden(): bool
+    {
+        return (bool) $this->evaluate($this->isIconSemiHidden);
+    }
+
+    public function hasInputIcon(): bool
+    {
+        return $this->inputIcon !== null;
+    }
+
+    public function inputIcon(string | BackedEnum | Htmlable | null $inputIcon): static
+    {
+        if ($inputIcon instanceof BackedEnum && $inputIcon instanceof HasLabel) {
+            $inputIcon = $inputIcon->getLabel();
+        }
+
+        $this->inputIcon = $inputIcon;
+
+        return $this;
+    }
+
+    public function getInputIcon(): string | BackedEnum | Htmlable
+    {
+        return $this->inputIcon ?? Phosphor::CheckCircleFill->getLabel();
+    }
+
+    public function isInputIconHidden(): bool
+    {
+        return (bool) $this->evaluate($this->isInputIconHidden);
+    }
+
+    public function hiddenInputIcon(bool | Closure $condition = true): static
+    {
+        $this->isInputIconHidden = $condition;
 
         return $this;
     }

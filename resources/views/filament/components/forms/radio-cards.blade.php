@@ -41,7 +41,9 @@
 
             <label
                 class="fi-fo-radio-cards-label group/label"
-                :class="{ 'fi-selected': $wire.{{ $statePath }} === '{{ $value }}' }"
+                :class="{
+                    'fi-selected': $wire.{{ $statePath }} === '{{ $value }}'
+                }"
                 for="{{ $id . '-' . $value }}"
             >
                 <div class="fi-fo-radio-cards-label-wrp">
@@ -61,10 +63,21 @@
                     </div>
                 </div>
 
+                @if ($hasInputIcon() && ! $isInputIconHidden())
+                    <x-icon name="{{ $getInputIcon() }}"
+                        @class([
+                            'fi-fo-radio-cards-input-icon',
+                            'fi-fo-radio-cards-input-icon-semi-hidden' => $isIconSemiHidden(),
+                        ])
+                    />
+                @endif
+
                 <input
                     type="radio"
                     {{
                         $inputAttributes->class([
+                            'hidden' => $hasInputIcon() || $isInputIconHidden(),
+                            'fi-fo-radio-cards-input-icon-semi-hidden' => $isIconSemiHidden(),
                             'fi-radio-input',
                             'fi-valid' => ! $errors->has($statePath),
                             'fi-invalid' => $errors->has($statePath),
