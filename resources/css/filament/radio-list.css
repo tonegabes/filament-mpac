@@ -1,0 +1,63 @@
+.fi-fo-radio-list {
+  @apply flex flex-col shadow-xs rounded-lg divide-y divide-gray-200 border border-gray-200;
+
+  & > .fi-grid-direction-col {
+    /* @apply -mt-4; */
+
+    & > .fi-fo-radio-list-label {
+      @apply break-inside-avoid;
+    }
+  }
+
+  & .fi-fo-radio-list-input-icon {
+    @apply size-5 fill-gray-300 dark:fill-gray-700 shrink-0 transition-opacity duration-400 ease-in-out;
+  }
+
+  & > .fi-fo-radio-list-label:first-child {
+    @apply rounded-t-lg;
+  }
+
+  & > .fi-fo-radio-list-label:last-child {
+    @apply rounded-b-lg;
+  }
+
+  & > .fi-fo-radio-list-label {
+    @apply flex items-center justify-between gap-4 p-4 dark:border-white/20 hover:ring hover:ring-primary cursor-pointer;
+
+    &.fi-selected {
+      @apply bg-primary/10 ring-primary ring-2;
+
+      & .fi-fo-radio-list-input-icon {
+        @apply opacity-100 fill-primary;
+      }
+
+      & .fi-fo-radio-list-label-icon {
+        @apply fill-primary;
+      }
+    }
+
+    & > .fi-fo-radio-list-label-wrp {
+      @apply flex items-center gap-4;
+    }
+
+    & .fi-fo-radio-list-label-icon {
+      @apply size-5 fill-gray-400 dark:fill-white/30 shrink-0;
+    }
+
+    & .fi-radio-input {
+      @apply mt-1 shrink-0;
+    }
+
+    & > .fi-fo-radio-list-label-text {
+      @apply grid text-sm leading-6 font-medium text-gray-950 dark:text-white;
+    }
+
+    & .fi-fo-radio-list-label-description {
+      @apply font-normal text-gray-500 dark:text-gray-400;
+    }
+
+    & .fi-fo-radio-list-label-extra-text {
+      @apply font-normal text-gray-500 dark:text-gray-400;
+    }
+  }
+}

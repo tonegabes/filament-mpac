@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Contracts\HasExtraText;
 use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
-enum PageLayouts: string implements HasDescription, HasIcon, HasLabel
+enum PageLayouts: string implements HasDescription, HasExtraText, HasIcon, HasLabel
 {
     case Split = 'layouts.auth.split';
     case Centered = 'layouts.auth.centered';
@@ -39,6 +40,15 @@ enum PageLayouts: string implements HasDescription, HasIcon, HasLabel
             self::Split    => 'Divide a página em duas colunas',
             self::Centered => 'Centraliza o conteúdo na página',
             self::FullPage => 'Ocupa a tela inteira',
+        };
+    }
+
+    public function getExtraText(): string
+    {
+        return match ($this) {
+            self::Split    => self::Split->value,
+            self::Centered => self::Centered->value,
+            self::FullPage => self::FullPage->value,
         };
     }
 }

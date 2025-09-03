@@ -7,7 +7,7 @@ namespace App\Filament\Pages\Settings;
 use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
-use App\Filament\Components\Forms\RadioCards;
+use App\Filament\Components\Forms\RadioList;
 use App\Settings\SystemSettings;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
@@ -77,7 +77,7 @@ class ManageSystem extends SettingsPage
                         ]),
 
                         Section::make('Login')->schema([
-                            RadioCards::make('auth_page_layout')
+                            RadioList::make('auth_page_layout')
                                 ->label('Layout da página de login')
                                 ->options([
                                     PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
@@ -89,13 +89,12 @@ class ManageSystem extends SettingsPage
                                     PageLayouts::Centered->value => PageLayouts::Centered->getIcon(),
                                     PageLayouts::FullPage->value => PageLayouts::FullPage->getIcon(),
                                 ])
-                                ->descriptions([
+                                ->extraTexts([
                                     PageLayouts::Split->value    => PageLayouts::Split->getDescription(),
                                     PageLayouts::Centered->value => PageLayouts::Centered->getDescription(),
                                     PageLayouts::FullPage->value => PageLayouts::FullPage->getDescription(),
                                 ])
-                                ->semiHiddenInputIcon()
-                                ->inputIcon(Phosphor::CheckCircleFill)
+                                ->hiddenInputIcon()
                                 ->columnSpanFull()
                                 ->required(),
 

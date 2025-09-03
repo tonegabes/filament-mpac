@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Components\Forms;
 
+use App\Traits\HasExtraTexts;
 use App\Traits\HasLabelIcon;
 use BackedEnum;
 use Closure;
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Contracts\CanDisableOptions;
 use Filament\Forms\Components\Field;
-use Filament\Schemas\Concerns\HasColumns;
 use Filament\Support\Contracts\HasLabel;
 use Illuminate\Contracts\Support\Htmlable;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
-class RadioCards extends Field implements CanDisableOptions
+class RadioList extends Field implements CanDisableOptions
 {
     use Concerns\CanDisableOptions;
     use Concerns\CanDisableOptionsWhenSelectedInSiblingRepeaterItems;
@@ -24,15 +24,13 @@ class RadioCards extends Field implements CanDisableOptions
     use Concerns\HasExtraInputAttributes;
     use Concerns\HasGridDirection;
     use Concerns\HasOptions;
-    use HasColumns;
+    use HasExtraTexts;
     use HasLabelIcon;
 
     /**
      * @var view-string
      */
-    protected string $view = 'filament.components.forms.radio-cards';
-
-    protected bool | Closure $isIconSemiHidden = false;
+    protected string $view = 'filament.components.forms.radio-list';
 
     protected bool | Closure $isDescriptionHidden = false;
 
@@ -40,24 +38,28 @@ class RadioCards extends Field implements CanDisableOptions
 
     protected string | BackedEnum | Htmlable | null $inputIcon = null;
 
-    public function simple(bool | Closure $condition = true): static
+    public function isDescriptionHidden(): bool
+    {
+        return (bool) $this->evaluate($this->isDescriptionHidden);
+    }
+
+    public function hiddenDescription(bool | Closure $condition = true): static
     {
         $this->isDescriptionHidden = $condition;
-        $this->isLabelIconHidden = $condition;
 
         return $this;
     }
 
-    public function semiHiddenInputIcon(bool | Closure $condition = true): static
+    public function isInputIconHidden(): bool
     {
-        $this->isIconSemiHidden = $condition;
-
-        return $this;
+        return (bool) $this->evaluate($this->isInputIconHidden);
     }
 
-    public function isIconSemiHidden(): bool
+    public function hiddenInputIcon(bool | Closure $condition = true): static
     {
-        return (bool) $this->evaluate($this->isIconSemiHidden);
+        $this->isInputIconHidden = $condition;
+
+        return $this;
     }
 
     public function hasInputIcon(): bool
@@ -79,30 +81,6 @@ class RadioCards extends Field implements CanDisableOptions
     public function getInputIcon(): string | BackedEnum | Htmlable
     {
         return $this->inputIcon ?? Phosphor::CheckCircleFill->getLabel();
-    }
-
-    public function isInputIconHidden(): bool
-    {
-        return (bool) $this->evaluate($this->isInputIconHidden);
-    }
-
-    public function hiddenInputIcon(bool | Closure $condition = true): static
-    {
-        $this->isInputIconHidden = $condition;
-
-        return $this;
-    }
-
-    public function isDescriptionHidden(): bool
-    {
-        return (bool) $this->evaluate($this->isDescriptionHidden);
-    }
-
-    public function hiddenDescription(bool | Closure $condition = true): static
-    {
-        $this->isDescriptionHidden = $condition;
-
-        return $this;
     }
 
     /**
