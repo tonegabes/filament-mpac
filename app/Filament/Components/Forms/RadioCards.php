@@ -9,6 +9,7 @@ use Closure;
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Contracts\CanDisableOptions;
 use Filament\Forms\Components\Field;
+use Filament\Schemas\Concerns\HasColumns;
 use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Enums\GridDirection;
 use Illuminate\Contracts\Support\Htmlable;
@@ -24,13 +25,14 @@ class RadioCards extends Field implements CanDisableOptions
     use Concerns\HasGridDirection;
     use Concerns\HasIcons;
     use Concerns\HasOptions;
+    use HasColumns;
 
     /**
      * @var view-string
      */
     protected string $view = 'filament.components.forms.radio-cards';
 
-    protected bool | Closure $isIconHidden = false;
+    protected bool | Closure $isLabelIconHidden = false;
 
     protected bool | Closure $isIconSemiHidden = false;
 
@@ -50,7 +52,7 @@ class RadioCards extends Field implements CanDisableOptions
     public function simple(bool | Closure $condition = true): static
     {
         $this->isDescriptionHidden = $condition;
-        $this->isIconHidden = $condition;
+        $this->isLabelIconHidden = $condition;
 
         return $this;
     }
@@ -100,16 +102,24 @@ class RadioCards extends Field implements CanDisableOptions
         return $this;
     }
 
-    public function isIconHidden(): bool
+    public function isLabelIconHidden(): bool
     {
-        return (bool) $this->evaluate($this->isIconHidden);
+        return (bool) $this->evaluate($this->isLabelIconHidden);
     }
 
-    public function hiddenIcon(bool | Closure $condition = true): static
+    public function hiddenLabelIcon(bool | Closure $condition = true): static
     {
-        $this->isIconHidden = $condition;
+        $this->isLabelIconHidden = $condition;
 
         return $this;
+    }
+
+    /**
+     * @param  array-key  $value
+     */
+    public function getLabelIcon(mixed $value): string | BackedEnum | Htmlable | null
+    {
+        return $this->getIcon($value);
     }
 
     public function isDescriptionHidden(): bool
@@ -127,7 +137,7 @@ class RadioCards extends Field implements CanDisableOptions
     /**
      * @param  array-key  $value
      */
-    public function hasIcon($value): bool
+    public function hasLabelIcon($value): bool
     {
         return array_key_exists($value, $this->getIcons());
     }

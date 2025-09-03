@@ -96,7 +96,6 @@ class ManageSystem extends SettingsPage
                                 ])
                                 ->semiHiddenInputIcon()
                                 ->inputIcon(Phosphor::CheckCircleFill)
-                                ->list()
                                 ->columnSpanFull()
                                 ->required(),
 

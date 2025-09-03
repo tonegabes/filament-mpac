@@ -9,7 +9,6 @@
     $livewireKey = $getLivewireKey();
     $statePath = $getStatePath();
     $wireModelAttribute = $applyStateBindingModifiers('wire:model');
-
 @endphp
 
 <x-dynamic-component
@@ -28,10 +27,11 @@
     >
         @foreach ($getOptions() as $value => $label)
             @php
+                $itemId = $id . '-' . $value;
                 $inputAttributes = $extraInputAttributeBag
                     ->merge([
                         'disabled' => $isDisabled || $isOptionDisabled($value, $label),
-                        'id' => $id . '-' . $value,
+                        'id' => $itemId,
                         'name' => $id,
                         'value' => $value,
                         'wire:loading.attr' => 'disabled',
@@ -44,12 +44,12 @@
                 :class="{
                     'fi-selected': $wire.{{ $statePath }} === '{{ $value }}'
                 }"
-                for="{{ $id . '-' . $value }}"
+                for="{{ $itemId }}"
             >
                 <div class="fi-fo-radio-cards-label-wrp">
 
-                    @if ($hasIcon($value) && ! $isIconHidden())
-                        @svg($getIcon($value), ['class' => 'fi-fo-radio-cards-label-icon'])
+                    @if ($hasLabelIcon($value) && ! $isLabelIconHidden())
+                        @svg($getLabelIcon($value), ['class' => 'fi-fo-radio-cards-label-icon'])
                     @endif
 
                     <div class="fi-fo-radio-cards-label-text">

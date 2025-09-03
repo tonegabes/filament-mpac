@@ -5,7 +5,7 @@
 @endphp
 
 <x-filament-panels::layout.base>
-    <div class="fi-simple-layout bg-amber-300">
+    <div class="fi-simple-layout">
 
         <div class="flex flex-col w-xl h-fit my-auto">
 
