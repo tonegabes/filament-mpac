@@ -1,6 +1,6 @@
 {
   "$schema": "https://getcomposer.org/schema.json",
-  "name": "tonegabes/filampac",
+  "name": "tonegabes/filament-mpac",
   "type": "project",
   "description": "The skeleton application for the MPs",
   "keywords": [
@@ -13,11 +13,11 @@
   "license": "MIT",
   "require": {
     "php": "^8.2",
-    "codeat3/blade-phosphor-icons": "*",
+    "codeat3/blade-phosphor-icons": "^2.3",
     "directorytree/ldaprecord-laravel": "^3.4",
     "filament/filament": "~4.0",
-    "filament/spatie-laravel-media-library-plugin": "4.0",
-    "filament/spatie-laravel-settings-plugin": "4.0",
+    "filament/spatie-laravel-media-library-plugin": "^4.0",
+    "filament/spatie-laravel-settings-plugin": "^4.0",
     "laravel/framework": "^12.0",
     "laravel/tinker": "^2.10.1",
     "opcodesio/log-viewer": "^3.19",
