@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Components\Forms;
 
-use App\Traits\HasLabelIcon;
-use BackedEnum;
+use App\Traits\HasExtraTexts;
+use App\Traits\HasInputIcon;
+use App\Traits\HasOptionIcon;
 use Closure;
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Contracts\CanDisableOptions;
 use Filament\Forms\Components\Field;
 use Filament\Schemas\Concerns\HasColumns;
-use Filament\Support\Contracts\HasLabel;
-use Illuminate\Contracts\Support\Htmlable;
-use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class RadioCards extends Field implements CanDisableOptions
 {
@@ -25,70 +23,27 @@ class RadioCards extends Field implements CanDisableOptions
     use Concerns\HasGridDirection;
     use Concerns\HasOptions;
     use HasColumns;
-    use HasLabelIcon;
+    use HasExtraTexts;
+    use HasInputIcon;
+    use HasOptionIcon;
 
     /**
      * @var view-string
      */
     protected string $view = 'filament.components.forms.radio-cards';
 
-    protected bool | Closure $isIconSemiHidden = false;
-
     protected bool | Closure $isDescriptionHidden = false;
 
-    protected bool | Closure $isInputIconHidden = false;
+    protected bool | Closure $isItemsCenter = false;
 
-    protected string | BackedEnum | Htmlable | null $inputIcon = null;
-
-    public function simple(bool | Closure $condition = true): static
+    public function isItemsCenter(): bool
     {
-        $this->isDescriptionHidden = $condition;
-        $this->isLabelIconHidden = $condition;
-
-        return $this;
+        return (bool) $this->evaluate($this->isItemsCenter);
     }
 
-    public function semiHiddenInputIcon(bool | Closure $condition = true): static
+    public function itemsCenter(bool | Closure $condition = true): static
     {
-        $this->isIconSemiHidden = $condition;
-
-        return $this;
-    }
-
-    public function isIconSemiHidden(): bool
-    {
-        return (bool) $this->evaluate($this->isIconSemiHidden);
-    }
-
-    public function hasInputIcon(): bool
-    {
-        return $this->inputIcon !== null;
-    }
-
-    public function inputIcon(string | BackedEnum | Htmlable | null $inputIcon): static
-    {
-        if ($inputIcon instanceof BackedEnum && $inputIcon instanceof HasLabel) {
-            $inputIcon = $inputIcon->getLabel();
-        }
-
-        $this->inputIcon = $inputIcon;
-
-        return $this;
-    }
-
-    public function getInputIcon(): string | BackedEnum | Htmlable
-    {
-        return $this->inputIcon ?? Phosphor::CheckCircleFill->getLabel();
-    }
-
-    public function isInputIconHidden(): bool
-    {
-        return (bool) $this->evaluate($this->isInputIconHidden);
-    }
-
-    public function hiddenInputIcon(bool | Closure $condition = true): static
-    {
-        $this->isInputIconHidden = $condition;
+        $this->isItemsCenter = $condition;
 
         return $this;
     }

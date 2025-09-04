@@ -9,20 +9,20 @@ use Closure;
 use Filament\Forms\Components\Concerns\HasIcons;
 use Illuminate\Contracts\Support\Htmlable;
 
-trait HasLabelIcon
+trait HasOptionIcon
 {
     use HasIcons;
 
-    protected bool | Closure $isLabelIconHidden = false;
+    protected bool | Closure $isOptionIconHidden = false;
 
-    public function isLabelIconHidden(): bool
+    public function isOptionIconHidden(): bool
     {
-        return (bool) $this->evaluate($this->isLabelIconHidden);
+        return (bool) $this->evaluate($this->isOptionIconHidden);
     }
 
-    public function hiddenLabelIcon(bool | Closure $condition = true): static
+    public function hiddenOptionIcon(bool | Closure $condition = true): static
     {
-        $this->isLabelIconHidden = $condition;
+        $this->isOptionIconHidden = $condition;
 
         return $this;
     }
@@ -30,7 +30,7 @@ trait HasLabelIcon
     /**
      * @param  array-key  $value
      */
-    public function hasLabelIcon($value): bool
+    public function hasOptionIcon($value): bool
     {
         return array_key_exists($value, $this->getIcons());
     }
@@ -38,7 +38,7 @@ trait HasLabelIcon
     /**
      * @param  array-key  $value
      */
-    public function getLabelIcon(mixed $value): string | BackedEnum | Htmlable | null
+    public function getOptionIcon(mixed $value): string | BackedEnum | Htmlable | null
     {
         return $this->getIcon($value);
     }

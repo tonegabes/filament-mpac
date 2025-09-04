@@ -40,18 +40,20 @@
             @endphp
 
             <label
-                class="fi-fo-radio-cards-label group/label"
-                :class="{
-                    'fi-selected': $wire.{{ $statePath }} === '{{ $value }}'
-                }"
+                @class([
+                    'fi-fo-radio-cards-label group/label',
+                    'input-icon-left' => $isInputIconLeft(),
+                    'items-center' => $isItemsCenter(),
+                ])
+                :class="{'fi-selected': $wire.{{ $statePath }} === '{{ $value }}'}"
                 for="{{ $itemId }}"
             >
+
+                @if ($hasOptionIcon($value) && ! $isOptionIconHidden())
+                    @svg($getOptionIcon($value), ['class' => 'fi-radio-option-icon'])
+                @endif
+
                 <div class="fi-fo-radio-cards-label-wrp">
-
-                    @if ($hasLabelIcon($value) && ! $isLabelIconHidden())
-                        @svg($getLabelIcon($value), ['class' => 'fi-fo-radio-cards-label-icon'])
-                    @endif
-
                     <div class="fi-fo-radio-cards-label-text">
                         <p>{{ $label }}</p>
 
@@ -61,15 +63,33 @@
                             </p>
                         @endif
                     </div>
+
+                    @if ($hasExtraText($value) && ! $isExtraTextHidden())
+                        <p class="fi-radio-extra-text">
+                            {{ $getExtraText($value) }}
+                        </p>
+                    @endif
                 </div>
 
                 @if ($hasInputIcon() && ! $isInputIconHidden())
-                    <x-icon name="{{ $getInputIcon() }}"
-                        @class([
-                            'fi-fo-radio-cards-input-icon',
-                            'fi-fo-radio-cards-input-icon-semi-hidden' => $isIconSemiHidden(),
-                        ])
-                    />
+                    <template x-if="$wire.{{ $statePath }} === '{{ $value }}'">
+                        <x-icon
+                            :name="$getSelectedInputIcon()"
+                            @class([
+                                'fi-radio-input-icon',
+                                'fi-radio-input-icon-semi-hidden' => $isInputIconSemiHidden(),
+                            ])
+                        />
+                    </template>
+                    <template x-if="$wire.{{ $statePath }} !== '{{ $value }}'">
+                        <x-icon
+                            :name="$getDefaultInputIcon()"
+                            @class([
+                                'fi-radio-input-icon',
+                                'fi-radio-input-icon-semi-hidden' => $isInputIconSemiHidden(),
+                            ])
+                        />
+                    </template>
                 @endif
 
                 <input
@@ -77,7 +97,7 @@
                     {{
                         $inputAttributes->class([
                             'hidden' => $hasInputIcon() || $isInputIconHidden(),
-                            'fi-fo-radio-cards-input-icon-semi-hidden' => $isIconSemiHidden(),
+                            'fi-radio-input-icon-semi-hidden' => $isInputIconSemiHidden(),
                             'fi-radio-input',
                             'fi-valid' => ! $errors->has($statePath),
                             'fi-invalid' => $errors->has($statePath),

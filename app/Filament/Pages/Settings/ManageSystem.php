@@ -7,6 +7,7 @@ namespace App\Filament\Pages\Settings;
 use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
+use App\Filament\Components\Forms\RadioCards;
 use App\Filament\Components\Forms\RadioList;
 use App\Settings\SystemSettings;
 use BackedEnum;
@@ -77,26 +78,36 @@ class ManageSystem extends SettingsPage
                         ]),
 
                         Section::make('Login')->schema([
-                            RadioList::make('auth_page_layout')
+                            RadioCards::make('auth_page_layout')
                                 ->label('Layout da página de login')
-                                ->options([
-                                    PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
-                                    PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
-                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
-                                ])
-                                ->icons([
-                                    PageLayouts::Split->value    => PageLayouts::Split->getIcon(),
-                                    PageLayouts::Centered->value => PageLayouts::Centered->getIcon(),
-                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getIcon(),
-                                ])
-                                ->extraTexts([
-                                    PageLayouts::Split->value    => PageLayouts::Split->getDescription(),
-                                    PageLayouts::Centered->value => PageLayouts::Centered->getDescription(),
-                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getDescription(),
-                                ])
-                                ->hiddenInputIcon()
+                                ->options(PageLayouts::class)
+                                ->defaultInputIcon(Phosphor::CheckCircleFill)
+                                ->semiHiddenInputIcon()
+                                ->itemsCenter()
+                                ->hiddenExtraText()
                                 ->columnSpanFull()
                                 ->required(),
+
+                            // RadioList::make('auth_page_layout')
+                            //     ->label('Layout da página de login')
+                            //     ->options([
+                            //         PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
+                            //         PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
+                            //         PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
+                            //     ])
+                            //     ->icons([
+                            //         PageLayouts::Split->value    => PageLayouts::Split->getIcon(),
+                            //         PageLayouts::Centered->value => PageLayouts::Centered->getIcon(),
+                            //         PageLayouts::FullPage->value => PageLayouts::FullPage->getIcon(),
+                            //     ])
+                            //     ->extraTexts([
+                            //         PageLayouts::Split->value    => PageLayouts::Split->getDescription(),
+                            //         PageLayouts::Centered->value => PageLayouts::Centered->getDescription(),
+                            //         PageLayouts::FullPage->value => PageLayouts::FullPage->getDescription(),
+                            //     ])
+                            //     ->hiddenInputIcon()
+                            //     ->columnSpanFull()
+                            //     ->required(),
 
                             FileUpload::make('auth_page_background')
                                 ->label('Imagem de fundo')
