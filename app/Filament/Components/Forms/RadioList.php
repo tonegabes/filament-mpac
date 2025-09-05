@@ -7,14 +7,10 @@ namespace App\Filament\Components\Forms;
 use App\Traits\HasExtraTexts;
 use App\Traits\HasInputIcon;
 use App\Traits\HasOptionIcon;
-use BackedEnum;
 use Closure;
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Contracts\CanDisableOptions;
 use Filament\Forms\Components\Field;
-use Filament\Support\Contracts\HasLabel;
-use Illuminate\Contracts\Support\Htmlable;
-use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class RadioList extends Field implements CanDisableOptions
 {
@@ -36,9 +32,19 @@ class RadioList extends Field implements CanDisableOptions
 
     protected bool | Closure $isDescriptionHidden = false;
 
-    protected bool | Closure $isInputIconHidden = false;
+    protected bool | Closure $isItemsCenter = false;
 
-    protected string | BackedEnum | Htmlable | null $inputIcon = null;
+    public function isItemsCenter(): bool
+    {
+        return (bool) $this->evaluate($this->isItemsCenter);
+    }
+
+    public function itemsCenter(bool | Closure $condition = true): static
+    {
+        $this->isItemsCenter = $condition;
+
+        return $this;
+    }
 
     public function isDescriptionHidden(): bool
     {
@@ -50,39 +56,6 @@ class RadioList extends Field implements CanDisableOptions
         $this->isDescriptionHidden = $condition;
 
         return $this;
-    }
-
-    public function isInputIconHidden(): bool
-    {
-        return (bool) $this->evaluate($this->isInputIconHidden);
-    }
-
-    public function hiddenInputIcon(bool | Closure $condition = true): static
-    {
-        $this->isInputIconHidden = $condition;
-
-        return $this;
-    }
-
-    public function hasInputIcon(): bool
-    {
-        return $this->inputIcon !== null;
-    }
-
-    public function inputIcon(string | BackedEnum | Htmlable | null $inputIcon): static
-    {
-        if ($inputIcon instanceof BackedEnum && $inputIcon instanceof HasLabel) {
-            $inputIcon = $inputIcon->getLabel();
-        }
-
-        $this->inputIcon = $inputIcon;
-
-        return $this;
-    }
-
-    public function getInputIcon(): string | BackedEnum | Htmlable
-    {
-        return $this->inputIcon ?? Phosphor::CheckCircleFill->getLabel();
     }
 
     /**

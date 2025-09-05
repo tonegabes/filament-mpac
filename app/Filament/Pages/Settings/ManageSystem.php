@@ -78,36 +78,18 @@ class ManageSystem extends SettingsPage
                         ]),
 
                         Section::make('Login')->schema([
-                            RadioCards::make('auth_page_layout')
+                            // RadioCards::make('auth_page_layout')
+                            //     ->label('Layout da página de login')
+                            //     ->options(PageLayouts::class)
+                            //     ->required(),
+
+                            RadioList::make('auth_page_layout')
                                 ->label('Layout da página de login')
                                 ->options(PageLayouts::class)
-                                ->defaultInputIcon(Phosphor::CheckCircleFill)
                                 ->semiHiddenInputIcon()
-                                ->itemsCenter()
-                                ->hiddenExtraText()
-                                ->columnSpanFull()
+                                ->defaultInputIcon(Phosphor::CircleThin)
+                                ->selectedInputIcon(Phosphor::CheckCircleFill)
                                 ->required(),
-
-                            // RadioList::make('auth_page_layout')
-                            //     ->label('Layout da página de login')
-                            //     ->options([
-                            //         PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
-                            //         PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
-                            //         PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
-                            //     ])
-                            //     ->icons([
-                            //         PageLayouts::Split->value    => PageLayouts::Split->getIcon(),
-                            //         PageLayouts::Centered->value => PageLayouts::Centered->getIcon(),
-                            //         PageLayouts::FullPage->value => PageLayouts::FullPage->getIcon(),
-                            //     ])
-                            //     ->extraTexts([
-                            //         PageLayouts::Split->value    => PageLayouts::Split->getDescription(),
-                            //         PageLayouts::Centered->value => PageLayouts::Centered->getDescription(),
-                            //         PageLayouts::FullPage->value => PageLayouts::FullPage->getDescription(),
-                            //     ])
-                            //     ->hiddenInputIcon()
-                            //     ->columnSpanFull()
-                            //     ->required(),
 
                             FileUpload::make('auth_page_background')
                                 ->label('Imagem de fundo')

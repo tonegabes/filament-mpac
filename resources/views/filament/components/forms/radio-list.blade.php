@@ -14,7 +14,7 @@
 <x-dynamic-component
     :component="$fieldWrapperView"
     :field="$field"
-    class="fi-fo-radio-list-wrp"
+    class="fi-fo-radio-list-wrapper"
 >
     <div
         {{
@@ -40,42 +40,24 @@
             @endphp
 
             <label
-                class="fi-fo-radio-list-label group/label"
-                :class="{
-                    'fi-selected': $wire.{{ $statePath }} === '{{ $value }}'
-                }"
+                @class([
+                    'fi-fo-radio-item group/radio-item',
+                    'is-indicator-left' => $isInputIconLeft(),
+                ])
+                :class="{'is-selected': $wire.{{ $statePath }} === '{{ $value }}'}"
                 for="{{ $itemId }}"
             >
-                <div class="fi-fo-radio-list-label-wrp">
-                    <input
-                        type="radio"
-                        {{
-                            $inputAttributes->class([
-                                'hidden' => $hasInputIcon() || $isInputIconHidden(),
-                                'fi-radio-input',
-                                'fi-valid' => ! $errors->has($statePath),
-                                'fi-invalid' => $errors->has($statePath),
-                            ])
-                        }}
-                    />
+                <div class="fi-fo-radio-item__content">
 
-                    @if ($hasInputIcon() && ! $isInputIconHidden())
-                        <x-icon name="{{ $getInputIcon() }}"
-                            @class([
-                                'fi-fo-radio-list-input-icon',
-                            ])
-                        />
+                    @if ($hasOptionIcon($value) && ! $isOptionIconHidden())
+                        @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-item__icon'])
                     @endif
 
-                    @if ($hasLabelIcon($value) && ! $isLabelIconHidden())
-                        @svg($getLabelIcon($value), ['class' => 'fi-fo-radio-list-label-icon'])
-                    @endif
-
-                    <div class="fi-fo-radio-list-label-text">
-                        <p>{{ $label }}</p>
+                    <div class="fi-fo-radio-item__header">
+                        <p class="fi-fo-radio-item__label">{{ $label }}</p>
 
                         @if ($hasDescription($value) && ! $isDescriptionHidden())
-                            <p class="fi-fo-radio-list-label-description">
+                            <p class="fi-fo-radio-item__description">
                                 {{ $getDescription($value) }}
                             </p>
                         @endif
@@ -83,10 +65,42 @@
                 </div>
 
                 @if ($hasExtraText($value) && ! $isExtraTextHidden())
-                    <p class="fi-fo-radio-list-label-extra-text">
+                    <p class="fi-fo-radio-item__extra">
                         {{ $getExtraText($value) }}
                     </p>
                 @endif
+
+                @if ($hasInputIcon() && ! $isInputIconHidden())
+                    <template x-if="$wire.{{ $statePath }} === '{{ $value }}'">
+                        <x-icon name="{{ $getSelectedInputIcon() }}"
+                        @class([
+                            'fi-fo-radio-item__indicator',
+                                'is-indicator-partially-hidden' => $isInputIconSemiHidden(),
+                            ])
+                        />
+                    </template>
+                    <template x-if="$wire.{{ $statePath }} !== '{{ $value }}'">
+                        <x-icon name="{{ $getDefaultInputIcon() }}"
+                            @class([
+                                'fi-fo-radio-item__indicator',
+                                'is-indicator-partially-hidden' => $isInputIconSemiHidden(),
+                            ])
+                        />
+                    </template>
+                @endif
+
+                <input
+                    type="radio"
+                    {{
+                        $inputAttributes->class([
+                            'hidden' => $hasInputIcon() || $isInputIconHidden(),
+                            'fi-radio-input',
+                            'is-indicator-partially-hidden' => $isInputIconSemiHidden(),
+                            'fi-valid' => ! $errors->has($statePath),
+                            'fi-invalid' => $errors->has($statePath),
+                        ])
+                    }}
+                />
             </label>
         @endforeach
     </div>

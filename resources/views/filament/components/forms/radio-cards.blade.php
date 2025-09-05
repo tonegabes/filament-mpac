@@ -14,7 +14,7 @@
 <x-dynamic-component
     :component="$fieldWrapperView"
     :field="$field"
-    class="fi-fo-radio-cards-wrp"
+    class="fi-fo-radio-cards-wrapper"
 >
     <div
         {{
@@ -41,31 +41,31 @@
 
             <label
                 @class([
-                    'fi-fo-radio-cards-label group/label',
-                    'input-icon-left' => $isInputIconLeft(),
-                    'items-center' => $isItemsCenter(),
+                    'fi-fo-radio-card group/radio-card',
+                    'is-indicator-left' => $isInputIconLeft(),
+                    'is-centered' => $isItemsCenter(),
                 ])
-                :class="{'fi-selected': $wire.{{ $statePath }} === '{{ $value }}'}"
+                :class="{'is-selected': $wire.{{ $statePath }} === '{{ $value }}'}"
                 for="{{ $itemId }}"
             >
 
                 @if ($hasOptionIcon($value) && ! $isOptionIconHidden())
-                    @svg($getOptionIcon($value), ['class' => 'fi-radio-option-icon'])
+                    @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-card__icon'])
                 @endif
 
-                <div class="fi-fo-radio-cards-label-wrp">
-                    <div class="fi-fo-radio-cards-label-text">
-                        <p>{{ $label }}</p>
+                <div class="fi-fo-radio-card__content">
+                    <div class="fi-fo-radio-card__header">
+                        <p class="fi-fo-radio-card__label">{{ $label }}</p>
 
                         @if ($hasDescription($value) && ! $isDescriptionHidden())
-                            <p class="fi-fo-radio-cards-label-description">
+                            <p class="fi-fo-radio-card__description">
                                 {{ $getDescription($value) }}
                             </p>
                         @endif
                     </div>
 
                     @if ($hasExtraText($value) && ! $isExtraTextHidden())
-                        <p class="fi-radio-extra-text">
+                        <p class="fi-fo-radio-card__extra">
                             {{ $getExtraText($value) }}
                         </p>
                     @endif
@@ -76,8 +76,8 @@
                         <x-icon
                             :name="$getSelectedInputIcon()"
                             @class([
-                                'fi-radio-input-icon',
-                                'fi-radio-input-icon-semi-hidden' => $isInputIconSemiHidden(),
+                                'fi-fo-radio-card__indicator',
+                                'is-indicator-partially-hidden' => $isInputIconSemiHidden(),
                             ])
                         />
                     </template>
@@ -85,8 +85,8 @@
                         <x-icon
                             :name="$getDefaultInputIcon()"
                             @class([
-                                'fi-radio-input-icon',
-                                'fi-radio-input-icon-semi-hidden' => $isInputIconSemiHidden(),
+                                'fi-fo-radio-card__indicator',
+                                'is-indicator-partially-hidden' => $isInputIconSemiHidden(),
                             ])
                         />
                     </template>
@@ -97,8 +97,8 @@
                     {{
                         $inputAttributes->class([
                             'hidden' => $hasInputIcon() || $isInputIconHidden(),
-                            'fi-radio-input-icon-semi-hidden' => $isInputIconSemiHidden(),
                             'fi-radio-input',
+                            'is-indicator-partially-hidden' => $isInputIconSemiHidden(),
                             'fi-valid' => ! $errors->has($statePath),
                             'fi-invalid' => $errors->has($statePath),
                         ])
