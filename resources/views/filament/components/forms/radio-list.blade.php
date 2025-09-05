@@ -42,7 +42,7 @@
             <label
                 @class([
                     'fi-fo-radio-item group/radio-item',
-                    'is-indicator-left' => $isInputIconLeft(),
+                    'is-indicator-left' => $isIndicatorLeft(),
                 ])
                 :class="{'is-selected': $wire.{{ $statePath }} === '{{ $value }}'}"
                 for="{{ $itemId }}"
@@ -70,20 +70,20 @@
                     </p>
                 @endif
 
-                @if ($hasInputIcon() && ! $isInputIconHidden())
+                @if ($hasIndicator() && ! $isIndicatorHidden())
                     <template x-if="$wire.{{ $statePath }} === '{{ $value }}'">
-                        <x-icon name="{{ $getSelectedInputIcon() }}"
+                        <x-icon name="{{ $getSelectedIndicator() }}"
                         @class([
                             'fi-fo-radio-item__indicator',
-                                'is-indicator-partially-hidden' => $isInputIconSemiHidden(),
+                                'is-indicator-partially-hidden' => $isIndicatorPartiallyHidden(),
                             ])
                         />
                     </template>
                     <template x-if="$wire.{{ $statePath }} !== '{{ $value }}'">
-                        <x-icon name="{{ $getDefaultInputIcon() }}"
+                        <x-icon name="{{ $getDefaultIndicator() }}"
                             @class([
                                 'fi-fo-radio-item__indicator',
-                                'is-indicator-partially-hidden' => $isInputIconSemiHidden(),
+                                'is-indicator-partially-hidden' => $isIndicatorPartiallyHidden(),
                             ])
                         />
                     </template>
@@ -93,9 +93,9 @@
                     type="radio"
                     {{
                         $inputAttributes->class([
-                            'hidden' => $hasInputIcon() || $isInputIconHidden(),
+                            'hidden' => $hasIndicator() || $isIndicatorHidden(),
                             'fi-radio-input',
-                            'is-indicator-partially-hidden' => $isInputIconSemiHidden(),
+                            'is-indicator-partially-hidden' => $isIndicatorPartiallyHidden(),
                             'fi-valid' => ! $errors->has($statePath),
                             'fi-invalid' => $errors->has($statePath),
                         ])

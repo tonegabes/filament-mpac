@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Components\Forms;
 
 use App\Traits\HasExtraTexts;
-use App\Traits\HasInputIcon;
+use App\Traits\HasIndicator;
 use App\Traits\HasOptionIcon;
 use Closure;
 use Filament\Forms\Components\Concerns;
@@ -24,7 +24,7 @@ class RadioCards extends Field implements CanDisableOptions
     use Concerns\HasOptions;
     use HasColumns;
     use HasExtraTexts;
-    use HasInputIcon;
+    use HasIndicator;
     use HasOptionIcon;
 
     /**

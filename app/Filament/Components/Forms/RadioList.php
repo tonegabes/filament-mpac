@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Components\Forms;
 
 use App\Traits\HasExtraTexts;
-use App\Traits\HasInputIcon;
+use App\Traits\HasIndicator;
 use App\Traits\HasOptionIcon;
 use Closure;
 use Filament\Forms\Components\Concerns;
@@ -22,7 +22,7 @@ class RadioList extends Field implements CanDisableOptions
     use Concerns\HasGridDirection;
     use Concerns\HasOptions;
     use HasExtraTexts;
-    use HasInputIcon;
+    use HasIndicator;
     use HasOptionIcon;
 
     /**
