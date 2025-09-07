@@ -19,6 +19,10 @@
     }
   }
 
+  & .is-selected {
+    @apply bg-primary/10 ring-2 ring-primary;
+  }
+
   & .fi-fo-checkbox-list-option {
     @apply flex gap-3 p-4 border border-gray-200 dark:border-white/20 hover:ring-2 hover:ring-primary rounded-lg cursor-pointer shadow-xs;
 

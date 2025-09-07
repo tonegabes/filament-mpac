@@ -94,7 +94,10 @@
                     @endif
                     class="fi-fo-checkbox-list-option-ctn"
                 >
-                    <label class="fi-fo-checkbox-list-option">
+                    <label
+                        class="fi-fo-checkbox-list-option"
+                        :class="{'is-selected': $wire.{{ $statePath }}.includes('{{ $value }}')}"
+                    >
                         <input
                             type="checkbox"
                             {{
