@@ -10,10 +10,14 @@
   }
 
   & .fi-fo-radio-card {
-    @apply flex gap-4  p-4 border border-gray-200 dark:border-white/20 hover:ring-2 hover:ring-primary rounded-lg cursor-pointer shadow-xs;
+    @apply flex gap-4 p-4 border border-gray-200 dark:border-white/20 rounded-lg cursor-pointer shadow-xs transition-all duration-200 ease-in-out;
 
-    &.is-indicator-left {
-      @apply flex-row-reverse;
+    &:hover {
+      @apply ring-2 ring-primary;
+    }
+
+    &:hover:not(.is-selected) {
+      @apply bg-gray-50 dark:bg-white/5 transform scale-[1.02];
     }
 
     & .fi-fo-radio-card__icon {
@@ -36,7 +40,7 @@
       @apply font-medium text-gray-900 dark:text-gray-50;
     }
 
-    & .fi-fo-radio-card__indicator {
+    & .fi-fo-radio__indicator {
       @apply size-6 fill-gray-400 shrink-0 transition-opacity duration-400 ease-in-out mt-1;
     }
 
@@ -69,19 +73,23 @@
     }
 
     &.is-selected {
-      @apply bg-primary/10 ring-2 ring-primary;
+      @apply bg-primary/10 ring-2 ring-primary transform scale-[1.01];
 
       & .fi-fo-radio-card__icon {
-        @apply fill-primary;
+        @apply fill-primary transition-colors duration-200;
       }
 
-      & .fi-fo-radio-card__indicator {
+      & .fi-fo-radio__indicator {
         @apply opacity-100 fill-primary;
       }
 
       & .is-indicator-partially-hidden {
         @apply opacity-100;
       }
+    }
+
+    &:has(input:focus-visible) {
+      @apply ring-2 ring-primary ring-offset-2;
     }
   }
 }

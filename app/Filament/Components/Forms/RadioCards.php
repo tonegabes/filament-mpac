@@ -12,6 +12,7 @@ use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Contracts\CanDisableOptions;
 use Filament\Forms\Components\Field;
 use Filament\Schemas\Concerns\HasColumns;
+use Filament\Support\Enums\IconPosition;
 
 class RadioCards extends Field implements CanDisableOptions
 {
@@ -35,6 +36,8 @@ class RadioCards extends Field implements CanDisableOptions
     protected bool | Closure $isDescriptionHidden = false;
 
     protected bool | Closure $isItemsCenter = false;
+
+    protected IconPosition $iconPosition = IconPosition::After;
 
     public function isItemsCenter(): bool
     {

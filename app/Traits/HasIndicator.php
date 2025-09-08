@@ -7,6 +7,7 @@ namespace App\Traits;
 use BackedEnum;
 use Closure;
 use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Enums\IconPosition;
 use Illuminate\Contracts\Support\Htmlable;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
@@ -16,11 +17,11 @@ trait HasIndicator
 
     protected string | BackedEnum | Htmlable | null $selectedIndicator = null;
 
-    protected bool | Closure $isIndicatorHidden = false;
+    protected bool | Closure $showIndicator = true;
 
     protected bool | Closure $isIndicatorPartiallyHidden = false;
 
-    protected bool | Closure $isIndicatorLeft = false;
+    protected IconPosition $indicatorPosition = IconPosition::Before;
 
     public function hasIndicator(): bool
     {
@@ -56,19 +57,19 @@ trait HasIndicator
 
     public function getSelectedIndicator(): string | BackedEnum | Htmlable
     {
-        return $this->selectedIndicator ?? $this->defaultIndicator ?? Phosphor::CheckCircleFill->getLabel();
+        return $this->selectedIndicator ?? $this->defaultIndicator ?? Phosphor::RecordFill->getLabel();
     }
 
     public function hiddenIndicator(bool | Closure $condition = true): static
     {
-        $this->isIndicatorHidden = $condition;
+        $this->showIndicator = ! $condition;
 
         return $this;
     }
 
-    public function isIndicatorHidden(): bool
+    public function showIndicator(): bool
     {
-        return (bool) $this->evaluate($this->isIndicatorHidden);
+        return (bool) $this->evaluate($this->showIndicator);
     }
 
     public function partiallyHiddenIndicator(bool | Closure $condition = true): static
@@ -83,15 +84,34 @@ trait HasIndicator
         return (bool) $this->evaluate($this->isIndicatorPartiallyHidden);
     }
 
-    public function indicatorLeft(bool | Closure $condition = true): static
+    public function indicatorPosition(IconPosition $position): static
     {
-        $this->isIndicatorLeft = $condition;
+        $this->indicatorPosition = $position;
 
         return $this;
     }
 
-    public function isIndicatorLeft(): bool
+    public function hasIndicatorBefore(): bool
     {
-        return (bool) $this->evaluate($this->isIndicatorLeft);
+        return $this->indicatorPosition === IconPosition::Before;
+    }
+
+    public function hasIndicatorAfter(): bool
+    {
+        return $this->indicatorPosition === IconPosition::After;
+    }
+
+    public function indicatorBefore(): static
+    {
+        $this->indicatorPosition = IconPosition::Before;
+
+        return $this;
+    }
+
+    public function indicatorAfter(): static
+    {
+        $this->indicatorPosition = IconPosition::After;
+
+        return $this;
     }
 }

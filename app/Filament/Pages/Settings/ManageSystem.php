@@ -8,6 +8,7 @@ use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Components\Forms\CheckboxCards;
+use App\Filament\Components\Forms\RadioCards;
 use App\Filament\Components\Forms\RadioList;
 use App\Settings\SystemSettings;
 use BackedEnum;
@@ -83,20 +84,21 @@ class ManageSystem extends SettingsPage
                             //     ->options(PageLayouts::class)
                             //     ->required(),
 
-                            CheckboxCards::make('auth_page_layout')
-                                ->label('Layout da página de login')
-                                ->options(PageLayouts::class)
-                                ->searchable()
-                                ->bulkToggleable()
-                                ->required(),
-
-                            // RadioList::make('auth_page_layout')
+                            // CheckboxCards::make('auth_page_layout')
                             //     ->label('Layout da página de login')
                             //     ->options(PageLayouts::class)
-                            //     ->partiallyHiddenIndicator()
-                            //     ->defaultIndicator(Phosphor::CircleThin)
-                            //     ->selectedIndicator(Phosphor::CheckCircleFill)
+                            //     ->searchable()
+                            //     ->bulkToggleable()
                             //     ->required(),
+
+                            RadioList::make('auth_page_layout')
+                                ->label('Layout da página de login')
+                                ->options(PageLayouts::class)
+                                ->indicatorAfter()
+                                // ->partiallyHiddenIndicator()
+                                // ->defaultIndicator(Phosphor::CircleThin)
+                                // ->selectedIndicator(Phosphor::CheckCircleFill)
+                                ->required(),
 
                             FileUpload::make('auth_page_background')
                                 ->label('Imagem de fundo')

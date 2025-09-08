@@ -11,6 +11,7 @@ use Closure;
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Contracts\CanDisableOptions;
 use Filament\Forms\Components\Field;
+use Filament\Support\Enums\IconPosition;
 
 class RadioList extends Field implements CanDisableOptions
 {
@@ -33,6 +34,8 @@ class RadioList extends Field implements CanDisableOptions
     protected bool | Closure $isDescriptionHidden = false;
 
     protected bool | Closure $isItemsCenter = false;
+
+    protected IconPosition $iconPosition = IconPosition::Before;
 
     public function isItemsCenter(): bool
     {

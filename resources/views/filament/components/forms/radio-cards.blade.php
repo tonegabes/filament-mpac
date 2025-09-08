@@ -27,7 +27,7 @@
     >
         @foreach ($getOptions() as $value => $label)
             @php
-                $itemId = $id . '-' . $value;
+                $itemId = "$id-$value";
                 $inputAttributes = $extraInputAttributeBag
                     ->merge([
                         'disabled' => $isDisabled || $isOptionDisabled($value, $label),
@@ -42,14 +42,28 @@
             <label
                 @class([
                     'fi-fo-radio-card group/radio-card',
-                    'is-indicator-left' => $isIndicatorLeft(),
                     'is-centered' => $isItemsCenter(),
                 ])
-                :class="{'is-selected': $wire.{{ $statePath }} === '{{ $value }}'}"
+                x-data="{ isSelected: false }"
+                x-init="$watch(
+                    '$wire.{{ $statePath }}',
+                    value => isSelected = value === '{{ $value }}'
+                )"
+                :class="{ 'is-selected': isSelected }"
+                :aria-checked="isSelected"
+                :aria-selected="isSelected"
                 for="{{ $itemId }}"
             >
+                @if ($hasIndicatorBefore() && $showIndicator())
+                    <x-forms.radio-indicator
+                        ::is-selected="isSelected"
+                        :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
+                        :default-indicator="$getDefaultIndicator()"
+                        :selected-indicator="$getSelectedIndicator()"
+                    />
+                @endif
 
-                @if ($hasOptionIcon($value) && ! $isOptionIconHidden())
+                @if ($hasIconBefore() && $showIcon())
                     @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-card__icon'])
                 @endif
 
@@ -71,34 +85,24 @@
                     @endif
                 </div>
 
-                @if ($hasIndicator() && ! $isIndicatorHidden())
-                    <template x-if="$wire.{{ $statePath }} === '{{ $value }}'">
-                        <x-icon
-                            :name="$getSelectedIndicator()"
-                            @class([
-                                'fi-fo-radio-card__indicator',
-                                'is-indicator-partially-hidden' => $isIndicatorPartiallyHidden(),
-                            ])
-                        />
-                    </template>
-                    <template x-if="$wire.{{ $statePath }} !== '{{ $value }}'">
-                        <x-icon
-                            :name="$getDefaultIndicator()"
-                            @class([
-                                'fi-fo-radio-card__indicator',
-                                'is-indicator-partially-hidden' => $isIndicatorPartiallyHidden(),
-                            ])
-                        />
-                    </template>
+                @if ($hasIconAfter() && $showIcon())
+                    @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-card__icon'])
+                @endif
+
+                @if ($hasIndicatorAfter() && $showIndicator())
+                    <x-forms.radio-indicator
+                        ::is-selected="isSelected"
+                        :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
+                        :default-indicator="$getDefaultIndicator()"
+                        :selected-indicator="$getSelectedIndicator()"
+                    />
                 @endif
 
                 <input
                     type="radio"
                     {{
                         $inputAttributes->class([
-                            'hidden' => $hasIndicator() || $isIndicatorHidden(),
-                            'fi-radio-input',
-                            'is-indicator-partially-hidden' => $isIndicatorPartiallyHidden(),
+                            'hidden',
                             'fi-valid' => ! $errors->has($statePath),
                             'fi-invalid' => $errors->has($statePath),
                         ])
