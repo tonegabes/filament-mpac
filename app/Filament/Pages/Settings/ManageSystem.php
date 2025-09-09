@@ -84,21 +84,24 @@ class ManageSystem extends SettingsPage
                             //     ->options(PageLayouts::class)
                             //     ->required(),
 
-                            // CheckboxCards::make('auth_page_layout')
-                            //     ->label('Layout da página de login')
-                            //     ->options(PageLayouts::class)
-                            //     ->searchable()
-                            //     ->bulkToggleable()
-                            //     ->required(),
-
-                            RadioList::make('auth_page_layout')
+                            CheckboxCards::make('auth_page_layout')
                                 ->label('Layout da página de login')
                                 ->options(PageLayouts::class)
-                                ->indicatorAfter()
-                                // ->partiallyHiddenIndicator()
-                                // ->defaultIndicator(Phosphor::CircleThin)
-                                // ->selectedIndicator(Phosphor::CheckCircleFill)
+                                ->searchable()
+                                ->iconAfter()
+                                ->defaultIndicator(Phosphor::Square)
+                                ->selectedIndicator(Phosphor::CheckSquareFill)
+                                ->bulkToggleable()
                                 ->required(),
+
+                            // RadioList::make('auth_page_layout')
+                            //     ->label('Layout da página de login')
+                            //     ->options(PageLayouts::class)
+                            //     ->indicatorAfter()
+                            //     // ->partiallyHiddenIndicator()
+                            //     // ->defaultIndicator(Phosphor::CircleThin)
+                            //     // ->selectedIndicator(Phosphor::CheckCircleFill)
+                            //     ->required(),
 
                             FileUpload::make('auth_page_background')
                                 ->label('Imagem de fundo')

@@ -95,8 +95,18 @@
                     class="fi-fo-checkbox-list-option-ctn"
                 >
                     <label
-                        class="fi-fo-checkbox-list-option"
-                        :class="{'is-selected': $wire.{{ $statePath }}.includes('{{ $value }}')}"
+                        x-data="{ isSelected: false }"
+                        x-init="$watch(
+                            '$wire.{{ $statePath }}',
+                            value => isSelected = value.includes('{{ $value }}')
+                        )"
+                        @class([
+                          'fi-fo-checkbox-list-option',
+                          'is-centered' => $isItemsCenter(),
+                        ])
+                        :class="{ 'is-selected': isSelected }"
+                        :aria-checked="isSelected"
+                        :aria-selected="isSelected"
                     >
                         <input
                             type="checkbox"
@@ -110,14 +120,28 @@
                                         'x-on:change' => $isBulkToggleable ? 'checkIfAllCheckboxesAreChecked()' : null,
                                     ], escape: false)
                                     ->class([
-                                        'fi-checkbox-input',
+                                        'fi-checkbox-input hidden',
                                         'fi-valid' => ! $errors->has($statePath),
                                         'fi-invalid' => $errors->has($statePath),
                                     ])
                             }}
                         />
 
+                        @if ($hasIndicatorBefore() && $showIndicator())
+                            <x-forms.checkbox-indicator
+                                ::is-selected="isSelected"
+                                :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
+                                :default-indicator="$getDefaultIndicator()"
+                                :selected-indicator="$getSelectedIndicator()"
+                            />
+                        @endif
+
+                        @if ($hasIconBefore() && $showIcon())
+                            @svg($getOptionIcon($value), ['class' => 'fi-fo-checkbox__icon'])
+                        @endif
+
                         <div class="fi-fo-checkbox-list-option-text">
+                          <div class="fi-fo-checkbox-list-option-header">
                             <span class="fi-fo-checkbox-list-option-label">
                                 @if ($isHtmlAllowed)
                                     {!! $label !!}
@@ -133,7 +157,27 @@
                                     {{ $getDescription($value) }}
                                 </p>
                             @endif
+                          </div>
+
+                            @if ($hasExtraText($value) && $showExtraText())
+                              <p class="fi-fo-checkbox__extra">
+                                {{ $getExtraText($value) }}
+                              </p>
+                            @endif
                         </div>
+
+                        @if ($hasIconAfter() && $showIcon())
+                            @svg($getOptionIcon($value), ['class' => 'fi-fo-checkbox__icon'])
+                        @endif
+
+                        @if ($hasIndicatorAfter() && $showIndicator())
+                            <x-forms.checkbox-indicator
+                                ::is-selected="isSelected"
+                                :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
+                                :default-indicator="$getDefaultIndicator()"
+                                :selected-indicator="$getSelectedIndicator()"
+                            />
+                        @endif
                     </label>
                 </div>
             @empty
