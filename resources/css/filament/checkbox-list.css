@@ -1,4 +1,4 @@
-.fi-fo-checkbox-card {
+.fi-fo-checkbox-list {
   & .fi-fo-checkbox-list-search-input-wrp {
     @apply mb-4;
   }
@@ -8,27 +8,31 @@
   }
 
   & .fi-fo-checkbox__options {
-    @apply gap-2;
+    @apply flex flex-col divide-y divide-gray-200 dark:divide-gray-800 border border-gray-200 dark:border-gray-800 rounded-lg shadow-xs;
+  }
 
-    &.fi-grid-direction-col {
-      @apply -mt-2;
+  & .fi-fo-checkbox-option__content {
+    @apply hover:ring-2 hover:ring-primary cursor-pointer;
+  }
 
-      & .fi-fo-checkbox-option__content {
-        @apply break-inside-avoid pt-2;
-      }
-    }
+  & .fi-fo-checkbox-option__content:first-child {
+    @apply rounded-t-lg;
+  }
+
+  & .fi-fo-checkbox-option__content:last-child {
+    @apply rounded-b-lg;
   }
 
   & .fi-fo-checkbox__indicator {
-    @apply size-5 mt-1 fill-gray-400 shrink-0 transition-opacity duration-400 ease-in-out;
+    @apply size-5 fill-gray-400 shrink-0 transition-opacity duration-400 ease-in-out;
   }
 
   & .fi-fo-checkbox__icon {
-    @apply size-10 text-gray-400 dark:text-gray-700 shrink-0 mt-1;
+    @apply size-10 text-gray-400 dark:text-gray-700 shrink-0;
   }
 
   & .fi-fo-checkbox__extra {
-    @apply font-medium text-gray-900 dark:text-gray-50 mt-4;
+    @apply font-medium text-gray-900 dark:text-gray-50;
   }
 
   & .fi-invalid {
@@ -52,32 +56,18 @@
   }
 
   & .fi-fo-checkbox-option {
-    @apply flex gap-3 p-4 border border-gray-200 dark:border-white/20 hover:ring-2 hover:ring-primary rounded-lg cursor-pointer shadow-xs;
-
-    &.is-centered {
-      @apply items-center;
-
-      & .fi-fo-checkbox-option__text {
-        @apply flex items-center gap-2;
-      }
-
-      & .fi-fo-checkbox__indicator,
-      & .fi-fo-checkbox__icon,
-      & .fi-fo-checkbox__extra {
-        @apply mt-0;
-      }
-    }
+    @apply flex gap-3 items-center p-4 cursor-pointer;
 
     & .fi-fo-checkbox-option__header {
       @apply flex flex-col grow;
     }
 
     & .fi-checkbox-input {
-      @apply mt-1 shrink-0;
+      @apply shrink-0;
     }
 
     & .fi-fo-checkbox-option__text {
-      @apply grid grow text-sm leading-6;
+      @apply flex grow text-sm items-center;
     }
 
     & .fi-fo-checkbox-option__label {

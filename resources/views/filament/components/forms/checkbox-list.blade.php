@@ -23,7 +23,7 @@
         x-data="checkboxListFormComponent({
             livewireId: @js($this->getId()),
         })"
-        {{ $getExtraAlpineAttributeBag()->class(['fi-fo-checkbox-card']) }}
+        {{ $getExtraAlpineAttributeBag()->class(['fi-fo-checkbox-list']) }}
     >
         @if (! $isDisabled)
             @if ($isSearchable)
@@ -104,7 +104,6 @@
                         )"
                         @class([
                             'fi-fo-checkbox-option',
-                            'is-centered' => $isItemsCenter(),
                             'fi-valid' => ! $errors->has($statePath),
                             'fi-invalid' => $errors->has($statePath),
                         ])

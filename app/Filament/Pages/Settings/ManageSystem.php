@@ -7,7 +7,7 @@ namespace App\Filament\Pages\Settings;
 use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
-use App\Filament\Components\Forms\CheckboxCards;
+use App\Filament\Components\Forms\CheckboxList;
 use App\Filament\Components\Forms\RadioCards;
 use App\Filament\Components\Forms\RadioList;
 use App\Settings\SystemSettings;
@@ -84,7 +84,7 @@ class ManageSystem extends SettingsPage
                             //     ->options(PageLayouts::class)
                             //     ->required(),
 
-                            CheckboxCards::make('auth_page_layout')
+                            CheckboxList::make('auth_page_layout')
                                 ->label('Layout da página de login')
                                 ->options(PageLayouts::class)
                                 ->searchable()
