@@ -35,7 +35,15 @@ class RadioList extends Field implements CanDisableOptions
 
     protected bool | Closure $isItemsCenter = false;
 
-    protected IconPosition $iconPosition = IconPosition::Before;
+    public function defaultIconPosition(): IconPosition
+    {
+        return IconPosition::After;
+    }
+
+    public function defaultIndicatorPosition(): IconPosition
+    {
+        return IconPosition::Before;
+    }
 
     public function isItemsCenter(): bool
     {

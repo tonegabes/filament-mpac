@@ -13,63 +13,19 @@ use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 trait HasIndicator
 {
-    protected string | BackedEnum | Htmlable | null $defaultIndicator = null;
+    protected bool | Closure $isIndicatorPartiallyHidden = false;
+
+    protected bool | Closure $isIndicatorVisible = true;
+
+    protected ?IconPosition $indicatorPosition = null;
+
+    protected string | BackedEnum | Htmlable | null $idleIndicator = null;
 
     protected string | BackedEnum | Htmlable | null $selectedIndicator = null;
 
-    protected bool | Closure $showIndicator = true;
-
-    protected bool | Closure $isIndicatorPartiallyHidden = false;
-
-    protected IconPosition $indicatorPosition = IconPosition::Before;
-
-    public function hasIndicator(): bool
+    public function isIndicatorPartiallyHidden(): bool
     {
-        return $this->defaultIndicator !== null || $this->selectedIndicator !== null;
-    }
-
-    public function getDefaultIndicator(): string | BackedEnum | Htmlable
-    {
-        return $this->defaultIndicator ?? Phosphor::CircleThin->getLabel();
-    }
-
-    public function defaultIndicator(string | BackedEnum | Htmlable | null $defaultIndicator): static
-    {
-        if ($defaultIndicator instanceof BackedEnum && $defaultIndicator instanceof HasLabel) {
-            $defaultIndicator = $defaultIndicator->getLabel();
-        }
-
-        $this->defaultIndicator = $defaultIndicator;
-
-        return $this;
-    }
-
-    public function selectedIndicator(string | BackedEnum | Htmlable | null $selectedIndicator): static
-    {
-        if ($selectedIndicator instanceof BackedEnum && $selectedIndicator instanceof HasLabel) {
-            $selectedIndicator = $selectedIndicator->getLabel();
-        }
-
-        $this->selectedIndicator = $selectedIndicator;
-
-        return $this;
-    }
-
-    public function getSelectedIndicator(): string | BackedEnum | Htmlable
-    {
-        return $this->selectedIndicator ?? $this->defaultIndicator ?? Phosphor::RecordFill->getLabel();
-    }
-
-    public function hiddenIndicator(bool | Closure $condition = true): static
-    {
-        $this->showIndicator = ! $condition;
-
-        return $this;
-    }
-
-    public function showIndicator(): bool
-    {
-        return (bool) $this->evaluate($this->showIndicator);
+        return (bool) $this->evaluate($this->isIndicatorPartiallyHidden);
     }
 
     public function partiallyHiddenIndicator(bool | Closure $condition = true): static
@@ -79,9 +35,21 @@ trait HasIndicator
         return $this;
     }
 
-    public function isIndicatorPartiallyHidden(): bool
+    public function isIndicatorVisible(): bool
     {
-        return (bool) $this->evaluate($this->isIndicatorPartiallyHidden);
+        return (bool) $this->evaluate($this->isIndicatorVisible);
+    }
+
+    public function hiddenIndicator(bool | Closure $condition = true): static
+    {
+        $this->isIndicatorVisible = ! $condition;
+
+        return $this;
+    }
+
+    public function defaultIndicatorPosition(): IconPosition
+    {
+        return IconPosition::Before;
     }
 
     public function indicatorPosition(IconPosition $position): static
@@ -91,13 +59,21 @@ trait HasIndicator
         return $this;
     }
 
-    public function hasIndicatorBefore(): bool
+    public function isIndicatorBefore(): bool
     {
+        if ($this->indicatorPosition === null) {
+            return $this->defaultIndicatorPosition() === IconPosition::Before;
+        }
+
         return $this->indicatorPosition === IconPosition::Before;
     }
 
-    public function hasIndicatorAfter(): bool
+    public function isIndicatorAfter(): bool
     {
+        if ($this->indicatorPosition === null) {
+            return $this->defaultIndicatorPosition() === IconPosition::After;
+        }
+
         return $this->indicatorPosition === IconPosition::After;
     }
 
@@ -111,6 +87,48 @@ trait HasIndicator
     public function indicatorAfter(): static
     {
         $this->indicatorPosition = IconPosition::After;
+
+        return $this;
+    }
+
+    public function defaultIdleIndicator(): string | BackedEnum | Htmlable
+    {
+        return Phosphor::CircleThin->getLabel();
+    }
+
+    public function defaultSelectedIndicator(): string | BackedEnum | Htmlable
+    {
+        return Phosphor::RecordFill->getLabel();
+    }
+
+    public function getIdleIndicator(): string | BackedEnum | Htmlable
+    {
+        return $this->idleIndicator ?? $this->defaultIdleIndicator();
+    }
+
+    public function getSelectedIndicator(): string | BackedEnum | Htmlable
+    {
+        return $this->selectedIndicator ?? $this->defaultSelectedIndicator();
+    }
+
+    public function idleIndicator(string | BackedEnum | Htmlable | null $idleIndicator): static
+    {
+        if ($idleIndicator instanceof BackedEnum && $idleIndicator instanceof HasLabel) {
+            $idleIndicator = $idleIndicator->getLabel();
+        }
+
+        $this->idleIndicator = $idleIndicator;
+
+        return $this;
+    }
+
+    public function selectedIndicator(string | BackedEnum | Htmlable | null $selectedIndicator): static
+    {
+        if ($selectedIndicator instanceof BackedEnum && $selectedIndicator instanceof HasLabel) {
+            $selectedIndicator = $selectedIndicator->getLabel();
+        }
+
+        $this->selectedIndicator = $selectedIndicator;
 
         return $this;
     }

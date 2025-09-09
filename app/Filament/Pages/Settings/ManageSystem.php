@@ -88,9 +88,6 @@ class ManageSystem extends SettingsPage
                                 ->label('Layout da página de login')
                                 ->options(PageLayouts::class)
                                 ->searchable()
-                                ->iconAfter()
-                                ->defaultIndicator(Phosphor::Square)
-                                ->selectedIndicator(Phosphor::CheckSquareFill)
                                 ->bulkToggleable()
                                 ->required(),
 

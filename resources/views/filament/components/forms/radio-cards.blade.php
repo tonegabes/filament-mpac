@@ -54,16 +54,16 @@
                 :aria-selected="isSelected"
                 for="{{ $itemId }}"
             >
-                @if ($hasIndicatorBefore() && $showIndicator())
+                @if ($isIndicatorBefore() && $isIndicatorVisible())
                     <x-forms.radio-indicator
                         ::is-selected="isSelected"
                         :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
-                        :default-indicator="$getDefaultIndicator()"
+                        :default-indicator="$getIdleIndicator()"
                         :selected-indicator="$getSelectedIndicator()"
                     />
                 @endif
 
-                @if ($hasIconBefore() && $showIcon())
+                @if ($hasIconBefore() && $isIconVisible())
                     @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-card__icon'])
                 @endif
 
@@ -85,15 +85,15 @@
                     @endif
                 </div>
 
-                @if ($hasIconAfter() && $showIcon())
+                @if ($hasIconAfter() && $isIconVisible())
                     @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-card__icon'])
                 @endif
 
-                @if ($hasIndicatorAfter() && $showIndicator())
+                @if ($isIndicatorAfter() && $isIndicatorVisible())
                     <x-forms.radio-indicator
                         ::is-selected="isSelected"
                         :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
-                        :default-indicator="$getDefaultIndicator()"
+                        :default-indicator="$getIdleIndicator()"
                         :selected-indicator="$getSelectedIndicator()"
                     />
                 @endif

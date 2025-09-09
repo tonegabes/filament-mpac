@@ -37,7 +37,15 @@ class RadioCards extends Field implements CanDisableOptions
 
     protected bool | Closure $isItemsCenter = false;
 
-    protected IconPosition $iconPosition = IconPosition::After;
+    public function defaultIconPosition(): IconPosition
+    {
+        return IconPosition::Before;
+    }
+
+    public function defaultIndicatorPosition(): IconPosition
+    {
+        return IconPosition::After;
+    }
 
     public function isItemsCenter(): bool
     {

@@ -7,9 +7,12 @@ namespace App\Filament\Components\Forms;
 use App\Traits\HasExtraTexts;
 use App\Traits\HasIndicator;
 use App\Traits\HasOptionIcon;
+use BackedEnum;
 use Closure;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Support\Enums\IconPosition;
+use Illuminate\Contracts\Support\Htmlable;
+use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class CheckboxCards extends CheckboxList
 {
@@ -21,7 +24,25 @@ class CheckboxCards extends CheckboxList
 
     protected string $view = 'filament.components.forms.checkbox-cards';
 
-    protected IconPosition $iconPosition = IconPosition::Before;
+    public function defaultIndicatorPosition(): IconPosition
+    {
+        return IconPosition::After;
+    }
+
+    public function defaultIconPosition(): IconPosition
+    {
+        return IconPosition::Before;
+    }
+
+    public function defaultIdleIndicator(): string | BackedEnum | Htmlable
+    {
+        return Phosphor::SquareThin->getLabel();
+    }
+
+    public function defaultSelectedIndicator(): string | BackedEnum | Htmlable
+    {
+        return Phosphor::CheckSquareFill->getLabel();
+    }
 
     public function isItemsCenter(): bool
     {

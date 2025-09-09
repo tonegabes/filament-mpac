@@ -53,16 +53,16 @@
             >
                 <div class="fi-fo-radio-item__content">
 
-                    @if ($hasIndicatorBefore() && $showIndicator())
+                    @if ($isIndicatorBefore() && $isIndicatorVisible())
                         <x-forms.radio-indicator
                             ::is-selected="isSelected"
                             :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
-                            :default-indicator="$getDefaultIndicator()"
+                            :default-indicator="$getIdleIndicator()"
                             :selected-indicator="$getSelectedIndicator()"
                         />
                     @endif
 
-                    @if ($hasIconBefore() && $showIcon())
+                    @if ($hasIconBefore() && $isIconVisible())
                         @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-item__icon'])
                     @endif
 
@@ -83,11 +83,11 @@
                     </p>
                 @endif
 
-                @if ($hasIndicatorAfter() && $showIndicator())
+                @if ($isIndicatorAfter() && $isIndicatorVisible())
                     <x-forms.radio-indicator
                         ::is-selected="isSelected"
                         :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
-                        :default-indicator="$getDefaultIndicator()"
+                        :default-indicator="$getIdleIndicator()"
                         :selected-indicator="$getSelectedIndicator()"
                     />
                 @endif

@@ -14,16 +14,23 @@ trait HasOptionIcon
 {
     use HasIcons;
 
-    protected bool | Closure $showIcon = true;
+    protected bool | Closure $isIconVisible = true;
 
-    public function showIcon(): bool
+    protected ?IconPosition $iconPosition = null;
+
+    public function defaultIconPosition(): IconPosition
     {
-        return (bool) $this->evaluate($this->showIcon);
+        return IconPosition::After;
+    }
+
+    public function isIconVisible(): bool
+    {
+        return (bool) $this->evaluate($this->isIconVisible);
     }
 
     public function hiddenIcon(bool | Closure $condition = true): static
     {
-        $this->showIcon = ! $condition;
+        $this->isIconVisible = ! $condition;
 
         return $this;
     }
@@ -44,7 +51,7 @@ trait HasOptionIcon
         return $this->getIcon($value);
     }
 
-    public function getOptionIconPosition(): IconPosition
+    public function getOptionIconPosition(): ?IconPosition
     {
         return $this->iconPosition;
     }
@@ -58,6 +65,7 @@ trait HasOptionIcon
 
     public function iconBefore(): static
     {
+
         $this->iconPosition = IconPosition::Before;
 
         return $this;
@@ -72,11 +80,19 @@ trait HasOptionIcon
 
     public function hasIconBefore(): bool
     {
+        if ($this->iconPosition === null) {
+            return $this->defaultIconPosition() === IconPosition::Before;
+        }
+
         return $this->iconPosition === IconPosition::Before;
     }
 
     public function hasIconAfter(): bool
     {
+        if ($this->iconPosition === null) {
+            return $this->defaultIconPosition() === IconPosition::After;
+        }
+
         return $this->iconPosition === IconPosition::After;
     }
 }

@@ -101,8 +101,10 @@
                             value => isSelected = value.includes('{{ $value }}')
                         )"
                         @class([
-                          'fi-fo-checkbox-list-option',
-                          'is-centered' => $isItemsCenter(),
+                            'fi-fo-checkbox-list-option',
+                            'is-centered' => $isItemsCenter(),
+                            'fi-valid' => ! $errors->has($statePath),
+                            'fi-invalid' => $errors->has($statePath),
                         ])
                         :class="{ 'is-selected': isSelected }"
                         :aria-checked="isSelected"
@@ -112,6 +114,7 @@
                             type="checkbox"
                             {{
                                 $extraInputAttributeBag
+                                    ->class(['hidden'])
                                     ->merge([
                                         'disabled' => $isDisabled || $isOptionDisabled($value, $label),
                                         'value' => $value,
@@ -119,24 +122,19 @@
                                         $wireModelAttribute => $statePath,
                                         'x-on:change' => $isBulkToggleable ? 'checkIfAllCheckboxesAreChecked()' : null,
                                     ], escape: false)
-                                    ->class([
-                                        'fi-checkbox-input hidden',
-                                        'fi-valid' => ! $errors->has($statePath),
-                                        'fi-invalid' => $errors->has($statePath),
-                                    ])
                             }}
                         />
 
-                        @if ($hasIndicatorBefore() && $showIndicator())
+                        @if ($isIndicatorBefore() && $isIndicatorVisible())
                             <x-forms.checkbox-indicator
                                 ::is-selected="isSelected"
                                 :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
-                                :default-indicator="$getDefaultIndicator()"
+                                :default-indicator="$getIdleIndicator()"
                                 :selected-indicator="$getSelectedIndicator()"
                             />
                         @endif
 
-                        @if ($hasIconBefore() && $showIcon())
+                        @if ($hasIconBefore() && $isIconVisible())
                             @svg($getOptionIcon($value), ['class' => 'fi-fo-checkbox__icon'])
                         @endif
 
@@ -166,15 +164,15 @@
                             @endif
                         </div>
 
-                        @if ($hasIconAfter() && $showIcon())
+                        @if ($hasIconAfter() && $isIconVisible())
                             @svg($getOptionIcon($value), ['class' => 'fi-fo-checkbox__icon'])
                         @endif
 
-                        @if ($hasIndicatorAfter() && $showIndicator())
+                        @if ($isIndicatorAfter() && $isIndicatorVisible())
                             <x-forms.checkbox-indicator
                                 ::is-selected="isSelected"
                                 :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
-                                :default-indicator="$getDefaultIndicator()"
+                                :default-indicator="$getIdleIndicator()"
                                 :selected-indicator="$getSelectedIndicator()"
                             />
                         @endif
