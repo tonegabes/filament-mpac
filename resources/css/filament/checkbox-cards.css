@@ -78,7 +78,7 @@
       }
 
       &.fi-invalid {
-        @apply bg-red-50;
+        @apply ring-1 ring-red-300;
 
         & .fi-fo-checkbox-option__indicator {
           @apply fill-red-500;

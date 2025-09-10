@@ -72,6 +72,14 @@
       }
     }
 
+    &.fi-invalid {
+      @apply ring-1 ring-red-300;
+
+      & .fi-fo-radio__indicator {
+        @apply fill-red-500;
+      }
+    }
+
     &.is-selected {
       @apply bg-primary/10 ring-2 ring-primary transform scale-[1.01];
 

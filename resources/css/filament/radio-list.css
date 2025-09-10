@@ -52,6 +52,14 @@
       @apply shrink-0;
     }
 
+    &.fi-invalid {
+      @apply ring-1 ring-red-300;
+
+      & .fi-fo-radio__indicator {
+        @apply fill-red-500;
+      }
+    }
+
     &.is-selected {
       @apply bg-primary/10 ring-primary ring-2;
 
