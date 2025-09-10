@@ -1,19 +1,21 @@
 @php
     use Filament\Support\Enums\GridDirection;
     use Filament\Support\Facades\FilamentAsset;
+    use Filament\Forms\View\FormsIconAlias;
+    use ToneGabes\Filament\Icons\Enums\Phosphor;
 
-    $fieldWrapperView = $getFieldWrapperView();
     $extraInputAttributeBag = $getExtraInputAttributeBag();
-    $isHtmlAllowed = $isHtmlAllowed();
+    $fieldWrapperView = $getFieldWrapperView();
     $gridDirection = $getGridDirection() ?? GridDirection::Row;
     $isBulkToggleable = $isBulkToggleable();
     $isDisabled = $isDisabled();
+    $isHtmlAllowed = $isHtmlAllowed();
     $isSearchable = $isSearchable();
-    $statePath = $getStatePath();
-    $options = $getOptions();
-    $livewireKey = $getLivewireKey();
-    $wireModelAttribute = $applyStateBindingModifiers('wire:model');
     $jsComponentSrc = FilamentAsset::getAlpineComponentSrc('checkbox');
+    $livewireKey = $getLivewireKey();
+    $options = $getOptions();
+    $statePath = $getStatePath();
+    $wireModelAttribute = $applyStateBindingModifiers('wire:model');
 @endphp
 
 <x-dynamic-component :component="$fieldWrapperView" :field="$field">
@@ -29,8 +31,8 @@
             @if ($isSearchable)
                 <x-filament::input.wrapper
                     inline-prefix
-                    :prefix-icon="\Filament\Support\Icons\Heroicon::MagnifyingGlass"
-                    :prefix-icon-alias="\Filament\Forms\View\FormsIconAlias::COMPONENTS_CHECKBOX_LIST_SEARCH_FIELD"
+                    :prefix-icon="Phosphor::MagnifyingGlass"
+                    :prefix-icon-alias="FormsIconAlias::COMPONENTS_CHECKBOX_LIST_SEARCH_FIELD"
                     class="fi-fo-checkbox-list-search-input-wrp"
                 >
                     <input
@@ -74,9 +76,7 @@
                     ->merge([
                         'x-show' => $isSearchable ? 'visibleCheckboxListOptions.length' : null,
                     ], escape: false)
-                    ->class([
-                        'fi-fo-checkbox-options',
-                    ])
+                    ->class(['fi-fo-checkbox-options'])
             }}
         >
             @forelse ($options as $value => $label)
@@ -140,9 +140,7 @@
                         </span>
 
                         @if ($hasDescription($value))
-                            <p
-                                class="fi-fo-checkbox-option__description"
-                            >
+                            <p class="fi-fo-checkbox-option__description">
                                 {{ $getDescription($value) }}
                             </p>
                         @endif

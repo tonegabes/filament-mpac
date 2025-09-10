@@ -1,8 +1,8 @@
 @php
     use Filament\Support\Enums\GridDirection;
 
-    $fieldWrapperView = $getFieldWrapperView();
     $extraInputAttributeBag = $getExtraInputAttributeBag();
+    $fieldWrapperView = $getFieldWrapperView();
     $gridDirection = $getGridDirection() ?? GridDirection::Row;
     $id = $getId();
     $isDisabled = $isDisabled();
@@ -20,9 +20,7 @@
         {{
             $getExtraAttributeBag()
                 ->grid($getColumns(), $gridDirection)
-                ->class([
-                    'fi-fo-radio-cards',
-                ])
+                ->class(['fi-fo-radio-cards'])
         }}
     >
         @foreach ($getOptions() as $value => $label)
@@ -101,11 +99,7 @@
 
                 <input
                     type="radio"
-                    {{
-                        $inputAttributes->class([
-                            'hidden',
-                        ])
-                    }}
+                    {{ $inputAttributes->class(['hidden']) }}
                 />
             </label>
         @endforeach

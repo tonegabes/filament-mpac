@@ -3,17 +3,17 @@
     use Filament\Forms\View\FormsIconAlias;
     use ToneGabes\Filament\Icons\Enums\Phosphor;
 
-    $fieldWrapperView = $getFieldWrapperView();
     $extraInputAttributeBag = $getExtraInputAttributeBag();
-    $isHtmlAllowed = $isHtmlAllowed();
+    $fieldWrapperView = $getFieldWrapperView();
     $isBulkToggleable = $isBulkToggleable();
     $isDisabled = $isDisabled();
+    $isHtmlAllowed = $isHtmlAllowed();
     $isSearchable = $isSearchable();
-    $statePath = $getStatePath();
-    $options = $getOptions();
-    $livewireKey = $getLivewireKey();
-    $wireModelAttribute = $applyStateBindingModifiers('wire:model');
     $jsComponentSrc = FilamentAsset::getAlpineComponentSrc('checkbox');
+    $livewireKey = $getLivewireKey();
+    $options = $getOptions();
+    $statePath = $getStatePath();
+    $wireModelAttribute = $applyStateBindingModifiers('wire:model');
 @endphp
 
 <x-dynamic-component :component="$fieldWrapperView" :field="$field">
@@ -73,9 +73,7 @@
                     ->merge([
                         'x-show' => $isSearchable ? 'visibleCheckboxListOptions.length' : null,
                     ], escape: false)
-                    ->class([
-                        'fi-fo-checkbox-options',
-                    ])
+                    ->class(['fi-fo-checkbox-options'])
             }}
         >
             @forelse ($options as $value => $label)

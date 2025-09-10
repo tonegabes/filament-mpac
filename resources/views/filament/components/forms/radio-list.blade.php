@@ -1,8 +1,8 @@
 @php
     use Filament\Support\Enums\GridDirection;
 
-    $fieldWrapperView = $getFieldWrapperView();
     $extraInputAttributeBag = $getExtraInputAttributeBag();
+    $fieldWrapperView = $getFieldWrapperView();
     $gridDirection = $getGridDirection() ?? GridDirection::Row;
     $id = $getId();
     $isDisabled = $isDisabled();
@@ -20,9 +20,7 @@
         {{
             $getExtraAttributeBag()
                 ->grid($getColumns(), $gridDirection)
-                ->class([
-                    'fi-fo-radio-list',
-                ])
+                ->class(['fi-fo-radio-list'])
         }}
     >
         @foreach ($getOptions() as $value => $label)
@@ -40,7 +38,10 @@
             @endphp
 
             <label
-                class="fi-fo-radio-item group/radio-item"
+                @class([
+                    'fi-fo-radio-item group/radio-item',
+                    'fi-invalid' => $errors->has($statePath),
+                ])
                 x-data="{ isSelected: false }"
                 x-init="$watch(
                     '$wire.{{ $statePath }}',
@@ -84,8 +85,8 @@
                 @endif
 
                 @if ($hasIconAfter() && $isIconVisible())
-                        @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-item__icon'])
-                    @endif
+                    @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-item__icon'])
+                @endif
 
                 @if ($isIndicatorAfter() && $isIndicatorVisible())
                     <x-forms.radio-indicator
@@ -98,13 +99,7 @@
 
                 <input
                     type="radio"
-                    {{
-                        $inputAttributes->class([
-                            'hidden',
-                            'fi-valid' => ! $errors->has($statePath),
-                            'fi-invalid' => $errors->has($statePath),
-                        ])
-                    }}
+                    {{ $inputAttributes->class(['hidden'])}}
                 />
             </label>
         @endforeach
