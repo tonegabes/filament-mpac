@@ -83,6 +83,10 @@
                     </p>
                 @endif
 
+                @if ($hasIconAfter() && $isIconVisible())
+                        @svg($getOptionIcon($value), ['class' => 'fi-fo-radio-item__icon'])
+                    @endif
+
                 @if ($isIndicatorAfter() && $isIndicatorVisible())
                     <x-forms.radio-indicator
                         ::is-selected="isSelected"

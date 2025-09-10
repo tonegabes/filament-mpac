@@ -42,6 +42,7 @@
             <label
                 @class([
                     'fi-fo-radio-card group/radio-card',
+                    'fi-invalid' => $errors->has($statePath),
                     'is-centered' => $isItemsCenter(),
                 ])
                 x-data="{ isSelected: false }"
@@ -103,8 +104,6 @@
                     {{
                         $inputAttributes->class([
                             'hidden',
-                            'fi-valid' => ! $errors->has($statePath),
-                            'fi-invalid' => $errors->has($statePath),
                         ])
                     }}
                 />

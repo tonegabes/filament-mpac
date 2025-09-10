@@ -21,7 +21,15 @@
     }
 
     & .fi-fo-checkbox-option {
-      @apply flex gap-3 p-4 border border-gray-200 dark:border-white/20 hover:ring-2 hover:ring-primary rounded-lg cursor-pointer shadow-xs;
+      @apply flex gap-3 p-4 border border-gray-200 dark:border-white/20 rounded-lg cursor-pointer shadow-xs transition-all duration-200 ease-in-out;
+
+      &:hover {
+        @apply ring-1 ring-primary;
+      }
+
+      &:hover:not(.is-selected) {
+        @apply bg-gray-50 dark:bg-white/5 transform scale-[1.02];
+      }
 
       & .fi-fo-checkbox-option__indicator {
         @apply size-5 mt-1 fill-gray-400 shrink-0 transition-opacity duration-400 ease-in-out;

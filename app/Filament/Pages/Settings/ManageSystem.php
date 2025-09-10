@@ -8,8 +8,7 @@ use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Components\Forms\CheckboxCards;
-use App\Filament\Components\Forms\CheckboxList;
-use App\Filament\Components\Forms\RadioList;
+use App\Filament\Components\Forms\RadioCards;
 use App\Settings\SystemSettings;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
@@ -44,8 +43,34 @@ class ManageSystem extends SettingsPage
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->columns(2)
+            ->columns(1)
             ->components([
+                Fieldset::make('Formulários')
+                    ->columns(1)
+                    ->schema([
+
+                        Section::make('Checkbox Cards')
+                            ->schema([
+                                CheckboxCards::make('auth_page_layout')
+                                    ->label('Layout da página de login')
+                                    ->columns(2)
+                                    ->searchable()
+                                    ->bulkToggleable()
+                                    ->options(PageLayouts::class)
+                                    ->required(),
+                            ]),
+
+                        Section::make('Radio Cards')
+                            ->schema([
+                                RadioCards::make('auth_page_layout_3')
+                                    ->label('Layout da página de login')
+                                    ->options(PageLayouts::class)
+                                    ->columns(2)
+                                    ->required(),
+                            ]),
+
+                    ]),
+
                 Fieldset::make()
                     ->columns(1)
                     ->extraAttributes([
@@ -79,29 +104,6 @@ class ManageSystem extends SettingsPage
                         ]),
 
                         Section::make('Login')->schema([
-                            CheckboxCards::make('auth_page_layout')
-                                ->label('Layout da página de login')
-                                ->columns(2)
-                                ->searchable()
-                                ->bulkToggleable()
-                                ->options(PageLayouts::class)
-                                ->required(),
-
-                            // CheckboxList::make('auth_page_layout')
-                            //     ->label('Layout da página de login')
-                            //     ->options(PageLayouts::class)
-                            //     ->searchable()
-                            //     ->bulkToggleable()
-                            //     ->required(),
-
-                            // RadioList::make('auth_page_layout')
-                            //     ->label('Layout da página de login')
-                            //     ->options(PageLayouts::class)
-                            //     ->indicatorAfter()
-                            //     // ->partiallyHiddenIndicator()
-                            //     // ->defaultIndicator(Phosphor::CircleThin)
-                            //     // ->selectedIndicator(Phosphor::CheckCircleFill)
-                            //     ->required(),
 
                             FileUpload::make('auth_page_background')
                                 ->label('Imagem de fundo')

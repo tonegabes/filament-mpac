@@ -13,11 +13,15 @@
     @apply flex gap-4 p-4 border border-gray-200 dark:border-white/20 rounded-lg cursor-pointer shadow-xs transition-all duration-200 ease-in-out;
 
     &:hover {
-      @apply ring-2 ring-primary;
+      @apply ring-1 ring-primary;
     }
 
     &:hover:not(.is-selected) {
       @apply bg-gray-50 dark:bg-white/5 transform scale-[1.02];
+    }
+
+    & .fi-fo-radio__indicator {
+      @apply size-5 fill-gray-400 shrink-0 transition-opacity duration-400 ease-in-out mt-1;
     }
 
     & .fi-fo-radio-card__icon {
@@ -26,22 +30,18 @@
 
     & .fi-fo-radio-card__content {
       @apply flex flex-col grow gap-4;
-    }
 
-    & .fi-fo-radio-card__label {
-      @apply font-medium text-gray-900 dark:text-gray-50;
-    }
+      & .fi-fo-radio-card__label {
+        @apply font-medium text-gray-900 dark:text-gray-50;
+      }
 
-    & .fi-fo-radio-card__description {
-      @apply font-normal text-gray-500 dark:text-gray-400;
-    }
+      & .fi-fo-radio-card__description {
+        @apply font-normal text-gray-500 dark:text-gray-400;
+      }
 
-    & .fi-fo-radio-card__extra {
-      @apply font-medium text-gray-900 dark:text-gray-50;
-    }
-
-    & .fi-fo-radio__indicator {
-      @apply size-6 fill-gray-400 shrink-0 transition-opacity duration-400 ease-in-out mt-1;
+      & .fi-fo-radio-card__extra {
+        @apply font-medium text-gray-900 dark:text-gray-50;
+      }
     }
 
     & .is-indicator-partially-hidden {
