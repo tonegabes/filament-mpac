@@ -78,7 +78,7 @@
                         @endif
                     </div>
 
-                    @if ($hasExtraText($value) && ! $isExtraTextHidden())
+                    @if ($hasExtraText($value) && $isExtraTextVisible())
                         <p class="fi-fo-radio-card__extra">
                             {{ $getExtraText($value) }}
                         </p>

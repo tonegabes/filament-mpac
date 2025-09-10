@@ -46,6 +46,19 @@ export default function checkboxListFormComponent({ livewireId }) {
       });
     },
 
+    isFoundInSearch(checkboxItem) {
+      return (
+        checkboxItem
+          .querySelector(".fi-fo-checkbox-option__label")
+          ?.innerText.toLowerCase()
+          .includes(this.search.toLowerCase()) ||
+        checkboxItem
+          .querySelector(".fi-fo-checkbox-option__description")
+          ?.innerText.toLowerCase()
+          .includes(this.search.toLowerCase())
+      );
+    },
+
     checkIfAllCheckboxesAreChecked() {
       this.areAllCheckboxesChecked =
         this.visibleCheckboxListOptions.length ===

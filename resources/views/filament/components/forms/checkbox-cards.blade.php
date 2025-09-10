@@ -5,7 +5,7 @@
     $fieldWrapperView = $getFieldWrapperView();
     $extraInputAttributeBag = $getExtraInputAttributeBag();
     $isHtmlAllowed = $isHtmlAllowed();
-    $gridDirection = $getGridDirection() ?? GridDirection::Column;
+    $gridDirection = $getGridDirection() ?? GridDirection::Row;
     $isBulkToggleable = $isBulkToggleable();
     $isDisabled = $isDisabled();
     $isSearchable = $isSearchable();
@@ -45,7 +45,7 @@
             @if ($isBulkToggleable && count($options))
                 <div
                     x-cloak
-                    class="fi-fo-checkbox__actions"
+                    class="fi-fo-checkbox-actions"
                     wire:key="{{ $livewireKey }}.actions"
                 >
                     <span
@@ -75,111 +75,99 @@
                         'x-show' => $isSearchable ? 'visibleCheckboxListOptions.length' : null,
                     ], escape: false)
                     ->class([
-                        'fi-fo-checkbox__options',
+                        'fi-fo-checkbox-options',
                     ])
             }}
         >
             @forelse ($options as $value => $label)
-                <div
+                <label
                     wire:key="{{ $livewireKey }}.options.{{ $value }}"
+
                     @if ($isSearchable)
-                        x-show="
-                            $el
-                                .querySelector('.fi-fo-checkbox-option__label')
-                                ?.innerText.toLowerCase()
-                                .includes(search.toLowerCase()) ||
-                                $el
-                                    .querySelector('.fi-fo-checkbox-option__description')
-                                    ?.innerText.toLowerCase()
-                                    .includes(search.toLowerCase())
-                        "
+                        x-show="isFoundInSearch($el)"
                     @endif
-                    class="fi-fo-checkbox-option__content"
+
+                    x-data="{ isSelected: false }"
+                    x-init="$watch(
+                        '$wire.{{ $statePath }}',
+                        value => isSelected = value.includes('{{ $value }}')
+                    )"
+                    @class([
+                        'fi-fo-checkbox-option',
+                        'is-centered' => $isItemsCenter(),
+                        'fi-invalid' => $errors->has($statePath),
+                    ])
+                    :class="{ 'is-selected': isSelected }"
+                    :aria-checked="isSelected"
+                    :aria-selected="isSelected"
                 >
-                    <label
-                        x-data="{ isSelected: false }"
-                        x-init="$watch(
-                            '$wire.{{ $statePath }}',
-                            value => isSelected = value.includes('{{ $value }}')
-                        )"
-                        @class([
-                            'fi-fo-checkbox-option',
-                            'is-centered' => $isItemsCenter(),
-                            'fi-valid' => ! $errors->has($statePath),
-                            'fi-invalid' => $errors->has($statePath),
-                        ])
-                        :class="{ 'is-selected': isSelected }"
-                        :aria-checked="isSelected"
-                        :aria-selected="isSelected"
-                    >
-                        <input
-                            type="checkbox"
-                            {{
-                                $extraInputAttributeBag
-                                    ->class(['hidden'])
-                                    ->merge([
-                                        'disabled' => $isDisabled || $isOptionDisabled($value, $label),
-                                        'value' => $value,
-                                        'wire:loading.attr' => 'disabled',
-                                        $wireModelAttribute => $statePath,
-                                        'x-on:change' => $isBulkToggleable ? 'checkIfAllCheckboxesAreChecked()' : null,
-                                    ], escape: false)
-                            }}
+                    <input
+                        type="checkbox"
+                        {{
+                            $extraInputAttributeBag
+                                ->class(['hidden'])
+                                ->merge([
+                                    'disabled' => $isDisabled || $isOptionDisabled($value, $label),
+                                    'value' => $value,
+                                    'wire:loading.attr' => 'disabled',
+                                    $wireModelAttribute => $statePath,
+                                    'x-on:change' => $isBulkToggleable ? 'checkIfAllCheckboxesAreChecked()' : null,
+                                ], escape: false)
+                        }}
+                    />
+
+                    @if ($isIndicatorBefore() && $isIndicatorVisible())
+                        <x-forms.checkbox-indicator
+                            ::is-selected="isSelected"
+                            :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
+                            :default-indicator="$getIdleIndicator()"
+                            :selected-indicator="$getSelectedIndicator()"
                         />
+                    @endif
 
-                        @if ($isIndicatorBefore() && $isIndicatorVisible())
-                            <x-forms.checkbox-indicator
-                                ::is-selected="isSelected"
-                                :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
-                                :default-indicator="$getIdleIndicator()"
-                                :selected-indicator="$getSelectedIndicator()"
-                            />
-                        @endif
+                    @if ($hasIconBefore() && $isIconVisible())
+                        @svg($getOptionIcon($value), ['class' => 'fi-fo-checkbox-option__icon'])
+                    @endif
 
-                        @if ($hasIconBefore() && $isIconVisible())
-                            @svg($getOptionIcon($value), ['class' => 'fi-fo-checkbox__icon'])
-                        @endif
-
-                        <div class="fi-fo-checkbox-option__text">
-                          <div class="fi-fo-checkbox-option__header">
-                            <span class="fi-fo-checkbox-option__label">
-                                @if ($isHtmlAllowed)
-                                    {!! $label !!}
-                                @else
-                                    {{ $label }}
-                                @endif
-                            </span>
-
-                            @if ($hasDescription($value))
-                                <p
-                                    class="fi-fo-checkbox-option__description"
-                                >
-                                    {{ $getDescription($value) }}
-                                </p>
+                    <div class="fi-fo-checkbox-option__content">
+                        <div class="fi-fo-checkbox-option__header">
+                        <span class="fi-fo-checkbox-option__label">
+                            @if ($isHtmlAllowed)
+                                {!! $label !!}
+                            @else
+                                {{ $label }}
                             @endif
-                          </div>
+                        </span>
 
-                            @if ($hasExtraText($value) && $showExtraText())
-                              <p class="fi-fo-checkbox__extra">
-                                {{ $getExtraText($value) }}
-                              </p>
-                            @endif
+                        @if ($hasDescription($value))
+                            <p
+                                class="fi-fo-checkbox-option__description"
+                            >
+                                {{ $getDescription($value) }}
+                            </p>
+                        @endif
                         </div>
 
-                        @if ($hasIconAfter() && $isIconVisible())
-                            @svg($getOptionIcon($value), ['class' => 'fi-fo-checkbox__icon'])
+                        @if ($hasExtraText($value) && $isExtraTextVisible())
+                            <p class="fi-fo-checkbox-option__extra">
+                            {{ $getExtraText($value) }}
+                            </p>
                         @endif
+                    </div>
 
-                        @if ($isIndicatorAfter() && $isIndicatorVisible())
-                            <x-forms.checkbox-indicator
-                                ::is-selected="isSelected"
-                                :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
-                                :default-indicator="$getIdleIndicator()"
-                                :selected-indicator="$getSelectedIndicator()"
-                            />
-                        @endif
-                    </label>
-                </div>
+                    @if ($hasIconAfter() && $isIconVisible())
+                        @svg($getOptionIcon($value), ['class' => 'fi-fo-checkbox-option__icon'])
+                    @endif
+
+                    @if ($isIndicatorAfter() && $isIndicatorVisible())
+                        <x-forms.checkbox-indicator
+                            ::is-selected="isSelected"
+                            :is-indicator-partially-hidden="$isIndicatorPartiallyHidden"
+                            :default-indicator="$getIdleIndicator()"
+                            :selected-indicator="$getSelectedIndicator()"
+                        />
+                    @endif
+                </label>
             @empty
                 <div wire:key="{{ $livewireKey }}.empty"></div>
             @endforelse

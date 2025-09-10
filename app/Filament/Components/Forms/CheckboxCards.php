@@ -10,12 +10,14 @@ use App\Traits\HasOptionIcon;
 use BackedEnum;
 use Closure;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Schemas\Concerns\HasColumns;
 use Filament\Support\Enums\IconPosition;
 use Illuminate\Contracts\Support\Htmlable;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class CheckboxCards extends CheckboxList
 {
+    use HasColumns;
     use HasExtraTexts;
     use HasIndicator;
     use HasOptionIcon;

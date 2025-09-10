@@ -7,8 +7,8 @@ namespace App\Filament\Pages\Settings;
 use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
+use App\Filament\Components\Forms\CheckboxCards;
 use App\Filament\Components\Forms\CheckboxList;
-use App\Filament\Components\Forms\RadioCards;
 use App\Filament\Components\Forms\RadioList;
 use App\Settings\SystemSettings;
 use BackedEnum;
@@ -79,17 +79,20 @@ class ManageSystem extends SettingsPage
                         ]),
 
                         Section::make('Login')->schema([
-                            // RadioCards::make('auth_page_layout')
-                            //     ->label('Layout da página de login')
-                            //     ->options(PageLayouts::class)
-                            //     ->required(),
-
-                            CheckboxList::make('auth_page_layout')
+                            CheckboxCards::make('auth_page_layout')
                                 ->label('Layout da página de login')
-                                ->options(PageLayouts::class)
+                                ->columns(2)
                                 ->searchable()
                                 ->bulkToggleable()
+                                ->options(PageLayouts::class)
                                 ->required(),
+
+                            // CheckboxList::make('auth_page_layout')
+                            //     ->label('Layout da página de login')
+                            //     ->options(PageLayouts::class)
+                            //     ->searchable()
+                            //     ->bulkToggleable()
+                            //     ->required(),
 
                             // RadioList::make('auth_page_layout')
                             //     ->label('Layout da página de login')

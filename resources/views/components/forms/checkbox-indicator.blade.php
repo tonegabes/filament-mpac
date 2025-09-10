@@ -9,7 +9,7 @@
     <x-icon
         :name="$selectedIndicator"
         @class([
-            'fi-fo-checkbox__indicator',
+            'fi-fo-checkbox-option__indicator',
             'is-indicator-partially-hidden' => $isIndicatorPartiallyHidden(),
         ])
     />
@@ -18,7 +18,7 @@
     <x-icon
         :name="$defaultIndicator"
         @class([
-            'fi-fo-checkbox__indicator',
+            'fi-fo-checkbox-option__indicator',
             'is-indicator-partially-hidden' => $isIndicatorPartiallyHidden(),
         ])
     />
