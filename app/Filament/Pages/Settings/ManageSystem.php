@@ -7,8 +7,6 @@ namespace App\Filament\Pages\Settings;
 use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
-use App\Filament\Components\Forms\CheckboxList;
-use App\Filament\Components\Forms\RadioList;
 use App\Settings\SystemSettings;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
@@ -18,6 +16,8 @@ use Filament\Pages\SettingsPage;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use ToneGabes\BetterOptions\Forms\Components\CheckboxList;
+use ToneGabes\BetterOptions\Forms\Components\RadioList;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class ManageSystem extends SettingsPage

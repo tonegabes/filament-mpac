@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-use App\Contracts\HasExtraText;
 use App\Traits\BetterEnum;
 use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
+use ToneGabes\BetterOptions\Support\Contracts\HasExtraText;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 enum PageLayouts: string implements HasDescription, HasExtraText, HasIcon, HasLabel

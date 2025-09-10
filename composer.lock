@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "64500cee1580b37701ddac9294f9b983",
+    "content-hash": "72858c289d54bc6842259523e2bfa672",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -9135,6 +9135,74 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.3.0"
             },
             "time": "2024-12-21T16:25:41+00:00"
+        },
+        {
+            "name": "tonegabes/filament-better-options",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tonegabes/filament-better-options.git",
+                "reference": "d20cc3792f0d79a70cca591122e32133aeba3895"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tonegabes/filament-better-options/zipball/d20cc3792f0d79a70cca591122e32133aeba3895",
+                "reference": "d20cc3792f0d79a70cca591122e32133aeba3895",
+                "shasum": ""
+            },
+            "require": {
+                "filament/forms": "^4.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.15.0",
+                "tonegabes/filament-phosphor-icons": "^1.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "phpstan/phpstan": "^1.12",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "ToneGabes\\BetterOptions\\BetterOptionsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "ToneGabes\\BetterOptions\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tone Gabes",
+                    "email": "tonegabes@gmail.com",
+                    "homepage": "https://tonegabes.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Filament form components for better radio and checkbox options.",
+            "homepage": "https://github.com/tonegabes/filament-better-options",
+            "keywords": [
+                "Forms",
+                "checkbox",
+                "filament",
+                "laravel",
+                "php",
+                "plugin",
+                "tonegabes"
+            ],
+            "support": {
+                "issues": "https://github.com/tonegabes/filament-better-options/issues",
+                "source": "https://github.com/tonegabes/filament-better-options"
+            },
+            "time": "2025-09-10T19:05:51+00:00"
         },
         {
             "name": "tonegabes/filament-phosphor-icons",
