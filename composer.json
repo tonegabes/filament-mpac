@@ -22,7 +22,7 @@
     "laravel/tinker": "^2.10.1",
     "opcodesio/log-viewer": "^3.19",
     "spatie/laravel-permission": "^6.21",
-    "tonegabes/filament-better-options": "1.0",
+    "tonegabes/filament-better-options": "1.0.4",
     "tonegabes/filament-phosphor-icons": "^1.0"
   },
   "require-dev": {

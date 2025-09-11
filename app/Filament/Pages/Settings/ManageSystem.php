@@ -16,7 +16,9 @@ use Filament\Pages\SettingsPage;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use ToneGabes\BetterOptions\Forms\Components\CheckboxCards;
 use ToneGabes\BetterOptions\Forms\Components\CheckboxList;
+use ToneGabes\BetterOptions\Forms\Components\RadioCards;
 use ToneGabes\BetterOptions\Forms\Components\RadioList;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
@@ -51,20 +53,35 @@ class ManageSystem extends SettingsPage
 
                         Section::make('Checkbox Cards')
                             ->schema([
-                                CheckboxList::make('auth_page_layout')
+                                CheckboxCards::make('auth_page_layout')
+                                    ->label('Layout da página de login')
+                                    ->searchable()
+                                    ->options(PageLayouts::class)
+                                    ->bulkToggleable()
+                                    ->required(),
+
+                                CheckboxList::make('auth_page_layout_2')
                                     ->label('Layout da página de login')
                                     ->options(PageLayouts::class)
+                                    ->searchable()
+                                    ->bulkToggleable()
                                     ->required(),
                             ]),
 
                         Section::make('Radio Cards')
                             ->schema([
-                                RadioList::make('auth_page_layout_3')
+                                RadioCards::make('auth_page_layout_3')
+                                    ->label('Layout da página de login')
+                                    ->options(PageLayouts::class)
+                                    ->columns(2)
+                                    ->itemsCenter()
+                                    ->required(),
+
+                                RadioList::make('auth_page_layout_4')
                                     ->label('Layout da página de login')
                                     ->options(PageLayouts::class)
                                     ->required(),
                             ]),
-
                     ]),
 
                 Fieldset::make()
