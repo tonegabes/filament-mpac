@@ -15,6 +15,7 @@ use Filament\Tables\View\TablesIconAlias;
 use Filament\View\PanelsIconAlias;
 use Filament\Widgets\View\WidgetsIconAlias;
 use Illuminate\Support\ServiceProvider;
+use ToneGabes\BetterOptions\Forms\IndicatorsIconAlias;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 final class BaseIconsProvider extends ServiceProvider
@@ -22,6 +23,12 @@ final class BaseIconsProvider extends ServiceProvider
     public function register(): void
     {
         FilamentIcon::register([
+            IndicatorsIconAlias::CHECKBOX_IDLE     => Phosphor::Cat,
+            IndicatorsIconAlias::CHECKBOX_SELECTED => Phosphor::CatFill,
+
+            IndicatorsIconAlias::RADIO_IDLE     => Phosphor::Acorn,
+            IndicatorsIconAlias::RADIO_SELECTED => Phosphor::AcornFill,
+
             ActionsIconAlias::ACTION_GROUP                => Phosphor::DotsThreeVertical,
             ActionsIconAlias::CREATE_ACTION_GROUPED       => Phosphor::Plus,
             ActionsIconAlias::DELETE_ACTION               => Phosphor::Trash,
