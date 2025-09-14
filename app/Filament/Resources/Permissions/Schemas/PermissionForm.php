@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Permissions\Schemas;
 
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use ToneGabes\BetterOptions\Forms\Components\CheckboxCards;
 
 class PermissionForm
 {
@@ -24,10 +24,9 @@ class PermissionForm
                 Section::make('Perfis Associados')
                     ->description('Selecione os perfis associados a essa permissão.')
                     ->schema([
-                        CheckboxList::make('roles')
+                        CheckboxCards::make('roles')
                             ->hiddenLabel()
                             ->relationship('roles', 'name')
-                            ->searchable()
                             ->bulkToggleable()
                             ->columns(3),
                     ]),

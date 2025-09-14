@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e26f8fbda9f64f89d5a2e18f55935c5c",
+    "content-hash": "02613255b15106586b8e14402cce3d2e",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -9138,16 +9138,16 @@
         },
         {
             "name": "tonegabes/filament-better-options",
-            "version": "1.0.4",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonegabes/filament-better-options.git",
-                "reference": "0782b13ac1696f7a7691e14c0fc7e852fe1ede2c"
+                "reference": "22a282a0d5bb37245b14b9af55a1ef7ef054ce2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonegabes/filament-better-options/zipball/0782b13ac1696f7a7691e14c0fc7e852fe1ede2c",
-                "reference": "0782b13ac1696f7a7691e14c0fc7e852fe1ede2c",
+                "url": "https://api.github.com/repos/tonegabes/filament-better-options/zipball/22a282a0d5bb37245b14b9af55a1ef7ef054ce2f",
+                "reference": "22a282a0d5bb37245b14b9af55a1ef7ef054ce2f",
                 "shasum": ""
             },
             "require": {
@@ -9202,7 +9202,7 @@
                 "issues": "https://github.com/tonegabes/filament-better-options/issues",
                 "source": "https://github.com/tonegabes/filament-better-options"
             },
-            "time": "2025-09-11T15:25:28+00:00"
+            "time": "2025-09-14T03:00:37+00:00"
         },
         {
             "name": "tonegabes/filament-phosphor-icons",
