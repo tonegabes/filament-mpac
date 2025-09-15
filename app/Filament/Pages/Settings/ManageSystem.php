@@ -16,9 +16,6 @@ use Filament\Pages\SettingsPage;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use ToneGabes\BetterOptions\Forms\Components\CheckboxCards;
-use ToneGabes\BetterOptions\Forms\Components\CheckboxList;
-use ToneGabes\BetterOptions\Forms\Components\RadioCards;
 use ToneGabes\BetterOptions\Forms\Components\RadioList;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
@@ -47,43 +44,6 @@ class ManageSystem extends SettingsPage
         return $schema
             ->columns(1)
             ->components([
-                Fieldset::make('Formulários')
-                    ->columns(1)
-                    ->schema([
-
-                        Section::make('Checkbox Cards')
-                            ->schema([
-                                CheckboxCards::make('auth_page_layout')
-                                    ->label('Layout da página de login')
-                                    ->searchable()
-                                    ->options(PageLayouts::class)
-                                    ->bulkToggleable()
-                                    ->required(),
-
-                                CheckboxList::make('auth_page_layout_2')
-                                    ->label('Layout da página de login')
-                                    ->options(PageLayouts::class)
-                                    ->searchable()
-                                    ->bulkToggleable()
-                                    ->required(),
-                            ]),
-
-                        Section::make('Radio Cards')
-                            ->schema([
-                                RadioCards::make('auth_page_layout_3')
-                                    ->label('Layout da página de login')
-                                    ->options(PageLayouts::class)
-                                    ->columns(2)
-                                    ->itemsCenter()
-                                    ->required(),
-
-                                RadioList::make('auth_page_layout_4')
-                                    ->label('Layout da página de login')
-                                    ->options(PageLayouts::class)
-                                    ->required(),
-                            ]),
-                    ]),
-
                 Fieldset::make()
                     ->columns(1)
                     ->extraAttributes([
@@ -117,6 +77,24 @@ class ManageSystem extends SettingsPage
                         ]),
 
                         Section::make('Login')->schema([
+                            RadioList::make('auth_page_layout')
+                                ->label('Layout da página de login')
+                                ->options([
+                                    PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
+                                    PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
+                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
+                                ])
+                                ->descriptions([
+                                    PageLayouts::Split->value    => PageLayouts::Split->getDescription(),
+                                    PageLayouts::Centered->value => PageLayouts::Centered->getDescription(),
+                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getDescription(),
+                                ])
+                                ->icons([
+                                    PageLayouts::Split->value    => PageLayouts::Split->getIcon(),
+                                    PageLayouts::Centered->value => PageLayouts::Centered->getIcon(),
+                                    PageLayouts::FullPage->value => PageLayouts::FullPage->getIcon(),
+                                ])
+                                ->required(),
 
                             FileUpload::make('auth_page_background')
                                 ->label('Imagem de fundo')

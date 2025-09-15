@@ -13,9 +13,6 @@ parameters:
     level: 9
 
     ignoreErrors:
-        - '#Call to an undefined static method ToneGabes\\BetterOptions\\Forms\\Components\\CheckboxCards::make\(\)#'
-        - '#Call to an undefined static method ToneGabes\\BetterOptions\\Forms\\Components\\CheckboxList::make\(\)#'
-        - '#Call to static method make\(\) on an unknown class Filament\\Forms\\Components\\CheckboxList#'
 
     excludePaths:
       - database\migrations\2025_08_13_193244_create_permission_tables.php
