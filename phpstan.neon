@@ -13,7 +13,6 @@ parameters:
     level: 9
 
     ignoreErrors:
-#        - '#Trait .* is used zero times and is not analysed#'
 
     excludePaths:
       - database\migrations\2025_08_13_193244_create_permission_tables.php
