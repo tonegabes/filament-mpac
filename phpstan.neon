@@ -16,6 +16,9 @@ parameters:
 
     excludePaths:
       - database\migrations\2025_08_13_193244_create_permission_tables.php
+      - database\migrations\2025_09_22_180234_create_activity_log_table.php
+      - database\migrations\2025_09_22_180235_add_event_column_to_activity_log_table.php
+      - database\migrations\2025_09_22_180236_add_batch_uuid_column_to_activity_log_table.php
       - config/log-viewer.php
       - config/settings.php
 

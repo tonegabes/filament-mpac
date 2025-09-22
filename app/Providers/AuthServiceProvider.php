@@ -46,5 +46,7 @@ final class AuthServiceProvider extends ServiceProvider
     private function configureGates(): void
     {
         Gate::before(fn (User $user) => $user->hasRole('TheOneAboveAll') ? true : null);
+
+        Gate::define('viewActivityLogUi', fn (User $user) => $user->can(SystemPermissions::ViewActivityLog));
     }
 }
