@@ -78,7 +78,16 @@ class AdminPanelProvider extends PanelProvider
                     ->icon(Phosphor::Scroll)
                     ->url('/' . Config::string('log-viewer.route_path'))
                     ->openUrlInNewTab()
-                    ->visible(fn () => auth()->user()?->can(SystemPermissions::LogViewerAccess)),
+                    ->visible(fn () => auth()->user()?->can(SystemPermissions::LogViewerAccess))
+                ,
+
+                NavigationItem::make('Activity Log')
+                    ->group(NavGroups::Tools->value)
+                    ->icon(Phosphor::Pulse)
+                    ->url('/' . Config::string('activitylog-ui.route.prefix'))
+                    ->openUrlInNewTab()
+                    ->visible(fn () => auth()->user()?->can(SystemPermissions::ViewActivityLog))
+                ,
             ])
             ->middleware([
                 EncryptCookies::class,
