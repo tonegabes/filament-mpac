@@ -103,7 +103,8 @@ class ManageSystem extends SettingsPage
                                 ->preserveFilenames()
                                 ->image()
                                 ->imageEditor()
-                                ->columnSpanFull(),
+                                ->columnSpanFull()
+                            ,
                         ]),
                     ]),
 
