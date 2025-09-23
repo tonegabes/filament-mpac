@@ -29,6 +29,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
@@ -72,23 +73,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentInfoWidget::class,
             ])
             ->navigationGroups($this->configureNavigationGroups())
-            ->navigationItems([
-                NavigationItem::make('Log Viewer')
-                    ->group(NavGroups::Tools->value)
-                    ->icon(Phosphor::Scroll)
-                    ->url('/' . Config::string('log-viewer.route_path'))
-                    ->openUrlInNewTab()
-                    ->visible(fn () => auth()->user()?->can(SystemPermissions::LogViewerAccess))
-                ,
-
-                NavigationItem::make('Activity Log')
-                    ->group(NavGroups::Tools->value)
-                    ->icon(Phosphor::Pulse)
-                    ->url('/' . Config::string('activitylog-ui.route.prefix'))
-                    ->openUrlInNewTab()
-                    ->visible(fn () => auth()->user()?->can(SystemPermissions::ViewActivityLog))
-                ,
-            ])
+            ->navigationItems($this->configureNavigationItems())
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -144,7 +129,7 @@ class AdminPanelProvider extends PanelProvider
     /**
      * Configure the navigation groups.
      *
-     * @return array<NavigationGroup>
+     * @return NavigationGroup[]
      */
     private function configureNavigationGroups(): array
     {
@@ -160,6 +145,30 @@ class AdminPanelProvider extends PanelProvider
 
             NavigationGroup::make(NavGroups::Tools->value)
                 ->collapsed(true),
+        ];
+    }
+
+    /**
+     * @return NavigationItem[]
+     */
+    private function configureNavigationItems(): array
+    {
+        return [
+            NavigationItem::make('Log Viewer')
+                ->group(NavGroups::Tools->value)
+                ->icon(Phosphor::Scroll)
+                ->url('/' . Config::string('log-viewer.route_path'))
+                ->openUrlInNewTab()
+                ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess))
+            ,
+
+            NavigationItem::make('Activity Log')
+                ->group(NavGroups::Tools->value)
+                ->icon(Phosphor::Pulse)
+                ->url('/' . Config::string('activitylog-ui.route.prefix'))
+                ->openUrlInNewTab()
+                ->visible(fn () => Auth::user()?->can(SystemPermissions::ViewActivityLog))
+            ,
         ];
     }
 }
