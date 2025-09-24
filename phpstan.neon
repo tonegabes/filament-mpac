@@ -21,6 +21,7 @@ parameters:
       - database\migrations\2025_09_22_180236_add_batch_uuid_column_to_activity_log_table.php
       - config/log-viewer.php
       - config/settings.php
+      - _ide_helper*.php
 
 #        - ./*/*/FileToBeExcluded.php
 #

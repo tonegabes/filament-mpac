@@ -29,6 +29,7 @@
   },
   "require-dev": {
     "agencetwogether/hookshelper": "^0.0.2",
+    "barryvdh/laravel-ide-helper": "^3.6",
     "fakerphp/faker": "^1.23",
     "friendsofphp/php-cs-fixer": "^3.86",
     "laradumps/laradumps": "4.0",
