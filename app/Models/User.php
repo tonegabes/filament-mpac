@@ -72,7 +72,7 @@ class User extends Authenticatable implements FilamentUser
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logAll()
+            ->logOnly($this->fillable)
             ->logOnlyDirty()
         ;
     }

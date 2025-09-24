@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -12,6 +14,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class Image extends Model implements HasMedia
 {
     use InteractsWithMedia;
+    use LogsActivity;
 
     public const COLLECTION_NAME = 'images';
 
@@ -59,5 +62,13 @@ class Image extends Model implements HasMedia
             ['file_name', $name],
             ['collection_name', self::COLLECTION_NAME],
         ])->first();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'guard_name'])
+            ->logOnlyDirty()
+        ;
     }
 }

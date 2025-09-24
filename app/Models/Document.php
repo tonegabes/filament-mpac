@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Document extends Model implements HasMedia
 {
     use InteractsWithMedia;
+    use LogsActivity;
 
     protected $fillable = ['name'];
 
@@ -48,5 +51,13 @@ class Document extends Model implements HasMedia
     public function getUrl(): string
     {
         return $this->getFirstMediaUrl(self::COLLECTION_NAME);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'guard_name'])
+            ->logOnlyDirty()
+        ;
     }
 }
