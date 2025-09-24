@@ -7,6 +7,7 @@ namespace App\Filament\Pages\Settings;
 use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
+use App\Filament\Components\Forms\ImagePicker;
 use App\Settings\SystemSettings;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
@@ -96,15 +97,18 @@ class ManageSystem extends SettingsPage
                                 ])
                                 ->required(),
 
-                            FileUpload::make('auth_page_background')
-                                ->label('Imagem de fundo')
-                                ->disk('public')
-                                ->directory(SystemSettings::LOGO_DIRECTORY)
-                                ->preserveFilenames()
-                                ->image()
-                                ->imageEditor()
-                                ->columnSpanFull()
+                            ImagePicker::make('auth_page_background')
                             ,
+
+                            // FileUpload::make('auth_page_background')
+                            //     ->label('Imagem de fundo')
+                            //     ->disk('public')
+                            //     ->directory(SystemSettings::LOGO_DIRECTORY)
+                            //     ->preserveFilenames()
+                            //     ->image()
+                            //     ->imageEditor()
+                            //     ->columnSpanFull()
+                            // ,
                         ]),
                     ]),
 
@@ -136,6 +140,17 @@ class ManageSystem extends SettingsPage
                     ]),
             ]);
     }
+
+    //     /**
+    //      * @param  array<string, mixed>  $data
+    //      * @return array<string, mixed>
+    //      */
+    //     protected function mutateFormDataBeforeSave(array $data): array
+    //     {
+    //         dd($data);
+    //
+    //         return $data;
+    //     }
 
     public function afterSave(): void
     {

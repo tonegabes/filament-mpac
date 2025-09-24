@@ -6,6 +6,7 @@ namespace App\Settings;
 
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
+use App\Models\Image;
 use BackedEnum;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelSettings\Settings;
@@ -94,6 +95,12 @@ class SystemSettings extends Settings
      */
     public function getAuthPageBackground(): string
     {
-        return $this->auth_page_background ? Storage::url($this->auth_page_background) : asset('images/background.avif');
+        if (! $this->auth_page_background) {
+            return asset('images/background.avif');
+        }
+
+        $image = Image::getMediaByName($this->auth_page_background);
+
+        return $image ? $image->getUrl() : asset('images/background.avif');
     }
 }

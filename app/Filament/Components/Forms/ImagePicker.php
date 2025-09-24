@@ -19,6 +19,8 @@ class ImagePicker extends Field
 
     public string $imageUrl = '#';
 
+    public ?string $imageName = null;
+
     /**
      * @return Collection<int, Image>
      */

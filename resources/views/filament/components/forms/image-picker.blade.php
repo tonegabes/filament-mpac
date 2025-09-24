@@ -7,21 +7,21 @@
 <x-dynamic-component
     :component="$getFieldWrapperView()"
     :field="$field"
-    class="fi-fo-toggle-buttons-wrp"
+    class="fi-fo-image-picker"
 >
-    <div class="grid grid-cols-6 gap-4">
+    <div class="fi-fo-image-picker__items">
         @foreach ($getImages() as $image)
             @php
                 $inputId = "{$id}-{$image->name}";
                 $imageUrl = $image->getUrl();
             @endphp
 
-            <div class="fi-fo-toggle-buttons-btn-ctn w-full">
+            <div class="fi-fo-image-picker__item">
                 <input
                     id="{{ $inputId }}"
                     name="{{ $id }}"
                     type="radio"
-                    value="{{ $imageUrl }}"
+                    value="{{ $image->getFilename() }}"
                     wire:model="{{ $statePath }}"
                     wire:loading.attr="disabled"
                     {{ $extraInputAttributeBag }}
@@ -29,9 +29,9 @@
                 <x-filament::button
                     :for="$inputId"
                     tag="label"
-                    class="w-full h-auto justify-start aspect-square"
+                    class="justify-start aspect-square p-1 hover:scale-95"
                 >
-                    <img src="{{ $imageUrl }}" class="w-full h-auto object-cover" alt="">
+                    <img src="{{ $imageUrl }}" class="w-full h-full object-cover" alt="">
                 </x-filament::button>
             </div>
         @endforeach

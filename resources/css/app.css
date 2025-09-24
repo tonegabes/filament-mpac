@@ -2,6 +2,7 @@
 @import "../../vendor/filament/filament/resources/css/theme.css";
 @import "./filament/sidebar.css" layer(components);
 @import "./filament/layout.css" layer(components);
+@import "./filament/image-picker.css" layer(components);
 
 @source '../../app/Filament/**/*';
 @source '../../resources/views/filament/**/*';
