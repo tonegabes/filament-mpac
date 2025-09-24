@@ -98,17 +98,8 @@ class ManageSystem extends SettingsPage
                                 ->required(),
 
                             ImagePicker::make('auth_page_background')
+                                ->label('Imagem de fundo')
                             ,
-
-                            // FileUpload::make('auth_page_background')
-                            //     ->label('Imagem de fundo')
-                            //     ->disk('public')
-                            //     ->directory(SystemSettings::LOGO_DIRECTORY)
-                            //     ->preserveFilenames()
-                            //     ->image()
-                            //     ->imageEditor()
-                            //     ->columnSpanFull()
-                            // ,
                         ]),
                     ]),
 

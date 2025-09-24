@@ -29,9 +29,9 @@
                 <x-filament::button
                     :for="$inputId"
                     tag="label"
-                    class="justify-start aspect-square p-1 hover:scale-95"
+                    class="fi-fo-image-picker__button "
                 >
-                    <img src="{{ $imageUrl }}" class="w-full h-full object-cover" alt="">
+                    <img src="{{ $imageUrl }}" alt="">
                 </x-filament::button>
             </div>
         @endforeach
