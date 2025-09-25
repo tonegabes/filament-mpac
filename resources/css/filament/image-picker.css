@@ -2,7 +2,7 @@
   /* @apply bg-amber-400; */
 
   & .fi-fo-image-picker__items {
-    @apply grid grid-cols-6 gap-1 border rounded-md p-2 shadow-xs max-h-[400px] overflow-y-auto;
+    @apply grid grid-cols-6 gap-1 border dark:border-gray-800 rounded-md p-2 shadow-xs max-h-[400px] overflow-y-auto;
     border-color: var(--border-color);
   }
 
@@ -17,5 +17,4 @@
       @apply w-full h-full object-cover rounded-sm;
     }
   }
-
 }
