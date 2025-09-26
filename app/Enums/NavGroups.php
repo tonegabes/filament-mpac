@@ -23,10 +23,10 @@ enum NavGroups: string implements HasIcon, HasLabel
     public function getIcon(): string
     {
         return match ($this) {
-            self::Authorization => (string) Phosphor::ShieldCheck->value,
-            self::Tools         => (string) Phosphor::Wrench->value,
-            self::Settings      => (string) Phosphor::Gear->value,
-            self::Files         => (string) Phosphor::File->value,
+            self::Authorization => (string) Phosphor::ShieldCheck->getLabel(),
+            self::Tools         => (string) Phosphor::Wrench->getLabel(),
+            self::Settings      => (string) Phosphor::Gear->getLabel(),
+            self::Files         => (string) Phosphor::File->getLabel(),
         };
     }
 }

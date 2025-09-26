@@ -2,6 +2,7 @@
 @import "../../vendor/filament/filament/resources/css/theme.css";
 @import "./filament/sidebar.css" layer(components);
 @import "./filament/layout.css" layer(components);
+@import "./filament/image-picker.css" layer(components);
 
 @source '../../app/Filament/**/*';
 @source '../../resources/views/filament/**/*';
@@ -19,6 +20,7 @@
     Times, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco;
 
+  --brand-color: #903031;
   --color-primary: var(--color-indigo-500);
 
   --border-color: var(--color-gray-200);
@@ -28,7 +30,7 @@
 @base {
   /* Smooth scrolling and transitions */
   * {
-    @apply transition-colors duration-300 ease-in-out;
+    @apply transition-all duration-300 ease-in-out;
   }
 
   h1,

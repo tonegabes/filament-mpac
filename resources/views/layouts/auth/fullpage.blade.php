@@ -19,7 +19,7 @@
             </a>
 
             <nav>
-                <a href="/"><x-phosphor-house-line class="size-6 text-black/50 hover:text-primary" /></a>
+                <a href="/"><x-phosphor-house-line class="size-6 text-black/50 dark:text-white/50 hover:text-primary" /></a>
             </nav>
         </div>
 
@@ -29,7 +29,7 @@
             </main>
         </div>
 
-        <footer class="flex justify-between items-center text-sm w-full px-4 py-2 tracking-wide text-black/50">
+        <footer class="flex justify-between items-center text-sm w-full px-4 py-2 tracking-wide text-black/50 dark:text-white/50">
             <span>© {{ date('Y') }} - Ministério Público do Estado do Acre</span>
             <span>{{ config('app.version') }}</span>
         </footer>

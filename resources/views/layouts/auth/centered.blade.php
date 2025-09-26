@@ -9,9 +9,9 @@
 
         <div class="flex flex-col w-xl h-fit my-auto">
 
-            <a href="/" class="flex flex-col items-center gap-8">
+            <a href="/" class="flex flex-col items-center dark:text-white gap-8">
                 @if ($settings->show_logo_in_topbar)
-                    <img src="{{ $settings->getAppLogoLight() }}" alt="Logo" class="h-6 w-auto">
+                    <img src="{{ $settings->getAppLogoLight() }}" alt="Logo" class="h-6 w-auto dark:invert">
                 @endif
 
                 @if ($settings->show_name_in_topbar)
@@ -23,7 +23,7 @@
                 {{ $slot }}
             </main>
 
-            <footer class="text-sm mx-auto tracking-wide text-black/50">
+            <footer class="text-sm mx-auto tracking-wide dark:text-white/50 text-black/50">
                 © {{ date('Y') }} - Ministério Público do Estado do Acre - {{ config('app.version') }}
             </footer>
         </div>
