@@ -6,12 +6,14 @@ namespace App\Filament\Resources\Images\Tables;
 
 use App\Models\Image;
 use App\Traits\HasNotifications;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Js;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class ImagesTable
@@ -33,19 +35,6 @@ class ImagesTable
                     ->searchable()
                 ,
 
-                TextColumn::make('media.url')
-                    ->label('Link')
-                    ->icon(Phosphor::Copy)
-                    ->iconColor('primary')
-                    ->color('primary')
-                    ->state('Copiar Link')
-                    ->alignCenter()
-                    ->copyable()
-                    ->copyableState(fn (Image $record) => $record->getUrl())
-                    ->copyMessage('Link copiado para área de transferência')
-                    ->copyMessageDuration(1500)
-                ,
-
                 TextColumn::make('media.size')
                     ->label('Tamanho')
                     ->sortable()
@@ -62,6 +51,23 @@ class ImagesTable
                 //
             ])
             ->recordActions([
+                Action::make('copy')
+                    ->label('Copiar Link')
+                    ->icon(Phosphor::Copy)
+                    ->alpineClickHandler(function (Image $record): string {
+                        $copyableState = Js::from($record->getUrl());
+                        $copyMessageJs = Js::from('Link copiado para área de transferência');
+
+                        return <<<JS
+                            window.navigator.clipboard.writeText({$copyableState})
+                            \$tooltip({$copyMessageJs}, {
+                                theme: \$store.theme,
+                                timeout: 2000,
+                            })
+                        JS;
+                    })
+                ,
+
                 DeleteAction::make(),
             ])
             ->toolbarActions([
