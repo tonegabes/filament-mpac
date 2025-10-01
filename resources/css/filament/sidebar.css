@@ -1,8 +1,12 @@
 .fi-sidebar {
-  @apply bg-white/80 border-r shadow-sm dark:bg-gray-950;
+  @apply border-r bg-none;
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   border-color: var(--border-color);
+
+  &:where(.dark, .dark *) {
+    border-color: var(--border-color-dark);
+  }
 }
 
 .fi-sidebar:not(.fi-sidebar-open) {
