@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Images\Tables;
 
+use App\Filament\Actions\CopyFileUrlAction;
 use App\Models\Image;
 use App\Traits\HasNotifications;
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Js;
-use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class ImagesTable
 {
@@ -51,23 +49,7 @@ class ImagesTable
                 //
             ])
             ->recordActions([
-                Action::make('copy')
-                    ->label('Copiar Link')
-                    ->icon(Phosphor::Copy)
-                    ->alpineClickHandler(function (Image $record): string {
-                        $copyableState = Js::from($record->getUrl());
-                        $copyMessageJs = Js::from('Link copiado para área de transferência');
-
-                        return <<<JS
-                            window.navigator.clipboard.writeText({$copyableState})
-                            \$tooltip({$copyMessageJs}, {
-                                theme: \$store.theme,
-                                timeout: 2000,
-                            })
-                        JS;
-                    })
-                ,
-
+                CopyFileUrlAction::make()->label('Link da Imagem'),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
