@@ -30,6 +30,7 @@
   "require-dev": {
     "agencetwogether/hookshelper": "^0.0.2",
     "barryvdh/laravel-ide-helper": "^3.6",
+    "driftingly/rector-laravel": "^2.0",
     "fakerphp/faker": "^1.23",
     "friendsofphp/php-cs-fixer": "^3.86",
     "larastan/larastan": "^3.0",
@@ -43,7 +44,8 @@
     "pestphp/pest-plugin-faker": "^3.0",
     "pestphp/pest-plugin-laravel": "^3.2",
     "phpstan/phpstan-deprecation-rules": "^2.0",
-    "phpunit/phpunit": "^11.5.3"
+    "phpunit/phpunit": "^11.5.3",
+    "rector/rector": "^2.2"
   },
   "autoload": {
     "psr-4": {
