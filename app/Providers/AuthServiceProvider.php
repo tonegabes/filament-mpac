@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
 
@@ -35,8 +36,17 @@ final class AuthServiceProvider extends ServiceProvider
     {
         $this->configureGates();
 
-        if (app()->isProduction()) {
-            LogViewer::auth(fn ($request) => $request->user()?->can(SystemPermissions::LogViewerAccess));
+        if (! app()->isProduction()) {
+            LogViewer::auth(function (Request $request) {
+
+                $user = $request->user();
+
+                if ($user) {
+                    return $user->can(SystemPermissions::LogViewerAccess);
+                }
+
+                return false;
+            });
         }
     }
 

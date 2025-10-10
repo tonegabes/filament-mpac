@@ -13,7 +13,7 @@ use Spatie\LaravelSettings\Settings;
 
 class SystemSettings extends Settings
 {
-    const LOGO_DIRECTORY = 'logos';
+    public const LOGO_DIRECTORY = 'logos';
 
     public string $app_name = 'MPAC';
 
@@ -75,6 +75,7 @@ class SystemSettings extends Settings
 
         $files = Storage::disk('public')->files(self::LOGO_DIRECTORY);
 
+        /** @var string[] $filesToDelete */
         $filesToDelete = array_diff($files, $logos);
 
         foreach ($filesToDelete as $file) {

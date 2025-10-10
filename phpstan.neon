@@ -14,7 +14,7 @@ parameters:
         - routes
 
     # Level 10 is the highest level
-    level: 9
+    level: max
 
     ignoreErrors:
 
