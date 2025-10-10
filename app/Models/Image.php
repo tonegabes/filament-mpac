@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\HasFileUrl;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -11,7 +12,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Image extends Model implements HasMedia
+class Image extends Model implements HasFileUrl, HasMedia
 {
     use InteractsWithMedia;
     use LogsActivity;
@@ -46,7 +47,7 @@ class Image extends Model implements HasMedia
         ];
     }
 
-    public function getUrl(): string
+    public function getFileUrl(): string
     {
         return $this->getFirstMediaUrl(self::COLLECTION_NAME);
     }
@@ -67,7 +68,7 @@ class Image extends Model implements HasMedia
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'guard_name'])
+            ->logOnly($this->fillable)
             ->logOnlyDirty()
         ;
     }

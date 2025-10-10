@@ -42,25 +42,16 @@ class Login extends VendorLogin
         }
     }
 
-    /**
-     * Override the default view to use the custom view.
-     */
     public function getView(): string
     {
         return 'filament.pages.auth.login';
     }
 
-    /**
-     * Override the default layout to use the custom layout.
-     */
     public function getLayout(): string
     {
         return app(SystemSettings::class)->getAppLayout();
     }
 
-    /**
-     * Override the default authentication logic to use the custom logic.
-     */
     public function authenticate(): ?LoginResponse
     {
         try {
@@ -107,9 +98,6 @@ class Login extends VendorLogin
         return app(LoginResponse::class);
     }
 
-    /**
-     * Check if the user is undertaking multi-factor authentication.
-     */
     public function checkMultiFactorAuthentication(Authenticatable $user): void
     {
         if (
@@ -141,8 +129,6 @@ class Login extends VendorLogin
     }
 
     /**
-     * Attempt to authenticate the user using the default authentication provider.
-     *
      * @param  array<string, mixed>  $credentials
      */
     public function attemptDefaultAuth(SessionGuard $authGuard, Authenticatable $user, array $credentials, bool $remember): void
@@ -163,15 +149,13 @@ class Login extends VendorLogin
     }
 
     /**
-     * Attempt to authenticate the user using LDAP.
-     *
      * @param  array<string, string>  $data
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function attemptLdapAuth(array $data): void
     {
-        $username = $data['username'] ?? '';
+        $username = $this->normalizeUsername($data['username']);
         $password = $data['password'] ?? '';
 
         // Check if user is in LDAP
@@ -195,9 +179,6 @@ class Login extends VendorLogin
         );
     }
 
-    /**
-     * Override the default form to use the custom form.
-     */
     public function form(Schema $schema): Schema
     {
         $loginComponent = $this->getEmailFormComponent();
@@ -214,9 +195,6 @@ class Login extends VendorLogin
             ]);
     }
 
-    /**
-     * Get the username form component.
-     */
     protected function getUsernameFormComponent(): Component
     {
         $emailDomain = $this->ldapAuthService->emailDomain;
@@ -232,8 +210,6 @@ class Login extends VendorLogin
     }
 
     /**
-     * Handle the local user record based on LDAP data.
-     *
      * @param  LdapUser  $ldapUser
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -265,5 +241,25 @@ class Login extends VendorLogin
         }
 
         return $user;
+    }
+
+    protected function normalizeUsername(?string $username): string
+    {
+        if (is_null($username)) {
+            return '';
+        }
+
+        $str = str($username)
+            ->lower()
+            ->trim()
+        ;
+
+        $emailDomain = config()->string('auth.ldap.email_domain');
+
+        if ($str->contains($emailDomain)) {
+            $str = $str->before($emailDomain);
+        }
+
+        return $str->toString();
     }
 }

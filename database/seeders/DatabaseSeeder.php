@@ -9,15 +9,16 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
+        activity()->disableLogging();
+
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
         ]);
+
+        activity()->enableLogging();
     }
 }
