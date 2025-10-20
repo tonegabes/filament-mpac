@@ -7,7 +7,7 @@
 <x-filament-panels::layout.base>
     <div class="fi-simple-layout">
 
-        <div class="flex flex-col w-xl h-fit my-auto">
+        <div class="flex flex-col lg:w-xl h-fit my-auto">
 
             <a href="/" class="flex flex-col items-center dark:text-white gap-8">
                 @if ($settings->show_logo_in_topbar)

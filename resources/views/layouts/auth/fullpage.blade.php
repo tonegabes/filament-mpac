@@ -23,7 +23,7 @@
             </nav>
         </div>
 
-        <div class="flex flex-col w-xl h-fit my-auto">
+        <div class="flex flex-col lg:w-xl h-fit my-auto">
             <main class="fi-simple-main">
                 {{ $slot }}
             </main>

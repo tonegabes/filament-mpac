@@ -9,7 +9,12 @@
 @endphp
 
 <section {{ $attributes->class(['fi-simple-page']) }}>
-    {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_PAGE_START, scopes: $this->getRenderHookScopes()) }}
+    {{
+        \Filament\Support\Facades\FilamentView::renderHook(
+            \Filament\View\PanelsRenderHook::SIMPLE_PAGE_START,
+            scopes: $this->getRenderHookScopes()
+        )
+    }}
 
     <div class="fi-simple-page-content">
         <x-filament-panels::header.simple
