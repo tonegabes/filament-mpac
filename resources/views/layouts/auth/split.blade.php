@@ -7,7 +7,7 @@
 <x-filament-panels::layout.base>
     <div class="flex min-h-dvh">
 
-        <div class="flex flex-col w-1/2 grow max-h-dvh">
+        <div class="hidden md:flex flex-col w-1/2 grow max-h-dvh">
             <img src="{{ $settings->getAuthPageBackground() }}" alt="Login Background" class="w-full h-full object-cover">
         </div>
 
@@ -29,7 +29,7 @@
             </div>
 
             <div class="flex grow">
-                <main class="fi-simple-main w-xl h-fit m-auto" style="margin-block: auto;">
+                <main class="fi-simple-main lg:w-xl h-fit m-auto" style="margin-block: auto;">
                     {{ $slot }}
                 </main>
             </div>

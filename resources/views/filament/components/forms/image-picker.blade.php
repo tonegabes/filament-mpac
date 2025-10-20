@@ -17,7 +17,7 @@
             @foreach ($images as $image)
                 @php
                     $inputId = "{$id}-{$image->name}";
-                    $imageUrl = $image->getUrl();
+                    $imageUrl = $image->getFileUrl();
                 @endphp
 
                 <div class="fi-fo-image-picker__item">
