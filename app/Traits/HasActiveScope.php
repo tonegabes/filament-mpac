@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
@@ -18,7 +19,13 @@ trait HasActiveScope
      */
     public function scopeIsActive(Builder $query): Builder
     {
-        return $query->where('is_active', true)->useIndex('idx_is_active');
+        $query->where('is_active', true);
+
+        if (DB::connection()->getDriverName() === 'mysql') {
+            $query->useIndex('idx_is_active');
+        }
+
+        return $query;
     }
 
     /**
