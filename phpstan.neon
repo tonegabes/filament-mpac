@@ -26,6 +26,7 @@ parameters:
       - config/log-viewer.php
       - config/settings.php
       - _ide_helper*.php
+      - tests
 
 #        - ./*/*/FileToBeExcluded.php
 #
