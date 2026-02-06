@@ -30,7 +30,6 @@
   "require-dev": {
     "barryvdh/laravel-ide-helper": "^3.6",
     "fakerphp/faker": "^1.24.1",
-    "filament/upgrade": "5.0",
     "friendsofphp/php-cs-fixer": "^3.88.2",
     "larastan/larastan": "^3.7.2",
     "laravel/boost": "^1.3",
