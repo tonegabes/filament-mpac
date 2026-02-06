@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use Agencetwogether\HooksHelper\HooksHelperPlugin;
 use App\Enums\NavGroups;
 use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Pages\Auth\Login;
@@ -89,7 +88,6 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                // HooksHelperPlugin::make(), // Usar apenas quando necessário
             ]);
     }
 
