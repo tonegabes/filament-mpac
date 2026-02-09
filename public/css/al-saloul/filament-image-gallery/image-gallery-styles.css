@@ -1,0 +1,21 @@
+.image-gallery {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(156 163 175) transparent;
+}
+
+.image-gallery::-webkit-scrollbar {
+    height: 6px;
+}
+
+.image-gallery::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.image-gallery::-webkit-scrollbar-thumb {
+    background-color: rgb(156 163 175);
+    border-radius: 3px;
+}
+
+.dark .image-gallery::-webkit-scrollbar-thumb {
+    background-color: rgb(75 85 99);
+}
