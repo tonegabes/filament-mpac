@@ -1,0 +1,30 @@
+{
+    auto_https off
+    admin off
+}
+
+:8080 {
+    encode gzip zstd
+
+    root * /var/www/html/public
+
+    php_server
+
+    file_server
+
+    # Cache forte para assets
+    header /build/* Cache-Control "public, max-age=31536000, immutable"
+    header /livewire/* Cache-Control "public, max-age=31536000, immutable"
+
+    # Segurança
+    header {
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    }
+
+    # Redireciona tudo pro Laravel (fallback)
+    try_files {path} /index.php
+}

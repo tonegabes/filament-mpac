@@ -1,71 +1,72 @@
-FROM php:8.3-apache-bullseye
+FROM serversideup/php:8.4-frankenphp-alpine AS base
 
-RUN apt-get update && apt-get install -y \
-  build-essential \
-  curl \
-  #git \
-  jpegoptim optipng pngquant gifsicle \
-  libavif-bin \
-  libpng-dev \
-  libxml2-dev \
-  libzip-dev \
-  locales \
-  nano \
-  #nodejs \
-  #npm \
-  unzip \
-  vim \
-  zip
+USER root
 
-RUN docker-php-ext-configure opcache --enable-opcache \
-  && docker-php-ext-install \
-  exif \
-  bcmath \
-  ctype \
-  fileinfo \
-  #json \
-  mysqli \
-  pdo_mysql \
-  #tokenizer \
-  xml \
-  zip \
-  intl \
-  gd \
-  && docker-php-ext-enable exif
+ENV LOG_CHANNEL=stderr \
+    SSL_MODE=on \
+    PHP_OPCACHE_ENABLE=1 \
+    PHP_OPCACHE_JIT=on \
+    COMPOSER_ALLOW_SUPERUSER=false
 
-COPY docker/php/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+RUN apk add --no-cache \
+    bash curl ca-certificates \
+    libpng-dev libzip-dev libxml2-dev \
+    zip unzip
 
-#COPY crontab /etc/crontabs/root
+RUN install-php-extensions intl exif ldap bcmath gd
 
-RUN apt-get update \
-  && apt-get install libldap2-dev -y \
-  && rm -rf /var/lib/apt/lists/* \
-  && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
-  && docker-php-ext-install ldap
+USER www-data
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+WORKDIR /var/www/html
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+FROM base AS build
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+USER root
+COPY --chown=www-data:www-data composer.* ./
+USER www-data
 
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-  && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN composer install \
+    --no-dev --no-interaction --prefer-dist \
+    --optimize-autoloader --no-scripts
 
-#WORKDIR /var/www/html
-COPY . /var/www/html
-#COPY docker/start.sh /usr/local/bin/start
+COPY --chown=www-data:www-data . .
 
-RUN composer install --prefer-dist --no-interaction --optimize-autoloader
+RUN composer dump-autoload --optimize --classmap-authoritative
 
-RUN php artisan optimize:clear && php artisan storage:link \
-  && php artisan icons:cache \
-  && php artisan filament:cache-components \
-  && chown -R www-data:www-data /var/www/html \
-  && chmod -R ugo+rwx storage/ bootstrap/cache \
-  #&& chmod u+x /usr/local/bin/start \
-  && a2enmod rewrite
+FROM node:20-alpine AS assets
 
-#CMD [ "/usr/local/bin/start" ]
+WORKDIR /var/www/html
 
-#ENTRYPOINT ["bash", "init.sh" ]
+COPY --from=build /var/www/html /var/www/html
+
+RUN npm ci
+
+RUN rm -rf public/build && npm cache clear --force
+
+RUN npm run build
+
+FROM base
+
+COPY --from=build --chown=www-data:www-data /var/www/html /var/www/html
+COPY --from=assets /var/www/html/public/build /var/www/html/public/build
+COPY --chown=root:root Caddyfile /etc/frankenphp/Caddyfile
+COPY --chown=root:root docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+USER root
+
+RUN mkdir -p storage/framework/{cache,sessions,views} \
+    bootstrap/cache \
+    storage/app/{public,private/livewire-tmp} && \
+    chown -R www-data:www-data storage bootstrap/cache
+
+RUN php artisan filament:assets && \
+    php artisan storage:link && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    php artisan event:cache && \
+    php artisan filament:optimize
+
+USER www-data
+
+HEALTHCHECK CMD wget --no-verbose --tries=1 --spider \
+  http://localhost:8080/up || exit 1
