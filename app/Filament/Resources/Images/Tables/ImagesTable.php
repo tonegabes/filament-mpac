@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Images\Tables;
 
+use Alsaloul\ImageGallery\Tables\Columns\ImageGalleryColumn;
 use App\Filament\Actions\CopyFileUrlAction;
 use App\Models\Image;
 use App\Traits\HasNotifications;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -22,8 +22,8 @@ class ImagesTable
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('image')
-                    ->collection(Image::COLLECTION_NAME)
+                ImageGalleryColumn::make('image')
+                    ->getStateUsing(fn (Image $record) => $record->getFileUrl())
                     ->label('Imagem')
                 ,
 
