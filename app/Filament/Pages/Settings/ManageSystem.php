@@ -16,6 +16,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Pages\SettingsPage;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use ToneGabes\BetterOptions\Forms\Components\RadioList;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
@@ -45,39 +47,73 @@ class ManageSystem extends SettingsPage
         return $schema
             ->columns(1)
             ->components([
-                Fieldset::make()
-                    ->columns(1)
-                    ->extraAttributes([
-                        'class' => 'border-none p-0',
-                    ])
-                    ->schema([
-                        Section::make('Nome')
-                            ->schema([
-                                TextInput::make('app_name')
-                                    ->label('Nome do Sistema')
-                                    ->maxLength(255)
-                                    ->columnSpanFull()
-                                    ->required(),
+                Tabs::make('Tabs')
+                    ->activeTab(1)
+                    ->tabs([
+                        Tab::make('Geral')->schema([
+                            Fieldset::make()
+                                ->columns(1)
+                                ->schema([
+                                    TextInput::make('app_name')
+                                        ->label('Nome do Sistema')
+                                        ->maxLength(255)
+                                        ->columnSpanFull()
+                                        ->required()
+                                    ,
 
-                                Toggle::make('show_name_in_topbar')
-                                    ->label('Exibir na barra de navegação')
-                                    ->onIcon(Phosphor::Check)
-                                    ->offIcon(Phosphor::X)
-                                    ->columnSpanFull()
-                                    ->required(),
-                            ]),
+                                    Toggle::make('show_name_in_topbar')
+                                        ->label('Exibir na barra de navegação')
+                                        ->onIcon(Phosphor::Check)
+                                        ->offIcon(Phosphor::X)
+                                        ->columnSpanFull()
+                                        ->required()
+                                    ,
+                                ])
+                            ,
 
-                        Section::make('Registro')->schema([
+                            Section::make('Logos')
+                                ->columns(2)
+                                ->schema([
+                                    FileUpload::make('app_logo_light')
+                                        ->label('Modo Claro')
+                                        ->disk('public')
+                                        ->directory(SystemSettings::LOGO_DIRECTORY)
+                                        ->preserveFilenames()
+                                        ->image()
+                                        ->imageEditor()
+                                    ,
+
+                                    FileUpload::make('app_logo_dark')
+                                        ->label('Modo Escuro')
+                                        ->disk('public')
+                                        ->directory(SystemSettings::LOGO_DIRECTORY)
+                                        ->preserveFilenames()
+                                        ->image()
+                                        ->imageEditor()
+                                    ,
+
+                                    Toggle::make('show_logo_in_topbar')
+                                        ->label('Exibir na barra de navegação')
+                                        ->onIcon(Phosphor::Check)
+                                        ->offIcon(Phosphor::X)
+                                        ->columnSpanFull()
+                                        ->required()
+                                    ,
+                                ]),
+                        ]),
+
+                        Tab::make('Registro')->schema([
                             Toggle::make('enable_registration')
                                 ->label('Habilitar Registro no Sistema')
                                 ->helperText('Se habilitado, os usuários poderão se registrar no sistema.')
                                 ->onIcon(Phosphor::Check)
                                 ->offIcon(Phosphor::X)
                                 ->columnSpanFull()
-                                ->required(),
+                                ->required()
+                            ,
                         ]),
 
-                        Section::make('Login')->schema([
+                        Tab::make('Login')->schema([
                             RadioList::make('auth_page_layout')
                                 ->label('Layout da página de login')
                                 ->options([
@@ -102,46 +138,8 @@ class ManageSystem extends SettingsPage
                             ,
                         ]),
                     ]),
-
-                Section::make('Logos')
-                    ->columns(2)
-                    ->schema([
-                        FileUpload::make('app_logo_light')
-                            ->label('Modo Claro')
-                            ->disk('public')
-                            ->directory(SystemSettings::LOGO_DIRECTORY)
-                            ->preserveFilenames()
-                            ->image()
-                            ->imageEditor(),
-
-                        FileUpload::make('app_logo_dark')
-                            ->label('Modo Escuro')
-                            ->disk('public')
-                            ->directory(SystemSettings::LOGO_DIRECTORY)
-                            ->preserveFilenames()
-                            ->image()
-                            ->imageEditor(),
-
-                        Toggle::make('show_logo_in_topbar')
-                            ->label('Exibir na barra de navegação')
-                            ->onIcon(Phosphor::Check)
-                            ->offIcon(Phosphor::X)
-                            ->columnSpanFull()
-                            ->required(),
-                    ]),
             ]);
     }
-
-    //     /**
-    //      * @param  array<string, mixed>  $data
-    //      * @return array<string, mixed>
-    //      */
-    //     protected function mutateFormDataBeforeSave(array $data): array
-    //     {
-    //         dd($data);
-    //
-    //         return $data;
-    //     }
 
     public function afterSave(): void
     {
