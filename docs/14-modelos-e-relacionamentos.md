@@ -227,8 +227,8 @@ SpatieMediaLibraryFileUpload::make('image')
 ### Configuração Básica
 
 ```php
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class Product extends Model
 {
@@ -239,7 +239,7 @@ class Product extends Model
         return LogOptions::defaults()
             ->logOnly($this->fillable)
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 }
 ```

@@ -71,15 +71,22 @@ class SystemSettings extends Settings
     public static function cleanLogoDirectory(): void
     {
         $self = new self;
-        $logos = [$self->app_logo_light, $self->app_logo_dark];
+        $logos = array_values(array_filter(
+            [$self->app_logo_light, $self->app_logo_dark],
+            static fn (?string $path): bool => $path !== null && $path !== ''
+        ));
 
         $files = Storage::disk('public')->files(self::LOGO_DIRECTORY);
+        $keep = array_flip($logos);
 
-        /** @var string[] $filesToDelete */
-        $filesToDelete = array_diff($files, $logos);
+        foreach ($files as $file) {
+            if (! is_string($file)) {
+                continue;
+            }
 
-        foreach ($filesToDelete as $file) {
-            Storage::disk('public')->delete($file);
+            if (! isset($keep[$file])) {
+                Storage::disk('public')->delete($file);
+            }
         }
     }
 
