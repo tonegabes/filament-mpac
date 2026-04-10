@@ -25,7 +25,7 @@ use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
@@ -79,7 +79,7 @@ class AdminPanelProvider extends PanelProvider
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
-                VerifyCsrfToken::class,
+                PreventRequestForgery::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
@@ -158,14 +158,6 @@ class AdminPanelProvider extends PanelProvider
                 ->url('/' . Config::string('log-viewer.route_path'))
                 ->openUrlInNewTab()
                 ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess))
-            ,
-
-            NavigationItem::make('Activity Log')
-                ->group(NavGroups::Tools->value)
-                ->icon(Phosphor::Pulse)
-                ->url('/' . Config::string('activitylog-ui.route.prefix'))
-                ->openUrlInNewTab()
-                ->visible(fn () => Auth::user()?->can(SystemPermissions::ViewActivityLog))
             ,
         ];
     }

@@ -136,13 +136,6 @@ private function configureNavigationItems(): array
             ->url('/' . Config::string('log-viewer.route_path'))
             ->openUrlInNewTab()
             ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess)),
-
-        NavigationItem::make('Activity Log')
-            ->group(NavGroups::Tools->value)
-            ->icon(Phosphor::Pulse)
-            ->url('/' . Config::string('activitylog-ui.route.prefix'))
-            ->openUrlInNewTab()
-            ->visible(fn () => Auth::user()?->can(SystemPermissions::ViewActivityLog)),
     ];
 }
 ```
@@ -211,7 +204,7 @@ private function configureRegistration(Panel $panel): Panel
     StartSession::class,
     AuthenticateSession::class,
     ShareErrorsFromSession::class,
-    VerifyCsrfToken::class,
+    PreventRequestForgery::class,
     SubstituteBindings::class,
     DisableBladeIconComponents::class,
     DispatchServingFilamentEvent::class,
@@ -286,7 +279,7 @@ class AdminPanelProvider extends PanelProvider
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
-                VerifyCsrfToken::class,
+                PreventRequestForgery::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,

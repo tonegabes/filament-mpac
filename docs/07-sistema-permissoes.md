@@ -77,8 +77,7 @@ Para permissões de sistema:
 enum SystemPermissions: string
 {
     case SystemSettingsManage = 'system.settings.manage';
-    case LogViewerAccess = 'system.logs.view';
-    case ViewActivityLog = 'system.activity.view';
+    case LogViewerAccess = 'system.log-viewer.access';
 }
 ```
 
