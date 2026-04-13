@@ -12,12 +12,14 @@
 @source '../**/*.js';
 
 @theme {
-  --font-sans: "Assistant", ui-sans-serif, system-ui, sans-serif,
+  --font-sans:
+    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
+  --font-display:
+    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-serif: "Crimson Pro", ui-serif, Georgia, Cambria, "Times New Roman",
-    Times, serif;
+  --font-serif:
+    "IBM Plex Mono", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco;
 
   --brand-color: #903031;
