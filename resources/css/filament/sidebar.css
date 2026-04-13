@@ -1,22 +1,18 @@
 .fi-sidebar {
-  @apply border-r bg-none;
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border-color: var(--border-color);
+  @apply border-r border-zinc-200/90 bg-white/95 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/95;
+}
 
-  &:where(.dark, .dark *) {
-    border-color: var(--border-color-dark);
-  }
+.fi-sidebar.fi-sidebar-open {
+  @apply shadow-none ring-0 dark:ring-0;
 }
 
 .fi-sidebar:not(.fi-sidebar-open) {
-  @apply w-[56px];
+  @apply w-14 lg:w-14;
 }
 
 .fi-sidebar-nav {
   @apply p-0;
   scrollbar-gutter: unset !important;
-
 }
 
 .fi-sidebar-nav-groups {
