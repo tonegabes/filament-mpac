@@ -6,6 +6,7 @@
 .phpunit.result.cache
 "laradumps.yaml"
 *.log
+/.cursor
 /.fleet
 /.idea
 /.nova
@@ -26,3 +27,5 @@ Homestead.yaml
 npm-debug.log
 Thumbs.db
 yarn-error.log
+CLAUDE.md
+WARP.md
