@@ -1,0 +1,36 @@
+.fi-sidebar {
+  @apply border-r border-zinc-200/90 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/95;
+}
+
+.fi-sidebar-nav {
+  @apply flex grow flex-col gap-y-7 overflow-x-hidden overflow-y-auto p-2;
+  scrollbar-gutter: stable;
+}
+
+.fi-sidebar-nav-groups {
+  @apply mx-0 flex flex-col gap-y-2;
+}
+
+.fi-sidebar-group-btn {
+  @apply flex items-center gap-x-3 px-4.5 py-1;
+
+  & .fi-icon {
+    @apply size-3 text-(--color-text-secondary);
+  }
+}
+
+.fi-sidebar-group-label {
+  @apply flex-1 text-xs leading-6 font-medium text-(--color-text-secondary) hover:text-(--color-text);
+}
+
+.fi-sidebar-item-btn {
+  @apply relative flex items-center justify-center gap-x-3 rounded-lg px-4 py-2.5 outline-hidden transition duration-75;
+
+  & > .fi-icon {
+    @apply size-5 text-(--color-text-secondary);
+  }
+}
+
+.fi-sidebar-item-label {
+  @apply flex-1 truncate text-sm font-medium text-(--color-text-secondary);
+}
