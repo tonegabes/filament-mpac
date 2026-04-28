@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
 @import "../../vendor/filament/filament/resources/css/theme.css";
-/* @import "./mpac-theme"; */
-@import "./alt-theme";
+@import "./mpac-theme";
 
 @source '../../app/Filament/**/*';
 @source '../../resources/views/filament/**/*';
