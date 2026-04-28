@@ -7,10 +7,10 @@ namespace App\Filament\Pages\Settings;
 use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
-use App\Filament\Components\Forms\ImagePicker;
 use App\Settings\SystemSettings;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\SettingsPage;
@@ -52,21 +52,18 @@ class ManageSystem extends SettingsPage
                     ->tabs([
                         Tab::make('Geral')->schema([
                             Fieldset::make()
-                                ->columns(1)
+                                ->columns(2)
                                 ->schema([
+                                    TextInput::make('app_sigla')
+                                        ->label('Sigla do sistema')
+                                        ->maxLength(10)
+                                        ->helperText('Deixe vazio para não exibir a sigla do sistema.')
+                                    ,
+
                                     TextInput::make('app_name')
                                         ->label('Nome do Sistema')
                                         ->maxLength(255)
-                                        ->columnSpanFull()
-                                        ->required()
-                                    ,
-
-                                    Toggle::make('show_name_in_topbar')
-                                        ->label('Exibir na barra de navegação')
-                                        ->onIcon(Phosphor::Check)
-                                        ->offIcon(Phosphor::X)
-                                        ->columnSpanFull()
-                                        ->required()
+                                        ->helperText('Deixe vazio para não exibir o nome do sistema.')
                                     ,
                                 ])
                             ,
@@ -92,8 +89,8 @@ class ManageSystem extends SettingsPage
                                         ->imageEditor()
                                     ,
 
-                                    Toggle::make('show_logo_in_topbar')
-                                        ->label('Exibir na barra de navegação')
+                                    Toggle::make('show_app_logo')
+                                        ->label('Exibir logo do sistema')
                                         ->onIcon(Phosphor::Check)
                                         ->offIcon(Phosphor::X)
                                         ->columnSpanFull()
@@ -116,6 +113,7 @@ class ManageSystem extends SettingsPage
                         Tab::make('Login')->schema([
                             RadioList::make('auth_page_layout')
                                 ->label('Layout da página de login')
+                                ->default(PageLayouts::Split->value)
                                 ->options([
                                     PageLayouts::Split->value    => PageLayouts::Split->getLabel(),
                                     PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
@@ -133,8 +131,11 @@ class ManageSystem extends SettingsPage
                                 ])
                                 ->required(),
 
-                            ImagePicker::make('auth_page_background')
+                            SpatieMediaLibraryFileUpload::make('auth_page_background')
                                 ->label('Imagem de fundo')
+                                ->collection('backgrounds')
+                                ->image()
+                                ->imageEditor()
                             ,
                         ]),
                     ]),

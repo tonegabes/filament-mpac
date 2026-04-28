@@ -15,11 +15,11 @@ class SystemSettings extends Settings
 {
     public const LOGO_DIRECTORY = 'logos';
 
-    public string $app_name = 'MPAC';
+    public ?string $app_name = 'Ministério Público do Estado do Acre';
 
-    public bool $show_name_in_topbar = true;
+    public ?string $app_sigla = 'MPAC';
 
-    public bool $show_logo_in_topbar = true;
+    public bool $show_app_logo = true;
 
     public ?string $app_logo_light = null;
 
