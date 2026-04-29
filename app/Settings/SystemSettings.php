@@ -6,18 +6,32 @@ namespace App\Settings;
 
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
-use App\Models\Image;
 use BackedEnum;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelSettings\Settings;
 
 class SystemSettings extends Settings
 {
-    public const LOGO_DIRECTORY = 'logos';
+    public const LOGO_DIRECTORY = 'system/logos';
 
-    public ?string $app_name = 'Ministério Público do Estado do Acre';
+    public const BACKGROUNDS_DIRECTORY = 'system/backgrounds';
 
-    public ?string $app_sigla = 'MPAC';
+    public const DEFAULT_APP_NAME = 'Ministério Público do Estado do Acre';
+
+    public const DEFAULT_APP_SIGLA = 'MPAC';
+
+    public const DEFAULT_LOGO_LIGHT = 'images/logo.png';
+
+    public const DEFAULT_LOGO_DARK = 'images/logo-dark.png';
+
+    public const DEFAULT_AUTH_BACKGROUND = 'images/background.avif';
+
+    public const DEFAULT_AUTH_PAGE_LAYOUT = PageLayouts::Split;
+
+    public ?string $app_name = self::DEFAULT_APP_NAME;
+
+    public ?string $app_sigla = self::DEFAULT_APP_SIGLA;
 
     public bool $show_app_logo = true;
 
@@ -25,13 +39,11 @@ class SystemSettings extends Settings
 
     public ?string $app_logo_dark = null;
 
-    public ?string $auth_page_layout = null;
+    public ?PageLayouts $auth_page_layout = self::DEFAULT_AUTH_PAGE_LAYOUT;
 
     public ?string $auth_page_background = null;
 
-    public bool $enable_registration = false;
-
-    public string $footer_text = 'Ministério Público do Estado do Acre';
+    public bool $enable_registration = true;
 
     /**
      * Return the group name for the settings.
@@ -54,7 +66,7 @@ class SystemSettings extends Settings
      */
     public function getAppLogoLight(): string
     {
-        return $this->app_logo_light ? Storage::url($this->app_logo_light) : asset('images/logo.png');
+        return $this->getPublicFileUrl($this->app_logo_light, self::DEFAULT_LOGO_LIGHT);
     }
 
     /**
@@ -62,32 +74,22 @@ class SystemSettings extends Settings
      */
     public function getAppLogoDark(): string
     {
-        return $this->app_logo_dark ? Storage::url($this->app_logo_dark) : asset('images/logo-dark.png');
+        return $this->getPublicFileUrl($this->app_logo_dark, self::DEFAULT_LOGO_DARK);
     }
 
     /**
      * Clean the logo directory.
      */
-    public static function cleanLogoDirectory(): void
+    public static function cleanLogoDirectory(?self $settings = null): void
     {
-        $self = new self;
+        $settings ??= app(self::class);
+
         $logos = array_values(array_filter(
-            [$self->app_logo_light, $self->app_logo_dark],
+            [$settings->app_logo_light, $settings->app_logo_dark],
             static fn (?string $path): bool => $path !== null && $path !== ''
         ));
 
-        $files = Storage::disk('public')->files(self::LOGO_DIRECTORY);
-        $keep = array_flip($logos);
-
-        foreach ($files as $file) {
-            if (! is_string($file)) {
-                continue;
-            }
-
-            if (! isset($keep[$file])) {
-                Storage::disk('public')->delete($file);
-            }
-        }
+        self::deleteUnusedPublicFiles(self::LOGO_DIRECTORY, $logos);
     }
 
     /**
@@ -95,7 +97,15 @@ class SystemSettings extends Settings
      */
     public function getAppLayout(): string
     {
-        return $this->auth_page_layout ?? PageLayouts::FullPage->value;
+        return $this->getAuthPageLayout();
+    }
+
+    /**
+     * Get the auth page layout view.
+     */
+    public function getAuthPageLayout(): string
+    {
+        return ($this->auth_page_layout ?? self::DEFAULT_AUTH_PAGE_LAYOUT)->value;
     }
 
     /**
@@ -103,12 +113,77 @@ class SystemSettings extends Settings
      */
     public function getAuthPageBackground(): string
     {
-        if (! $this->auth_page_background) {
-            return asset('images/background.avif');
+        return $this->getPublicFileUrl($this->auth_page_background, self::DEFAULT_AUTH_BACKGROUND);
+    }
+
+    /**
+     * Get the name used in auth layout footers.
+     */
+    public function getFooterBrandName(): string
+    {
+        return $this->app_name ?: self::DEFAULT_APP_NAME;
+    }
+
+    /**
+     * Clean the auth backgrounds directory.
+     */
+    public static function cleanBackgroundsDirectory(?self $settings = null): void
+    {
+        $settings ??= app(self::class);
+
+        $keepPaths = array_filter(
+            [$settings->auth_page_background],
+            static fn (?string $path): bool => $path !== null && $path !== ''
+        );
+
+        self::deleteUnusedPublicFiles(self::BACKGROUNDS_DIRECTORY, $keepPaths);
+    }
+
+    /**
+     * @param  list<string>  $keepPaths
+     */
+    private static function deleteUnusedPublicFiles(string $directory, array $keepPaths): void
+    {
+        $keep = array_flip($keepPaths);
+        $disk = self::publicDisk();
+        $files = $disk->files($directory);
+
+        foreach ($files as $file) {
+            if (! is_string($file)) {
+                continue;
+            }
+
+            if (isset($keep[$file])) {
+                continue;
+            }
+
+            $disk->delete($file);
+        }
+    }
+
+    /**
+     * Get a public file URL or a local asset fallback.
+     */
+    private function getPublicFileUrl(?string $path, string $fallbackAsset): string
+    {
+        if (! $path) {
+            return asset($fallbackAsset);
         }
 
-        $image = Image::getMediaByName($this->auth_page_background);
+        $disk = self::publicDisk();
 
-        return $image ? $image->getUrl() : asset('images/background.avif');
+        if (! $disk->exists($path)) {
+            return asset($fallbackAsset);
+        }
+
+        return $disk->url($path);
+    }
+
+    /**
+     * Get the public filesystem disk.
+     */
+    private static function publicDisk(): FilesystemAdapter
+    {
+        return Storage::disk('public');
     }
 }

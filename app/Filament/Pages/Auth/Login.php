@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
 use App\Models\User;
 use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
-use App\Settings\SystemSettings;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\MultiFactor\Contracts\HasBeforeChallengeHook;
@@ -26,6 +26,8 @@ use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 
 class Login extends VendorLogin
 {
+    use UsesConfiguredAuthLayout;
+
     private LdapAuthService $ldapAuthService;
 
     private LdapUserService $ldapUserService;
@@ -45,11 +47,6 @@ class Login extends VendorLogin
     public function getView(): string
     {
         return 'filament.pages.auth.login';
-    }
-
-    public function getLayout(): string
-    {
-        return app(SystemSettings::class)->getAppLayout();
     }
 
     public function authenticate(): ?LoginResponse

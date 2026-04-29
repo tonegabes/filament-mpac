@@ -5,22 +5,16 @@ declare(strict_types=1);
 namespace App\Filament\Pages\Auth;
 
 use App\Enums\Roles;
+use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
 use App\Models\User;
-use App\Settings\SystemSettings;
 use Filament\Auth\Pages\Register as VendorRegister;
 use Illuminate\Database\Eloquent\Model;
 
 class Register extends VendorRegister
 {
-    protected string $view = 'filament.pages.auth.register';
+    use UsesConfiguredAuthLayout;
 
-    /**
-     * Override the default layout to use the custom layout.
-     */
-    public function getLayout(): string
-    {
-        return app(SystemSettings::class)->getAppLayout();
-    }
+    protected string $view = 'filament.pages.auth.register';
 
     /**
      * @param  array<string, mixed>  $data

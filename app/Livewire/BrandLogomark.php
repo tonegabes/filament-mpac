@@ -20,6 +20,9 @@ class BrandLogomark extends Component
 
     public bool $showAppLogo;
 
+    /**
+     * Load the current branding values from system settings.
+     */
     public function mount(): void
     {
         $settings = app(SystemSettings::class);
@@ -31,6 +34,9 @@ class BrandLogomark extends Component
         $this->showAppLogo = $settings->show_app_logo;
     }
 
+    /**
+     * Render the brand logomark.
+     */
     public function render(): View
     {
         return view('livewire.brand-logomark');

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\PageLayouts;
 use App\Enums\Roles;
 use App\Filament\Pages\Auth\Register;
 use App\Models\User;
@@ -48,7 +49,11 @@ it('creates user with username from email and is_active true and Operator role',
 });
 
 it('getLayout returns value from SystemSettings', function (): void {
+    $settings = app(SystemSettings::class);
+    $settings->auth_page_layout = PageLayouts::FullPage;
+    $settings->save();
+
     $page = app(Register::class);
 
-    expect($page->getLayout())->toBeString()->not->toBeEmpty();
+    expect($page->getLayout())->toBe(PageLayouts::FullPage->value);
 });
