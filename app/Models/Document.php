@@ -56,7 +56,7 @@ class Document extends Model implements HasMedia
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'guard_name'])
+            ->logOnly(['name'])
             ->logOnlyDirty()
         ;
     }

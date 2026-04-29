@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-it('returns a successful response', function (): void {
-    $response = $this->get('/');
+use Filament\Facades\Filament;
 
-    $response->assertStatus(200);
+it('redirects the public login route to the Filament login page', function (): void {
+    Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+    $this->get('/login')
+        ->assertRedirect((string) Filament::getLoginUrl());
 });

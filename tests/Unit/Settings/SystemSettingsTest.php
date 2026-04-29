@@ -123,9 +123,8 @@ it('cleanLogoDirectory keeps configured logos and deletes orphan files', functio
 
     SystemSettings::cleanLogoDirectory($settings);
 
-    expect(Storage::disk('public')->exists($light))->toBeTrue()
-        ->and(Storage::disk('public')->exists($dark))->toBeTrue()
-        ->and(Storage::disk('public')->exists($orphan))->toBeFalse();
+    Storage::disk('public')->assertExists([$light, $dark]);
+    Storage::disk('public')->assertMissing($orphan);
 });
 
 it('cleanBackgroundsDirectory keeps only current auth_page_background', function (): void {
@@ -140,6 +139,6 @@ it('cleanBackgroundsDirectory keeps only current auth_page_background', function
 
     SystemSettings::cleanBackgroundsDirectory($settings);
 
-    expect(Storage::disk('public')->exists($keep))->toBeTrue()
-        ->and(Storage::disk('public')->exists($delete))->toBeFalse();
+    Storage::disk('public')->assertExists($keep);
+    Storage::disk('public')->assertMissing($delete);
 });
