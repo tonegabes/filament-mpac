@@ -44,12 +44,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
+            ->sidebarWidth('16rem')
             ->profile()
             ->brandLogo(fn () => view('components.brand-logo'))
             ->unsavedChangesAlerts()
             ->sidebarCollapsibleOnDesktop()
             ->colors([
-                'primary' => Color::Indigo,
+                'primary' => Color::Emerald,
             ])
             ->viteTheme('resources/css/app.css')
             ->discoverResources(

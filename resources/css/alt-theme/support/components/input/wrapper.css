@@ -1,0 +1,123 @@
+.fi-input-wrp {
+    @apply flex rounded-xl ring-1 ring-gray-950/10 transition duration-200 dark:ring-white/20;
+    background: color-mix(in oklab, var(--alt-surface-elevated) 90%, transparent);
+    box-shadow: 0 1px 0 color-mix(in oklab, white 60%, transparent) inset,
+        0 8px 20px color-mix(in oklab, var(--gray-950) 5%, transparent);
+    transition-property: background-color, border-color, box-shadow, transform;
+    transition-timing-function: var(--alt-ease-out);
+
+    &:not(.fi-disabled):not(:has(.fi-ac-action:focus)) {
+        @apply focus-within:ring-primary-600 dark:focus-within:ring-primary-500 focus-within:ring-2;
+        &:hover {
+            box-shadow: 0 1px 0 color-mix(in oklab, white 72%, transparent) inset,
+                0 12px 26px color-mix(in oklab, var(--primary-800) 8%, transparent);
+            transform: translateY(-1px);
+        }
+
+        &:focus-within {
+            background: color-mix(in oklab, var(--alt-surface-elevated) 96%, var(--primary-50));
+            box-shadow: 0 0 0 4px var(--alt-glow),
+                0 16px 34px color-mix(in oklab, var(--primary-700) 12%, transparent);
+        }
+
+        &.fi-invalid {
+            @apply focus-within:ring-danger-600 dark:focus-within:ring-danger-500;
+            &:focus-within {
+                box-shadow: 0 0 0 4px color-mix(in oklab, var(--danger-500) 18%, transparent),
+                    0 16px 34px color-mix(in oklab, var(--danger-700) 10%, transparent);
+            }
+        }
+    }
+
+    &.fi-disabled {
+        @apply bg-gray-50 dark:bg-transparent;
+        opacity: 0.74;
+
+        &:not(.fi-invalid) {
+            @apply dark:ring-white/10;
+        }
+    }
+
+    &.fi-invalid {
+        @apply ring-danger-600 dark:ring-danger-500;
+        background: color-mix(in oklab, var(--alt-surface-elevated) 88%, var(--danger-50));
+    }
+
+    & .fi-input-wrp-prefix {
+        @apply hidden items-center gap-x-3 ps-3;
+
+        &.fi-input-wrp-prefix-has-content {
+            @apply flex;
+        }
+
+        &.fi-inline {
+            @apply pe-2;
+
+            &.fi-input-wrp-prefix-has-label {
+                @apply pe-1;
+            }
+        }
+
+        &:not(.fi-inline) {
+            @apply border-e border-gray-200 ps-3 pe-3 dark:border-white/10;
+            background: color-mix(in oklab, var(--primary-50) 34%, transparent);
+        }
+    }
+
+    & .fi-input-wrp-content-ctn,
+    &:not(:has(.fi-input-wrp-content-ctn)) > * {
+        @apply min-w-0 flex-1;
+
+        &.fi-input-wrp-content-ctn-ps {
+            @apply ps-3;
+        }
+    }
+
+    & .fi-input-wrp-suffix {
+        @apply flex items-center gap-x-3 pe-3;
+
+        &.fi-inline {
+            @apply ps-2;
+
+            &.fi-input-wrp-suffix-has-label {
+                @apply ps-1;
+            }
+        }
+
+        &:not(.fi-inline) {
+            @apply border-s border-gray-200 ps-3 dark:border-white/10;
+            background: color-mix(in oklab, var(--primary-50) 34%, transparent);
+        }
+    }
+
+    & .fi-input-wrp-actions {
+        @apply flex items-center gap-3;
+    }
+
+    & .fi-input-wrp-label {
+        @apply text-sm font-medium whitespace-nowrap text-gray-500 dark:text-gray-400;
+    }
+
+    & .fi-input-wrp-prefix,
+    & .fi-input-wrp-suffix {
+        & > .fi-icon {
+            @apply text-gray-400 dark:text-gray-500;
+
+            &.fi-color {
+                @apply text-color-500;
+            }
+        }
+    }
+}
+
+:root.dark .fi-input-wrp {
+    background: color-mix(in oklab, var(--alt-surface-elevated) 84%, transparent);
+}
+
+:root.dark .fi-input-wrp:not(.fi-disabled):not(:has(.fi-ac-action:focus)):focus-within {
+    background: color-mix(in oklab, var(--alt-surface-elevated) 90%, var(--primary-950));
+}
+
+:root.dark .fi-input-wrp.fi-invalid {
+    background: color-mix(in oklab, var(--alt-surface-elevated) 88%, var(--danger-950));
+}

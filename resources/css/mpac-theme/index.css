@@ -1,0 +1,59 @@
+@import "./components/sidebar.css" layer(components);
+
+:root {
+  --color-background-darker: #eff0f0;
+  --color-background-dark: #fafafa;
+  --color-background: #fff;
+  --color-background-light: #fff;
+  --color-contrast-low: #8a8d8f;
+  --color-contrast-medium: #505355;
+  --color-contrast-high: #1c1f21;
+  --sidebar-width: 16rem;
+}
+
+@theme {
+  /* fonts */
+  --font-sans:
+    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display:
+    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif:
+    "IBM Plex Mono", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco;
+
+  /* brand */
+  --color-brand: #903031;
+
+  /* borders */
+  --color-border: var(--color-contrast-low);
+
+  /* backgrounds */
+  --color-bg: var(--color-background);
+  --color-bg-secondary: var(--color-contrast-medium);
+  --color-bg-inverse: var(--color-contrast-high);
+
+  /* text */
+  --color-text: var(--color-contrast-high);
+  --color-text-secondary: var(--color-contrast-low);
+  --color-text-inverse: var(--color-background-darker);
+}
+
+.dark {
+  --color-bg: var(--color-bg-dark);
+  --color-bg-secondary: var(--color-contrast-medium);
+  --color-bg-inverse: var(--color-background-darker);
+
+  --color-text: var(--color-background-darker);
+  --color-text-secondary: var(--color-contrast-low);
+  --color-text-inverse: var(--color-contrast-high);
+  --color-border: var(--color-contrast-medium);
+}
+
+@layer components {
+  .fi-body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+}

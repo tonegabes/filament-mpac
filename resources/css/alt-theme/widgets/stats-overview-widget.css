@@ -1,0 +1,89 @@
+.fi-wi-stats-overview-stat {
+    @apply relative block h-full overflow-hidden rounded-2xl p-6 ring-1 ring-gray-950/5 dark:ring-white/10;
+    background:
+        radial-gradient(circle at 90% 12%, color-mix(in oklab, var(--primary-200) 34%, transparent), transparent 7rem),
+        color-mix(in oklab, var(--alt-surface-elevated) 94%, transparent);
+    box-shadow: var(--alt-shadow-sm);
+    backdrop-filter: blur(16px) saturate(1.1);
+    transition: box-shadow 220ms var(--alt-ease-out), transform 220ms var(--alt-ease-out);
+
+    &:hover {
+        box-shadow: var(--alt-shadow-md);
+        transform: translateY(-2px);
+    }
+
+    &::before {
+        position: absolute;
+        inset-inline: 1.5rem;
+        top: 0;
+        height: 1px;
+        content: '';
+        background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--primary-400) 52%, transparent), transparent);
+    }
+
+    & .fi-icon {
+        @apply shrink-0 text-primary-500 dark:text-primary-400;
+        filter: drop-shadow(0 8px 14px color-mix(in oklab, var(--primary-500) 20%, transparent));
+    }
+
+    & .fi-wi-stats-overview-stat-content {
+        @apply grid gap-y-2;
+    }
+
+    & .fi-wi-stats-overview-stat-label-ctn {
+        @apply flex items-center gap-x-2;
+    }
+
+    & .fi-wi-stats-overview-stat-label {
+        @apply text-xs font-bold tracking-[0.14em] text-gray-500 uppercase dark:text-gray-400;
+    }
+
+    & .fi-wi-stats-overview-stat-value {
+        @apply text-3xl font-bold tracking-tight text-gray-950 dark:text-white;
+    }
+
+    & .fi-wi-stats-overview-stat-description {
+        @apply flex items-center gap-x-1 text-sm text-gray-500 dark:text-gray-400;
+
+        &.fi-color {
+            @apply text-(--text) dark:text-(--dark-text);
+
+            & .fi-icon {
+                @apply text-color-500;
+            }
+        }
+    }
+
+    & .fi-wi-stats-overview-stat-chart {
+        @apply absolute inset-x-0 bottom-0 overflow-hidden rounded-b-2xl;
+        opacity: 0.82;
+
+        & > canvas {
+            @apply h-7;
+        }
+
+        & .fi-wi-stats-overview-stat-chart-bg-color {
+            @apply text-primary-100 dark:text-primary-950;
+        }
+
+        & .fi-wi-stats-overview-stat-chart-border-color {
+            @apply text-gray-400;
+        }
+
+        &.fi-color {
+            & .fi-wi-stats-overview-stat-chart-bg-color {
+                @apply text-color-50 dark:text-color-400/10;
+            }
+
+            & .fi-wi-stats-overview-stat-chart-border-color {
+                @apply text-color-500 dark:text-color-400;
+            }
+        }
+    }
+}
+
+:root.dark .fi-wi-stats-overview-stat {
+    background:
+        radial-gradient(circle at 90% 12%, color-mix(in oklab, var(--primary-500) 14%, transparent), transparent 7rem),
+        color-mix(in oklab, var(--alt-surface-elevated) 88%, transparent);
+}

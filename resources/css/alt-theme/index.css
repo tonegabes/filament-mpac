@@ -1,0 +1,9 @@
+@import './support/index.css';
+@import './actions/index.css';
+@import './forms/index.css';
+@import './infolists/index.css';
+@import './notifications/index.css';
+@import './schemas/index.css';
+@import './tables/index.css';
+@import './widgets/index.css';
+@import './panels/index.css';

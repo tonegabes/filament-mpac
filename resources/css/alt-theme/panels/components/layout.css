@@ -1,0 +1,207 @@
+html.fi {
+    @apply min-h-dvh;
+}
+
+.fi-body {
+    @apply min-h-dvh bg-gray-50 font-normal text-gray-950 antialiased dark:bg-gray-950 dark:text-white;
+    background:
+        radial-gradient(circle at top left, color-mix(in oklab, var(--primary-200) 42%, transparent), transparent 30rem),
+        radial-gradient(circle at 85% 12%, color-mix(in oklab, var(--info-200) 28%, transparent), transparent 26rem),
+        linear-gradient(135deg, color-mix(in oklab, white 88%, var(--primary-50)), var(--gray-50) 48%, color-mix(in oklab, white 92%, var(--primary-100)));
+
+    &.fi-body-has-sidebar-collapsible-on-desktop,
+    &.fi-body-has-sidebar-fully-collapsible-on-desktop {
+        & .fi-main-ctn {
+            @apply min-h-[calc(100dvh-4rem)] opacity-0 transition-all;
+            transition-duration: 360ms;
+            transition-timing-function: var(--alt-ease-out);
+        }
+    }
+
+    & > .fi-layout-sidebar-toggle-btn-ctn {
+        @apply ps-5 pt-5;
+
+        &.lg\:fi-hidden {
+            @apply lg:hidden;
+        }
+    }
+
+    &.fi-body-has-navigation:not(
+            .fi-body-has-sidebar-collapsible-on-desktop
+        ):not(.fi-body-has-sidebar-fully-collapsible-on-desktop):not(
+            .fi-body-has-top-navigation
+        ) {
+        & .fi-main-ctn {
+            @apply opacity-0;
+        }
+    }
+
+    &.fi-body-has-top-navigation,
+    &:not(.fi-body-has-navigation) {
+        & .fi-main-ctn {
+            @apply flex min-h-[calc(100dvh-4rem)];
+        }
+    }
+
+    &:not(.fi-body-has-topbar) {
+        & .fi-main-ctn {
+            @apply flex min-h-dvh;
+        }
+    }
+}
+
+.fi-layout {
+    @apply flex h-full w-full overflow-x-clip;
+}
+
+.fi-main-ctn {
+    @apply w-screen flex-1 flex-col;
+}
+
+.fi-main {
+    @apply mx-auto h-full w-full px-4 md:px-6 lg:px-8;
+    animation: alt-fade-slide-up 420ms var(--alt-ease-out) both;
+}
+
+.fi-main,
+.fi-simple-main {
+    &.fi-width-3xs {
+        @apply max-w-3xs;
+    }
+
+    &.fi-width-2xs {
+        @apply max-w-2xs;
+    }
+
+    &.fi-width-xs {
+        @apply max-w-xs;
+    }
+
+    &.fi-width-sm {
+        @apply max-w-sm;
+    }
+
+    &.fi-width-md {
+        @apply max-w-md;
+    }
+
+    &.fi-width-lg {
+        @apply max-w-lg;
+    }
+
+    &.fi-width-xl {
+        @apply max-w-xl;
+    }
+
+    &.fi-width-2xl {
+        @apply max-w-2xl;
+    }
+
+    &.fi-width-3xl {
+        @apply max-w-3xl;
+    }
+
+    &.fi-width-4xl {
+        @apply max-w-4xl;
+    }
+
+    &.fi-width-5xl {
+        @apply max-w-5xl;
+    }
+
+    &.fi-width-6xl {
+        @apply max-w-6xl;
+    }
+
+    &.fi-width-7xl {
+        @apply max-w-7xl;
+    }
+
+    &.fi-width-none {
+        @apply max-w-none;
+    }
+
+    &.fi-width-full {
+        @apply max-w-full;
+    }
+
+    &.fi-width-min {
+        @apply max-w-min;
+    }
+
+    &.fi-width-max {
+        @apply max-w-max;
+    }
+
+    &.fi-width-fit {
+        @apply max-w-fit;
+    }
+
+    &.fi-width-prose {
+        @apply max-w-prose;
+    }
+
+    &.fi-width-container {
+        @apply container;
+    }
+
+    &.fi-width-screen-sm {
+        @apply max-w-screen-sm;
+    }
+
+    &.fi-width-screen-md {
+        @apply max-w-screen-md;
+    }
+
+    &.fi-width-screen-lg {
+        @apply max-w-screen-lg;
+    }
+
+    &.fi-width-screen-xl {
+        @apply max-w-screen-xl;
+    }
+
+    &.fi-width-screen-2xl {
+        @apply max-w-screen-2xl;
+    }
+
+    &.fi-width-screen {
+        @apply fixed inset-0;
+    }
+}
+
+.fi-simple-layout {
+    @apply flex min-h-dvh flex-col items-center;
+    background:
+        radial-gradient(circle at 50% 0, color-mix(in oklab, var(--primary-200) 44%, transparent), transparent 30rem),
+        linear-gradient(145deg, color-mix(in oklab, white 90%, var(--primary-50)), var(--gray-50));
+}
+
+.fi-simple-layout-header {
+    @apply absolute end-0 top-0 flex h-16 items-center gap-x-4 pe-4 md:pe-6 lg:pe-8;
+}
+
+.fi-simple-main-ctn {
+    @apply flex w-full grow items-center justify-center;
+}
+
+.fi-simple-main {
+    @apply my-16 w-full px-6 py-12 ring-1 sm:rounded-3xl sm:px-12;
+    background: var(--alt-surface-elevated);
+    border: 1px solid var(--alt-border);
+    box-shadow: var(--alt-shadow-md);
+    backdrop-filter: blur(20px) saturate(1.15);
+}
+
+:root.dark .fi-body {
+    background:
+        radial-gradient(circle at top left, color-mix(in oklab, var(--primary-500) 18%, transparent), transparent 32rem),
+        radial-gradient(circle at 84% 10%, color-mix(in oklab, var(--info-500) 12%, transparent), transparent 28rem),
+        linear-gradient(135deg, var(--gray-950), color-mix(in oklab, var(--gray-950) 86%, var(--primary-950)) 52%, var(--gray-950));
+}
+
+:root.dark .fi-simple-layout {
+    background:
+        radial-gradient(circle at 50% 0, color-mix(in oklab, var(--primary-500) 18%, transparent), transparent 30rem),
+        linear-gradient(145deg, var(--gray-950), color-mix(in oklab, var(--gray-950) 88%, var(--primary-950)));
+}

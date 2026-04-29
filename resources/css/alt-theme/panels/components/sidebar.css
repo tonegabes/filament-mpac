@@ -1,0 +1,338 @@
+.fi-sidebar-group {
+    @apply flex flex-col gap-y-1;
+
+    &.fi-collapsed {
+        & .fi-sidebar-group-collapse-btn {
+            @apply -rotate-180;
+        }
+    }
+
+    &.fi-collapsible > .fi-sidebar-group-btn {
+        @apply cursor-pointer;
+    }
+
+    &.fi-active {
+        & .fi-sidebar-group-dropdown-trigger-btn {
+            & .fi-icon {
+                @apply text-primary-600 dark:text-primary-400;
+            }
+        }
+    }
+}
+
+.fi-sidebar-group-btn {
+    @apply flex items-center gap-x-3 p-2;
+
+    & .fi-icon {
+        @apply text-gray-400 dark:text-gray-500;
+    }
+}
+
+.fi-sidebar-group-label {
+    @apply flex-1 text-xs leading-6 font-semibold tracking-[0.16em] text-gray-500 uppercase dark:text-gray-400;
+}
+
+.fi-sidebar-group-dropdown-trigger-btn {
+    @apply relative flex flex-1 items-center justify-center gap-x-3 rounded-full p-2 outline-hidden transition duration-200 hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5;
+    transition-property: background-color, box-shadow, transform;
+    transition-timing-function: var(--alt-ease-spring);
+
+    &:hover {
+        transform: translateX(2px);
+        box-shadow: 0 10px 20px color-mix(in oklab, var(--primary-800) 7%, transparent);
+    }
+
+    & .fi-icon {
+        @apply text-gray-400 dark:text-gray-500;
+    }
+}
+
+.fi-sidebar-group-items {
+    @apply flex flex-col gap-y-1;
+}
+
+.fi-sidebar-group-btn,
+.fi-sidebar-group-items {
+    &.fi-transition-enter {
+        @apply delay-100 lg:transition;
+    }
+
+    &.fi-transition-enter-start {
+        @apply opacity-0;
+    }
+
+    &.fi-transition-enter-end {
+        @apply opacity-100;
+    }
+}
+
+.fi-sidebar {
+    @apply fixed inset-y-0 start-0 z-30 flex h-dvh flex-col content-start transition-all lg:z-20 lg:bg-transparent lg:transition-none dark:lg:bg-transparent;
+    background: color-mix(in oklab, var(--alt-surface-elevated) 92%, transparent);
+    backdrop-filter: blur(22px) saturate(1.18);
+
+    &.fi-sidebar-open {
+        @apply w-(--sidebar-width) translate-x-0 ring-1 lg:shadow-none lg:ring-0 rtl:-translate-x-0;
+        box-shadow: var(--alt-shadow-md);
+    }
+
+    &:not(.fi-sidebar-open) {
+        @apply -translate-x-full rtl:translate-x-full;
+    }
+}
+
+.fi-body-has-topbar .fi-sidebar {
+    @apply lg:top-[4rem] lg:h-[calc(100dvh-4rem)];
+}
+
+.fi-sidebar-close-overlay {
+    @apply fixed inset-0 z-30 transition duration-500 lg:hidden;
+    background: color-mix(in oklab, var(--gray-950) 58%, transparent);
+    backdrop-filter: blur(8px);
+}
+
+.fi-body {
+    &.fi-body-has-top-navigation {
+        & .fi-sidebar {
+            @apply lg:-translate-x-full lg:rtl:translate-x-full;
+        }
+    }
+
+    &:not(.fi-body-has-top-navigation) {
+        & .fi-sidebar {
+            &.fi-sidebar-open {
+                @apply lg:sticky;
+            }
+        }
+
+        &.fi-body-has-sidebar-collapsible-on-desktop {
+            & .fi-sidebar {
+                &:not(.fi-sidebar-open) {
+                    @apply lg:sticky lg:translate-x-0 lg:rtl:-translate-x-0;
+                }
+            }
+        }
+
+        &:not(.fi-body-has-sidebar-collapsible-on-desktop):not(
+                .fi-body-has-sidebar-fully-collapsible-on-desktop
+            ) {
+            & .fi-sidebar {
+                @apply lg:translate-x-0 lg:rtl:-translate-x-0;
+
+                &:not(.fi-sidebar-open) {
+                    @apply w-(--sidebar-width) lg:sticky;
+                }
+            }
+        }
+    }
+}
+
+.fi-sidebar-header-ctn {
+    @apply overflow-x-clip;
+}
+
+.fi-sidebar-header {
+    @apply flex h-16 items-center justify-center;
+}
+
+.fi-sidebar-header-logo-ctn {
+    @apply flex-1;
+}
+
+.fi-body-has-topbar .fi-sidebar-header {
+    @apply px-6 ring-1 lg:hidden lg:shadow-xs;
+    background: color-mix(in oklab, var(--alt-surface-elevated) 88%, transparent);
+    border-bottom: 1px solid var(--alt-border);
+}
+
+:not(.fi-body-has-topbar) .fi-sidebar-header {
+    @apply bg-transparent px-4 shadow-none ring-0;
+
+    .fi-logo {
+        @apply ms-3;
+    }
+}
+
+.fi-sidebar-nav {
+    @apply flex grow flex-col gap-y-8 overflow-x-hidden overflow-y-auto px-5 py-8;
+    scrollbar-gutter: stable;
+}
+
+.fi-sidebar-nav-groups {
+    @apply flex flex-col gap-y-7;
+}
+
+.fi-sidebar-item {
+    &.fi-active,
+    &.fi-sidebar-item-has-active-child-items {
+        @apply flex flex-col gap-y-1;
+    }
+
+    &.fi-active {
+        & > .fi-sidebar-item-btn {
+            @apply dark:bg-white/5;
+            background:
+                linear-gradient(135deg, color-mix(in oklab, var(--primary-100) 78%, white), color-mix(in oklab, var(--primary-50) 58%, transparent)),
+                radial-gradient(circle at 12% 50%, color-mix(in oklab, var(--primary-300) 52%, transparent), transparent 4rem);
+            box-shadow: 0 12px 26px color-mix(in oklab, var(--primary-700) 12%, transparent);
+
+            & > .fi-icon {
+                @apply text-primary-700 dark:text-primary-400;
+                transform: scale(1.08);
+            }
+
+            &
+                > .fi-sidebar-item-grouped-border
+                > .fi-sidebar-item-grouped-border-part {
+                @apply bg-primary-700 dark:bg-primary-400;
+            }
+
+            & > .fi-sidebar-item-label {
+                @apply text-primary-700 dark:text-primary-400;
+            }
+
+            .fi-sidebar-item-grouped-border-part {
+                @apply relative h-1.5 w-1.5 rounded-full;
+                animation: alt-soft-pulse 1800ms var(--alt-ease-out) infinite;
+            }
+        }
+    }
+
+    &.fi-sidebar-item-has-url {
+        & > .fi-sidebar-item-btn {
+            @apply hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5;
+
+            &:hover {
+                transform: translateX(3px);
+            }
+        }
+    }
+}
+
+.fi-sidebar-item-btn {
+    @apply relative flex items-center justify-center gap-x-3 rounded-2xl p-2 outline-hidden transition duration-200;
+    transition-property: color, background-color, box-shadow, transform;
+    transition-timing-function: var(--alt-ease-spring);
+
+    &:focus-visible {
+        box-shadow: 0 0 0 3px var(--alt-glow);
+    }
+
+    & > .fi-icon {
+        @apply text-gray-400 dark:text-gray-500;
+        transition: color 200ms var(--alt-ease-out), transform 200ms var(--alt-ease-out);
+    }
+}
+
+.fi-sidebar-item-grouped-border {
+    @apply relative flex size-6 items-center justify-center;
+}
+
+.fi-sidebar-item-grouped-border-part-not-first {
+    @apply absolute -top-1/2 bottom-1/2 w-px bg-gray-300 dark:bg-gray-600;
+}
+
+.fi-sidebar-item-grouped-border-part-not-last {
+    @apply absolute top-1/2 -bottom-1/2 w-px bg-gray-300 dark:bg-gray-600;
+}
+
+.fi-sidebar-item-grouped-border-part {
+    @apply relative h-1.5 w-1.5 rounded-full bg-gray-400 dark:bg-gray-500;
+}
+
+.fi-sidebar-item-label {
+    @apply flex-1 truncate text-sm font-medium text-gray-700 dark:text-gray-200;
+}
+
+.fi-sidebar-item-label,
+.fi-sidebar-item-badge-ctn {
+    &.fi-transition-enter {
+        @apply lg:transition lg:delay-100;
+    }
+
+    &.fi-transition-enter-start {
+        @apply opacity-0;
+    }
+
+    &.fi-transition-enter-end {
+        @apply opacity-100;
+    }
+}
+
+.fi-sidebar-footer {
+    @apply mx-4 my-3 grid gap-y-3;
+
+    & > .fi-no-database {
+        @apply block;
+    }
+}
+
+.fi-sidebar-sub-group-items {
+    @apply flex flex-col gap-y-1;
+}
+
+.fi-sidebar-database-notifications-btn {
+    @apply relative flex w-full items-center justify-center gap-x-3 rounded-2xl p-2 text-start outline-hidden transition duration-200 hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5;
+    transition-property: background-color, box-shadow, transform;
+    transition-timing-function: var(--alt-ease-spring);
+
+    &:hover {
+        transform: translateX(3px);
+        box-shadow: 0 10px 22px color-mix(in oklab, var(--primary-800) 8%, transparent);
+    }
+
+    & > .fi-icon {
+        @apply text-gray-400 dark:text-gray-500;
+    }
+
+    & > .fi-sidebar-database-notifications-btn-label {
+        @apply flex-1 truncate text-sm font-medium text-gray-700 dark:text-gray-200;
+    }
+
+    & > .fi-sidebar-database-notifications-btn-label,
+    & > .fi-sidebar-database-notifications-btn-badge-ctn {
+        &.fi-transition-enter {
+            @apply lg:transition lg:delay-100;
+        }
+
+        &.fi-transition-enter-start {
+            @apply opacity-0;
+        }
+
+        &.fi-transition-enter-end {
+            @apply opacity-100;
+        }
+    }
+}
+
+.fi-sidebar-open-sidebar-btn,
+.fi-sidebar-open-collapse-sidebar-btn {
+    @apply mx-0!;
+}
+
+.fi-sidebar-close-collapse-sidebar-btn {
+    @apply mx-0! hidden lg:flex;
+}
+
+.fi-body {
+    &.fi-body-has-sidebar-collapsible-on-desktop,
+    &:not(.fi-body-has-sidebar-fully-collapsible-on-desktop) {
+        & .fi-sidebar-open-sidebar-btn {
+            @apply lg:hidden;
+        }
+    }
+}
+
+.fi-sidebar-close-sidebar-btn {
+    @apply mx-0! lg:hidden;
+}
+
+:root.dark .fi-sidebar {
+    background: color-mix(in oklab, var(--alt-surface-elevated) 82%, transparent);
+}
+
+:root.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background:
+        linear-gradient(135deg, color-mix(in oklab, var(--primary-500) 18%, transparent), color-mix(in oklab, white 5%, transparent)),
+        radial-gradient(circle at 12% 50%, color-mix(in oklab, var(--primary-400) 20%, transparent), transparent 4rem);
+}

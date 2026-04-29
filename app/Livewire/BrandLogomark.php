@@ -10,32 +10,32 @@ use Livewire\Component;
 
 class BrandLogomark extends Component
 {
-    public string $appName;
+    public ?string $appName;
+
+    public ?string $appSigla;
 
     public string $lightLogo;
 
     public string $darkLogo;
 
-    public bool $showLogo;
-
-    public bool $showName;
+    public bool $showAppLogo;
 
     /**
-     * Initialize component properties.
+     * Load the current branding values from system settings.
      */
     public function mount(): void
     {
         $settings = app(SystemSettings::class);
 
         $this->appName = $settings->app_name;
+        $this->appSigla = $settings->app_sigla;
         $this->lightLogo = $settings->getAppLogoLight();
         $this->darkLogo = $settings->getAppLogoDark();
-        $this->showLogo = $settings->show_logo_in_topbar;
-        $this->showName = $settings->show_name_in_topbar;
+        $this->showAppLogo = $settings->show_app_logo;
     }
 
     /**
-     * Render the component view.
+     * Render the brand logomark.
      */
     public function render(): View
     {

@@ -1,0 +1,94 @@
+.fi-ta-row {
+    @apply [@media(hover:hover)]:transition-colors [@media(hover:hover)]:duration-200;
+    transition-property: background-color, box-shadow, transform;
+    transition-timing-function: var(--alt-ease-out);
+
+    &.fi-clickable {
+        @apply hover:bg-gray-50 dark:hover:bg-white/5;
+
+        @media (hover: hover) {
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: inset 3px 0 0 color-mix(in oklab, var(--primary-500) 42%, transparent),
+                    0 10px 24px color-mix(in oklab, var(--primary-900) 7%, transparent);
+            }
+        }
+    }
+
+    &.fi-striped {
+        background: color-mix(in oklab, var(--alt-surface-muted) 54%, transparent);
+    }
+
+    &.fi-collapsed {
+        @apply hidden;
+    }
+
+    &.fi-ta-group-header-row {
+        & > td {
+            background: color-mix(in oklab, var(--primary-50) 50%, var(--alt-surface-muted));
+        }
+    }
+
+    & .fi-ta-group-header-cell {
+        @apply px-3 sm:first-of-type:ps-6 sm:last-of-type:pe-6;
+    }
+
+    & .fi-ta-group-header {
+        @apply flex w-full items-center gap-x-3 py-2;
+
+        &.fi-collapsible {
+            @apply cursor-pointer;
+
+            &.fi-collapsed {
+                & .fi-icon-btn {
+                    @apply -rotate-180;
+                }
+            }
+        }
+
+        & .fi-ta-group-heading {
+            @apply text-sm font-medium text-gray-950 dark:text-white;
+        }
+
+        & .fi-ta-group-description {
+            @apply text-sm text-gray-500 dark:text-gray-400;
+        }
+    }
+
+    &.fi-selected {
+        &:not(.fi-striped) {
+            background: color-mix(in oklab, var(--primary-50) 76%, transparent);
+        }
+
+        & > *:first-child {
+            @apply relative;
+
+            &::before {
+                @apply bg-primary-600 absolute inset-y-2 start-0 w-1 rounded-full;
+                content: '';
+            }
+
+            @variant dark {
+                &::before {
+                    @apply bg-primary-500;
+                }
+            }
+        }
+    }
+}
+
+.fi-ta-reordering {
+    & .fi-ta-row {
+        &:not(.fi-ta-row-not-reorderable) {
+            @apply cursor-move;
+        }
+    }
+}
+
+:root.dark .fi-ta-row.fi-selected:not(.fi-striped) {
+    background: color-mix(in oklab, var(--primary-500) 12%, transparent);
+}
+
+:root.dark .fi-ta-row.fi-striped {
+    background: color-mix(in oklab, white 5%, transparent);
+}

@@ -1,8 +1,7 @@
 @import "tailwindcss";
+
 @import "../../vendor/filament/filament/resources/css/theme.css";
-@import "./filament/sidebar.css" layer(components);
-@import "./filament/layout.css" layer(components);
-@import "./filament/image-picker.css" layer(components);
+@import "./mpac-theme";
 
 @source '../../app/Filament/**/*';
 @source '../../resources/views/filament/**/*';
@@ -10,37 +9,3 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
-
-@theme {
-  --font-sans:
-    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-display:
-    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-serif:
-    "IBM Plex Mono", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco;
-
-  --brand-color: #903031;
-  --color-primary: var(--color-indigo-500);
-
-  --border-color: var(--color-gray-200);
-  --border-color-dark: var(--color-gray-800);
-}
-
-@base {
-  /* Smooth scrolling and transitions */
-  * {
-    @apply transition-all duration-300 ease-in-out;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-display;
-  }
-}

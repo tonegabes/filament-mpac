@@ -10,13 +10,13 @@
         <div class="flex flex-col lg:w-xl h-fit my-auto">
 
             <a href="/" class="flex flex-col items-center dark:text-white gap-8">
-                @if ($settings->show_logo_in_topbar)
-                    <img src="{{ $settings->getAppLogoLight() }}" alt="Logo" class="h-6 w-auto dark:invert">
-                @endif
-
-                @if ($settings->show_name_in_topbar)
-                    <h1 class="text-2xl font-semibold">{{ $settings->app_name; }}</h1>
-                @endif
+                <x-brand-logomark
+                    :showAppLogo="$settings->show_app_logo"
+                    :appName="$settings->app_name"
+                    :appSigla="$settings->app_sigla"
+                    :lightLogo="$settings->getAppLogoLight()"
+                    :darkLogo="$settings->getAppLogoDark()"
+                />
             </a>
 
             <main class="fi-simple-main">
