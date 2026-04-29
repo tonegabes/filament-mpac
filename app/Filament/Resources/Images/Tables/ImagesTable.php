@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Images\Tables;
 use Alsaloul\ImageGallery\Tables\Columns\ImageGalleryColumn;
 use App\Filament\Actions\CopyFileUrlAction;
 use App\Models\Image;
+use App\Support\FileLibrary;
 use App\Traits\HasNotifications;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -37,7 +38,7 @@ class ImagesTable
                     ->label('Tamanho')
                     ->sortable()
                     ->alignEnd()
-                    ->formatStateUsing(fn (int $state): string => number_format($state / 1024, 2) . ' KB')
+                    ->formatStateUsing(fn (?int $state): string => FileLibrary::formatSize($state))
                 ,
 
                 TextColumn::make('media.mime_type')

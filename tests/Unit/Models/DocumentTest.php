@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Contracts\HasFileUrl;
 use App\Models\Document;
 
 it('returns expected mime types for documents', function (): void {
@@ -22,4 +23,8 @@ it('returns expected mime types for documents', function (): void {
 
 it('has collection name constant', function (): void {
     expect(Document::COLLECTION_NAME)->toBe('documents');
+});
+
+it('can be used anywhere a file url record is expected', function (): void {
+    expect(new Document)->toBeInstanceOf(HasFileUrl::class);
 });

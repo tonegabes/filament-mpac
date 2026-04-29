@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Documents\Tables;
 
+use App\Filament\Actions\CopyFileUrlAction;
 use App\Models\Document;
+use App\Support\FileLibrary;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -41,7 +43,7 @@ class DocumentsTable
                     ->label('Tamanho')
                     ->sortable()
                     ->alignEnd()
-                    ->formatStateUsing(fn (int $state): string => number_format($state / 1024, 2) . ' KB')
+                    ->formatStateUsing(fn (?int $state): string => FileLibrary::formatSize($state))
                 ,
 
                 TextColumn::make('media.mime_type')
@@ -59,6 +61,7 @@ class DocumentsTable
                 //
             ])
             ->recordActions([
+                CopyFileUrlAction::make()->label('Link do Arquivo'),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

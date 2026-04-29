@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Settings;
 
+use App\Enums\FileCollection;
 use App\Enums\NavGroups;
 use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
+use App\Filament\Support\LibraryFileUpload;
 use App\Settings\SystemSettings;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
@@ -169,17 +171,7 @@ class ManageSystem extends SettingsPage
      */
     private function logoUpload(string $name, string $label): FileUpload
     {
-        return FileUpload::make($name)
-            ->label($label)
-            ->disk('public')
-            ->directory(SystemSettings::LOGO_DIRECTORY)
-            ->visibility('public')
-            ->preserveFilenames()
-            ->image()
-            ->imageEditor()
-            ->maxSize(2048)
-            ->openable()
-            ->downloadable();
+        return LibraryFileUpload::publicImage($name, FileCollection::SystemLogos, $label, 2048);
     }
 
     /**
@@ -187,16 +179,11 @@ class ManageSystem extends SettingsPage
      */
     private function backgroundUpload(): FileUpload
     {
-        return FileUpload::make('auth_page_background')
-            ->label('Imagem de fundo')
-            ->disk('public')
-            ->directory(SystemSettings::BACKGROUNDS_DIRECTORY)
-            ->visibility('public')
-            ->preserveFilenames()
-            ->image()
-            ->imageEditor()
-            ->maxSize(5120)
-            ->openable()
-            ->downloadable();
+        return LibraryFileUpload::publicImage(
+            'auth_page_background',
+            FileCollection::SystemBackgrounds,
+            'Imagem de fundo',
+            5120
+        );
     }
 }
