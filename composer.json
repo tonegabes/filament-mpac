@@ -68,6 +68,10 @@
     "code:analyze": [
       "phpstan analyze --memory-limit=4G --no-progress --no-interaction --ansi"
     ],
+    "pre-autoload-dump": [
+      "@php -r \"file_exists('bootstrap/cache/packages.php') && unlink('bootstrap/cache/packages.php');\"",
+      "@php -r \"file_exists('bootstrap/cache/services.php') && unlink('bootstrap/cache/services.php');\""
+    ],
     "post-autoload-dump": [
       "@php artisan config:clear",
       "@php artisan clear-compiled",
