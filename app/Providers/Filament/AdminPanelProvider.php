@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Enums\AuthMode;
 use App\Enums\NavGroups;
 use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Pages\Auth\Login;
@@ -94,7 +95,9 @@ class AdminPanelProvider extends PanelProvider
      */
     private function configureRegistration(Panel $panel): Panel
     {
-        if (Config::boolean('auth.ldap.enabled')) {
+        $authMode = AuthMode::fromConfig(Config::string('auth.mode'));
+
+        if (! $authMode->allowsLocalRegistration()) {
             return $panel;
         }
 

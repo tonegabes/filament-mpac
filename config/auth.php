@@ -123,12 +123,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Uses Ldap Authentication
+    | Authentication Mode
+    |--------------------------------------------------------------------------
+    |
+    | Supported: local, ldap
+    |
+    */
+
+    'mode' => env('AUTH_MODE', App\Enums\AuthMode::Local->value),
+
+    /*
+    |--------------------------------------------------------------------------
+    | LDAP Authentication
     |--------------------------------------------------------------------------
     */
 
     'ldap' => [
-        'enabled'        => env('LDAP_AUTH_ENABLED', false),
         'requires_local' => env('LDAP_AUTH_REQUIRES_LOCAL', false),
         'email_domain'   => env('LDAP_AUTH_EMAIL_DOMAIN', '@mpac.mp.br'),
     ],
