@@ -3,7 +3,7 @@
 }
 
 .fi-sidebar-nav {
-  @apply flex grow flex-col gap-y-7 overflow-x-hidden overflow-y-auto p-2;
+  @apply flex grow flex-col gap-y-4 overflow-x-hidden overflow-y-auto p-2;
   scrollbar-gutter: stable;
 }
 
@@ -15,7 +15,11 @@
   @apply flex items-center gap-x-3 px-4.5 py-1;
 
   & .fi-icon {
-    @apply size-3 text-(--color-text-secondary);
+    @apply size-2 text-(--color-text-secondary);
+  }
+
+  & .fi-icon-btn > .fi-icon {
+    @apply size-3;
   }
 }
 

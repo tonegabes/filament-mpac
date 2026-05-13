@@ -31,6 +31,7 @@ class UserForm
                             ->required(),
 
                         TextInput::make('username')
+                            ->label('Nome de Usuário')
                             ->maxLength(255)
                             ->required(),
 
