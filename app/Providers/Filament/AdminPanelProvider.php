@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Enums\AuthMode;
 use App\Enums\NavGroups;
 use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Password\ResetPasswordAction;
 use App\Filament\Pages\Auth\Password\ResetPasswordRequest;
 use App\Filament\Pages\Auth\Register;
+use App\Services\Auth\AuthModeHandlerResolver;
 use App\Settings\SystemSettings;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -95,9 +95,9 @@ class AdminPanelProvider extends PanelProvider
      */
     private function configureRegistration(Panel $panel): Panel
     {
-        $authMode = AuthMode::fromConfig(Config::string('auth.mode'));
+        $authModeHandler = app(AuthModeHandlerResolver::class)->resolveFromConfig();
 
-        if (! $authMode->allowsLocalRegistration()) {
+        if (! $authModeHandler->allowsLocalRegistration()) {
             return $panel;
         }
 

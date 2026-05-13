@@ -7,6 +7,8 @@ namespace App\Filament\Pages\Auth;
 use App\Enums\AuthMode;
 use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
 use App\Models\User;
+use App\Services\Auth\AuthModeHandler;
+use App\Services\Auth\AuthModeHandlerResolver;
 use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
@@ -29,7 +31,7 @@ class Login extends VendorLogin
 {
     use UsesConfiguredAuthLayout;
 
-    private AuthMode $authMode;
+    private AuthModeHandler $authModeHandler;
 
     private ?LdapAuthService $ldapAuthService = null;
 
@@ -40,9 +42,10 @@ class Login extends VendorLogin
      */
     public function __construct()
     {
-        $this->authMode = AuthMode::fromConfig(Config::string('auth.mode'));
+        $authMode = AuthMode::fromConfig(Config::string('auth.mode'));
+        $this->authModeHandler = app(AuthModeHandlerResolver::class)->resolve($authMode);
 
-        if ($this->authMode === AuthMode::Ldap) {
+        if ($authMode === AuthMode::Ldap) {
             $this->ldapAuthService = app(LdapAuthService::class);
             $this->ldapUserService = app(LdapUserService::class);
         }
@@ -72,10 +75,7 @@ class Login extends VendorLogin
         /** @var array<string, string> $data */
         $data = $this->form->getState();
 
-        match ($this->authMode) {
-            AuthMode::Ldap  => $this->attemptLdapAuth($data),
-            AuthMode::Local => $this->attemptLocalAuth($data),
-        };
+        $this->authModeHandler->authenticate($this, $data);
 
         session()->regenerate();
 
@@ -85,7 +85,7 @@ class Login extends VendorLogin
     /**
      * @param  array<string, string>  $data
      */
-    private function attemptLocalAuth(array $data): void
+    public function attemptLocalAuth(array $data): void
     {
         /** @var SessionGuard $authGuard */
         $authGuard = Filament::auth();
@@ -186,8 +186,12 @@ class Login extends VendorLogin
             $this->throwFailureValidationException();
         }
 
+        $user = $this->handleLocalUserRecord($username, $ldapUser);
+
+        $this->ensurePanelAccess($user);
+
         Filament::auth()->login(
-            user: $this->handleLocalUserRecord($username, $ldapUser),
+            user: $user,
             remember: (bool) ($data['remember'] ?? false),
         );
     }
@@ -197,9 +201,7 @@ class Login extends VendorLogin
      */
     public function form(Schema $schema): Schema
     {
-        $loginComponent = $this->authMode->usesUsernameField()
-            ? $this->getUsernameFormComponent()
-            : $this->getEmailFormComponent();
+        $loginComponent = $this->authModeHandler->loginComponent($this);
 
         return $schema
             ->components([
@@ -227,11 +229,9 @@ class Login extends VendorLogin
     }
 
     /**
-     * @param  LdapUser  $ldapUser
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function handleLocalUserRecord(string $username, $ldapUser): User
+    private function handleLocalUserRecord(string $username, LdapUser $ldapUser): User
     {
         if (Config::boolean('auth.ldap.requires_local')) {
             $user = User::firstWhere('username', $username);
@@ -253,7 +253,7 @@ class Login extends VendorLogin
             ],
         );
 
-        if ($user->roles->isEmpty()) {
+        if ($user->roles()->doesntExist()) {
             $user->syncRoles([Config::string('auth.default_role')]);
         }
 
@@ -297,5 +297,34 @@ class Login extends VendorLogin
     private function getLdapUserService(): LdapUserService
     {
         return $this->ldapUserService ?? app(LdapUserService::class);
+    }
+
+    /**
+     * Build the default email component used by local authentication.
+     */
+    public function makeEmailLoginFormComponent(): Component
+    {
+        return $this->getEmailFormComponent();
+    }
+
+    /**
+     * Build the username component used by LDAP authentication.
+     */
+    public function makeUsernameLoginFormComponent(): Component
+    {
+        return $this->getUsernameFormComponent();
+    }
+
+    /**
+     * Ensure that user can access the current panel.
+     */
+    private function ensurePanelAccess(User $user): void
+    {
+        /** @var Panel $panel */
+        $panel = Filament::getCurrentOrDefaultPanel();
+
+        if (! $user->canAccessPanel($panel)) {
+            $this->throwFailureValidationException();
+        }
     }
 }

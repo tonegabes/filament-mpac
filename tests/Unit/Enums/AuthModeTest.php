@@ -10,9 +10,11 @@ it('resolves configured auth mode values', function (): void {
         ->and(AuthMode::fromConfig(' LDAP '))->toBe(AuthMode::Ldap);
 });
 
-it('falls back to local mode for unknown values', function (): void {
-    expect(AuthMode::fromConfig('workos'))->toBe(AuthMode::Local)
-        ->and(AuthMode::fromConfig(null))->toBe(AuthMode::Local);
+it('throws exception for unknown auth mode values', function (): void {
+    expect(fn () => AuthMode::fromConfig('workos'))
+        ->toThrow(InvalidArgumentException::class)
+        ->and(fn () => AuthMode::fromConfig(null))
+        ->toThrow(InvalidArgumentException::class);
 });
 
 it('exposes capabilities per auth mode', function (): void {

@@ -7,7 +7,7 @@ namespace App\Services\Auth;
 use Illuminate\Support\Facades\Config;
 use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 
-final class LdapAuthService
+class LdapAuthService
 {
     public string $emailDomain;
 

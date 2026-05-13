@@ -6,8 +6,11 @@ namespace App\Providers;
 
 use App\Enums\Permissions\SystemPermissions;
 use App\Models\User;
+use App\Services\Auth\AuthModeHandlerResolver;
+use App\Services\Auth\LdapAuthModeHandler;
 use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
+use App\Services\Auth\LocalAuthModeHandler;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,6 +23,9 @@ final class AuthServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(LocalAuthModeHandler::class);
+        $this->app->singleton(LdapAuthModeHandler::class);
+        $this->app->singleton(AuthModeHandlerResolver::class);
         $this->app->singleton(LdapAuthService::class);
         $this->app->singleton(LdapUserService::class);
 
