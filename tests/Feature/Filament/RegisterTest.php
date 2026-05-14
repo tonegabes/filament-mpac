@@ -28,18 +28,18 @@ beforeEach(function (): void {
 it('creates user with username from email and is_active true and Operator role', function (): void {
     Livewire::test(Register::class)
         ->fillForm([
-            'name'                 => 'New User',
-            'email'                => 'newuser@example.com',
-            'password'             => 'password123',
+            'name' => 'New User',
+            'email' => 'newuser@example.com',
+            'password' => 'password123',
             'passwordConfirmation' => 'password123',
         ])
         ->call('register')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas(User::class, [
-        'name'      => 'New User',
-        'email'     => 'newuser@example.com',
-        'username'  => 'newuser@example.com',
+        'name' => 'New User',
+        'email' => 'newuser@example.com',
+        'username' => 'newuser@example.com',
         'is_active' => true,
     ]);
 

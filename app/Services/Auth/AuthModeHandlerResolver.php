@@ -19,7 +19,7 @@ final class AuthModeHandlerResolver
     {
         return match ($authMode) {
             AuthMode::Local => $this->localAuthModeHandler,
-            AuthMode::Ldap  => $this->ldapAuthModeHandler,
+            AuthMode::Ldap => $this->ldapAuthModeHandler,
         };
     }
 

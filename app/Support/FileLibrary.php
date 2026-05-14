@@ -35,7 +35,7 @@ class FileLibrary
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'Planilha',
             'application/vnd.ms-powerpoint',
             'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'Apresentação',
-            default                                                                     => 'Arquivo',
+            default => 'Arquivo',
         };
     }
 

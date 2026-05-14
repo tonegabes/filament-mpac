@@ -24,9 +24,9 @@ enum NavGroups: string implements HasIcon, HasLabel
     {
         return match ($this) {
             self::Authorization => (string) Phosphor::ShieldCheck->getLabel(),
-            self::Tools         => (string) Phosphor::Wrench->getLabel(),
-            self::Settings      => (string) Phosphor::Gear->getLabel(),
-            self::Files         => (string) Phosphor::File->getLabel(),
+            self::Tools => (string) Phosphor::Wrench->getLabel(),
+            self::Settings => (string) Phosphor::Gear->getLabel(),
+            self::Files => (string) Phosphor::File->getLabel(),
         };
     }
 }

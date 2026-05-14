@@ -44,13 +44,13 @@ it('saves system settings from the form', function (): void {
 
     Livewire::test(ManageSystem::class)
         ->fillForm([
-            'app_sigla'            => 'PORTAL',
-            'app_name'             => 'Portal MPAC',
-            'show_app_logo'        => false,
-            'enable_registration'  => false,
-            'auth_page_layout'     => PageLayouts::Centered->value,
-            'app_logo_light'       => null,
-            'app_logo_dark'        => null,
+            'app_sigla' => 'PORTAL',
+            'app_name' => 'Portal MPAC',
+            'show_app_logo' => false,
+            'enable_registration' => false,
+            'auth_page_layout' => PageLayouts::Centered->value,
+            'app_logo_light' => null,
+            'app_logo_dark' => null,
             'auth_page_background' => null,
         ])
         ->call('save')

@@ -18,9 +18,9 @@ enum Roles: string
     {
         return match ($this) {
             self::Developer => 'Full system access with development privileges',
-            self::Admin     => 'Administrative access to manage system',
-            self::Operator  => 'Operational access to use the system',
-            self::Guest     => 'Limited access for viewing only',
+            self::Admin => 'Administrative access to manage system',
+            self::Operator => 'Operational access to use the system',
+            self::Guest => 'Limited access for viewing only',
         };
     }
 
@@ -47,9 +47,9 @@ enum Roles: string
     {
         return match ($this) {
             self::Developer => 4,
-            self::Admin     => 3,
-            self::Operator  => 2,
-            self::Guest     => 1,
+            self::Admin => 3,
+            self::Operator => 2,
+            self::Guest => 1,
         };
     }
 }

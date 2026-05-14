@@ -51,7 +51,7 @@ class DocumentResource extends Resource
     {
         return [
             'index' => ListDocuments::route('/'),
-            'view'  => ViewDocument::route('/{record}'),
+            'view' => ViewDocument::route('/{record}'),
         ];
     }
 }

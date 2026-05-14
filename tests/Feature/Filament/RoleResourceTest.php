@@ -39,7 +39,7 @@ it('can create a role', function (): void {
 
     Livewire::test(CreateRole::class)
         ->fillForm([
-            'name'        => 'Editor',
+            'name' => 'Editor',
             'permissions' => $permissions,
         ])
         ->call('create')

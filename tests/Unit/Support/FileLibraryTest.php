@@ -7,9 +7,9 @@ use App\Support\FileLibrary;
 
 it('returns library collection options', function (): void {
     expect(FileCollection::options())->toMatchArray([
-        'images'             => 'Imagens',
-        'documents'          => 'Documentos',
-        'system_logos'       => 'Logos do sistema',
+        'images' => 'Imagens',
+        'documents' => 'Documentos',
+        'system_logos' => 'Logos do sistema',
         'system_backgrounds' => 'Fundos do sistema',
     ]);
 });

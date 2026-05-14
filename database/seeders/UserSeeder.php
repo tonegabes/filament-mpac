@@ -17,11 +17,11 @@ final class UserSeeder extends Seeder
         $userDeveloper = User::firstOrCreate(
             [
                 'username' => 'developer',
-                'email'    => 'developer@email.com',
+                'email' => 'developer@email.com',
             ],
             [
-                'name'      => 'Desenvolvedor',
-                'password'  => Hash::make('developer'),
+                'name' => 'Desenvolvedor',
+                'password' => Hash::make('developer'),
                 'is_active' => true,
             ]
         );
@@ -34,11 +34,11 @@ final class UserSeeder extends Seeder
         $userAdmin = User::firstOrCreate(
             [
                 'username' => 'admin',
-                'email'    => 'admin@email.com',
+                'email' => 'admin@email.com',
             ],
             [
-                'name'      => 'Administrador',
-                'password'  => Hash::make('admin'),
+                'name' => 'Administrador',
+                'password' => Hash::make('admin'),
                 'is_active' => true,
             ]
         );
@@ -50,11 +50,11 @@ final class UserSeeder extends Seeder
         $userOperator = User::firstOrCreate(
             [
                 'username' => 'operator',
-                'email'    => 'operator@email.com',
+                'email' => 'operator@email.com',
             ],
             [
-                'name'      => 'Operador',
-                'password'  => Hash::make('operator'),
+                'name' => 'Operador',
+                'password' => Hash::make('operator'),
                 'is_active' => true,
             ],
         );

@@ -48,19 +48,19 @@ it('can create a user', function (): void {
 
     Livewire::test(CreateUser::class)
         ->fillForm([
-            'name'      => 'New User',
-            'email'     => 'newuser@example.com',
-            'username'  => 'newuser',
+            'name' => 'New User',
+            'email' => 'newuser@example.com',
+            'username' => 'newuser',
             'is_active' => true,
-            'roles'     => [$role->id],
+            'roles' => [$role->id],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas(User::class, [
-        'name'      => 'New User',
-        'email'     => 'newuser@example.com',
-        'username'  => 'newuser',
+        'name' => 'New User',
+        'email' => 'newuser@example.com',
+        'username' => 'newuser',
         'is_active' => true,
     ]);
 });

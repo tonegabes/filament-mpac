@@ -14,9 +14,9 @@ enum FileCollection: string
     public function label(): string
     {
         return match ($this) {
-            self::Images            => 'Imagens',
-            self::Documents         => 'Documentos',
-            self::SystemLogos       => 'Logos do sistema',
+            self::Images => 'Imagens',
+            self::Documents => 'Documentos',
+            self::SystemLogos => 'Logos do sistema',
             self::SystemBackgrounds => 'Fundos do sistema',
         };
     }
@@ -24,8 +24,8 @@ enum FileCollection: string
     public function disk(): string
     {
         return match ($this) {
-            self::Images                               => 'images',
-            self::Documents                            => 'documents',
+            self::Images => 'images',
+            self::Documents => 'documents',
             self::SystemLogos, self::SystemBackgrounds => 'public',
         };
     }
@@ -34,8 +34,8 @@ enum FileCollection: string
     {
         return match ($this) {
             self::Images, self::Documents => null,
-            self::SystemLogos             => 'system/logos',
-            self::SystemBackgrounds       => 'system/backgrounds',
+            self::SystemLogos => 'system/logos',
+            self::SystemBackgrounds => 'system/backgrounds',
         };
     }
 

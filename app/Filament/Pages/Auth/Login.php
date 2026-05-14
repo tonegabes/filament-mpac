@@ -246,9 +246,9 @@ class Login extends VendorLogin
         $user = User::firstOrCreate(
             ['username' => $username],
             [
-                'name'      => $this->getLdapUserService()->getUserInfo('displayName', $ldapUser),
-                'email'     => $this->getLdapUserService()->getUserInfo('mail', $ldapUser),
-                'password'  => Hash::make(\Str::random(16)),
+                'name' => $this->getLdapUserService()->getUserInfo('displayName', $ldapUser),
+                'email' => $this->getLdapUserService()->getUserInfo('mail', $ldapUser),
+                'password' => Hash::make(\Str::random(16)),
                 'is_active' => true,
             ],
         );
