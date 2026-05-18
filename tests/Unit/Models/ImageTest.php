@@ -7,17 +7,16 @@ use App\Models\Image;
 it('returns expected mime types for images', function (): void {
     $mimes = Image::getMimeTypeMap();
 
-    expect($mimes)->toBeArray()
-        ->and($mimes)->toContain(
-            'image/jpeg',
-            'image/jpg',
-            'image/png',
-            'image/gif',
-            'image/webp',
-            'image/svg+xml',
-            'image/avif',
-            'image/bmp'
-        )
+    expect($mimes)->toContain(
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'image/svg+xml',
+        'image/avif',
+        'image/bmp'
+    )
         ->and($mimes)->toHaveCount(8);
 });
 

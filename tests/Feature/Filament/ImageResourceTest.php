@@ -45,9 +45,10 @@ function createImageRecord(string $name, string $fileName): Image
 it('can render list images page and see records', function (): void {
     $image = createImageRecord('Main brand image', 'brand.png');
 
-    Livewire::test(ListImages::class)
-        ->assertOk()
-        ->assertCanSeeTableRecords([$image]);
+    $component = Livewire::test(ListImages::class);
+
+    $component->assertOk();
+    $component->assertCanSeeTableRecords([$image]);
 });
 
 it('can search images by name', function (): void {
@@ -63,11 +64,12 @@ it('can search images by name', function (): void {
 it('can render the image view page', function (): void {
     $image = createImageRecord('Viewable image', 'viewable.png');
 
-    Livewire::test(ViewImage::class, ['record' => $image->getRouteKey()])
-        ->assertOk()
-        ->assertSchemaStateSet([
-            'name' => 'Viewable image',
-        ]);
+    $component = Livewire::test(ViewImage::class, ['record' => $image->getRouteKey()]);
+
+    $component->assertOk();
+    $component->assertSchemaStateSet([
+        'name' => 'Viewable image',
+    ]);
 });
 
 it('can delete an image from the table', function (): void {

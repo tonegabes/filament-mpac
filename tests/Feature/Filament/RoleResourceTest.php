@@ -51,7 +51,7 @@ it('can create a role', function (): void {
 });
 
 it('can edit a role', function (): void {
-    $role = Role::first();
+    $role = Role::query()->firstOrFail();
     $newName = 'Updated Role Name';
 
     Livewire::test(EditRole::class, ['record' => $role->getRouteKey()])

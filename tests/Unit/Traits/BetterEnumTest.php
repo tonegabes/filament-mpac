@@ -22,16 +22,14 @@ it('returns values from cases', function (): void {
 
 it('returns options as name => value', function (): void {
     $options = PageLayouts::options();
-    expect($options)->toBeArray()
-        ->and($options)->toHaveCount(3)
+    expect($options)->toHaveCount(3)
         ->and(array_keys($options))->toBe(PageLayouts::names())
         ->and(array_values($options))->toBe(PageLayouts::values());
 });
 
 it('returns asArray with value keyed by name', function (): void {
     $arr = PageLayouts::asArray();
-    expect($arr)->toBeArray()
-        ->and($arr['Split'])->toBe('layouts.auth.split')
+    expect($arr['Split'])->toBe('layouts.auth.split')
         ->and($arr['Centered'])->toBe('layouts.auth.centered')
         ->and($arr['FullPage'])->toBe('layouts.auth.fullpage');
 });

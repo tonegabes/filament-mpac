@@ -44,7 +44,7 @@ it('can list and search users', function (): void {
 });
 
 it('can create a user', function (): void {
-    $role = Role::first();
+    $role = Role::query()->firstOrFail();
 
     Livewire::test(CreateUser::class)
         ->fillForm([
@@ -67,7 +67,7 @@ it('can create a user', function (): void {
 
 it('can edit a user', function (): void {
     $user = User::factory()->create(['name' => 'Original Name']);
-    $role = Role::first();
+    $role = Role::query()->firstOrFail();
     $user->assignRole($role);
 
     Livewire::test(EditUser::class, ['record' => $user->getRouteKey()])

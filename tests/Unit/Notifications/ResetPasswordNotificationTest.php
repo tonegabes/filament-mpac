@@ -18,8 +18,7 @@ it('builds mail message with expected subject and body', function (): void {
 
     $message = $notification->toMail($user);
 
-    expect($message)->toBeInstanceOf(Illuminate\Notifications\Messages\MailMessage::class)
-        ->and($message->subject)->toBe('Redefinição de senha')
+    expect($message->subject)->toBe('Redefinição de senha')
         ->and($message->introLines)->toContain('Você está recebendo este e-mail porque recebemos um pedido de redefinição de senha para sua conta.')
         ->and($message->outroLines)->toContain('Se você não solicitou uma redefinição de senha, nenhuma ação adicional é necessária.');
 });
@@ -31,6 +30,7 @@ it('includes expire minutes in mail message', function (): void {
     $notification->url = 'https://example.com/reset';
 
     $message = $notification->toMail($user);
+    $outroLines = array_filter($message->outroLines, is_string(...));
 
-    expect(implode(' ', $message->outroLines ?? []))->toContain('120');
+    expect(implode(' ', $outroLines))->toContain('120');
 });

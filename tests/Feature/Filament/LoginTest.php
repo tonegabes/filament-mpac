@@ -14,11 +14,48 @@ use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 
-uses(RefreshDatabase::class);
+final class LoginTestLdapUserService extends LdapUserService
+{
+    /** @var list<string> */
+    public array $usernames = [];
 
-afterEach(function (): void {
-    Mockery::close();
-});
+    public ?LdapUser $ldapUser;
+
+    public function __construct()
+    {
+        $this->ldapUser = new LdapUser;
+    }
+
+    public function findUserByUsername(string $username): ?LdapUser
+    {
+        $this->usernames[] = $username;
+
+        return $this->ldapUser;
+    }
+}
+
+final class LoginTestLdapAuthService extends LdapAuthService
+{
+    /** @var list<array{username: string, password: string}> */
+    public array $credentials = [];
+
+    public function __construct()
+    {
+        $this->emailDomain = '@mpac.mp.br';
+    }
+
+    public function authenticate(string $username, string $password): bool
+    {
+        $this->credentials[] = [
+            'username' => $username,
+            'password' => $password,
+        ];
+
+        return true;
+    }
+}
+
+uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     Config::set('auth.mode', 'local');
@@ -69,20 +106,8 @@ it('authenticates with ldap credentials when user can access panel', function ()
     $user = User::factory()->create(['username' => 'johndoe']);
     $user->givePermissionTo(SystemPermissions::PanelsViewAdmin->value);
 
-    $ldapUser = Mockery::mock(LdapUser::class);
-    $ldapUserService = Mockery::mock(LdapUserService::class);
-    $ldapAuthService = Mockery::mock(LdapAuthService::class);
-    $ldapAuthService->emailDomain = '@mpac.mp.br';
-
-    $ldapUserService->shouldReceive('findUserByUsername')
-        ->once()
-        ->with('johndoe')
-        ->andReturn($ldapUser);
-
-    $ldapAuthService->shouldReceive('authenticate')
-        ->once()
-        ->with('johndoe', 'password')
-        ->andReturn(true);
+    $ldapUserService = new LoginTestLdapUserService;
+    $ldapAuthService = new LoginTestLdapAuthService;
 
     $this->instance(LdapUserService::class, $ldapUserService);
     $this->instance(LdapAuthService::class, $ldapAuthService);
@@ -94,6 +119,10 @@ it('authenticates with ldap credentials when user can access panel', function ()
         ->call('authenticate');
 
     $this->assertAuthenticatedAs($user);
+    expect($ldapUserService->usernames)->toBe(['johndoe'])
+        ->and($ldapAuthService->credentials)->toBe([
+            ['username' => 'johndoe', 'password' => 'password'],
+        ]);
 });
 
 it('blocks ldap login when user cannot access panel', function (): void {
@@ -102,20 +131,8 @@ it('blocks ldap login when user cannot access panel', function (): void {
 
     User::factory()->create(['username' => 'denied-user']);
 
-    $ldapUser = Mockery::mock(LdapUser::class);
-    $ldapUserService = Mockery::mock(LdapUserService::class);
-    $ldapAuthService = Mockery::mock(LdapAuthService::class);
-    $ldapAuthService->emailDomain = '@mpac.mp.br';
-
-    $ldapUserService->shouldReceive('findUserByUsername')
-        ->once()
-        ->with('denied-user')
-        ->andReturn($ldapUser);
-
-    $ldapAuthService->shouldReceive('authenticate')
-        ->once()
-        ->with('denied-user', 'password')
-        ->andReturn(true);
+    $ldapUserService = new LoginTestLdapUserService;
+    $ldapAuthService = new LoginTestLdapAuthService;
 
     $this->instance(LdapUserService::class, $ldapUserService);
     $this->instance(LdapAuthService::class, $ldapAuthService);
@@ -128,4 +145,8 @@ it('blocks ldap login when user cannot access panel', function (): void {
         ->assertHasErrors();
 
     $this->assertGuest();
+    expect($ldapUserService->usernames)->toBe(['denied-user'])
+        ->and($ldapAuthService->credentials)->toBe([
+            ['username' => 'denied-user', 'password' => 'password'],
+        ]);
 });

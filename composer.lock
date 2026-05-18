@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "026b7deca105f4b77df4df0be287f11c",
+    "content-hash": "7fb59bd499111f902c1c073cd4b85749",
     "packages": [
         {
             "name": "al-saloul/filament-image-gallery",
@@ -11374,6 +11374,69 @@
             "time": "2024-05-16T03:13:13+00:00"
         },
         {
+            "name": "mrpunyapal/peststan",
+            "version": "0.2.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MrPunyapal/PestStan.git",
+                "reference": "750859a911050915cb6e3efbfde30e900ad717bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MrPunyapal/PestStan/zipball/750859a911050915cb6e3efbfde30e900ad717bf",
+                "reference": "750859a911050915cb6e3efbfde30e900ad717bf",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2",
+                "phpstan/phpstan": "^2.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.18",
+                "mrpunyapal/rector-pest": "^0.2.0",
+                "nunomaduro/pao": "^0.1.4",
+                "pestphp/pest": "^3.0 || ^4.0 || ^5.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "rector/rector": "^2.0"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PestStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHPStan extension for Pest PHP testing framework",
+            "keywords": [
+                "PHPStan",
+                "pest",
+                "static-analysis",
+                "testing"
+            ],
+            "support": {
+                "issues": "https://github.com/MrPunyapal/PestStan/issues",
+                "source": "https://github.com/MrPunyapal/PestStan/tree/0.2.10"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/mrpunyapal",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-05-10T16:55:11+00:00"
+        },
+        {
             "name": "myclabs/deep-copy",
             "version": "1.13.4",
             "source": {
@@ -12344,6 +12407,62 @@
                 "source": "https://github.com/phpstan/phpstan-deprecation-rules/tree/2.0.4"
             },
             "time": "2026-02-09T13:21:14+00:00"
+        },
+        {
+            "name": "phpstan/phpstan-phpunit",
+            "version": "2.0.16",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/phpstan-phpunit.git",
+                "reference": "6ab598e1bc106e6827fd346ae4a12b4a5d634c32"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan-phpunit/zipball/6ab598e1bc106e6827fd346ae4a12b4a5d634c32",
+                "reference": "6ab598e1bc106e6827fd346ae4a12b4a5d634c32",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0",
+                "phpstan/phpstan": "^2.1.32"
+            },
+            "conflict": {
+                "phpunit/phpunit": "<7.0"
+            },
+            "require-dev": {
+                "nikic/php-parser": "^5",
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^9.6"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon",
+                        "rules.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHPUnit extensions and rules for PHPStan",
+            "keywords": [
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/phpstan/phpstan-phpunit/issues",
+                "source": "https://github.com/phpstan/phpstan-phpunit/tree/2.0.16"
+            },
+            "time": "2026-02-14T09:05:21+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

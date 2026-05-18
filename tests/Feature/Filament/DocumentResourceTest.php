@@ -45,9 +45,10 @@ function createDocumentRecord(string $name, string $fileName): Document
 it('can render list documents page and see records', function (): void {
     $document = createDocumentRecord('Policy document', 'policy.pdf');
 
-    Livewire::test(ListDocuments::class)
-        ->assertOk()
-        ->assertCanSeeTableRecords([$document]);
+    $component = Livewire::test(ListDocuments::class);
+
+    $component->assertOk();
+    $component->assertCanSeeTableRecords([$document]);
 });
 
 it('can search documents by name', function (): void {
@@ -63,11 +64,12 @@ it('can search documents by name', function (): void {
 it('can render the document view page', function (): void {
     $document = createDocumentRecord('Viewable document', 'viewable.pdf');
 
-    Livewire::test(ViewDocument::class, ['record' => $document->getRouteKey()])
-        ->assertOk()
-        ->assertSchemaStateSet([
-            'name' => 'Viewable document',
-        ]);
+    $component = Livewire::test(ViewDocument::class, ['record' => $document->getRouteKey()]);
+
+    $component->assertOk();
+    $component->assertSchemaStateSet([
+        'name' => 'Viewable document',
+    ]);
 });
 
 it('can delete a document from the table', function (): void {

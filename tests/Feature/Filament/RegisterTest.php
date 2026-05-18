@@ -43,9 +43,9 @@ it('creates user with username from email and is_active true and Operator role',
         'is_active' => true,
     ]);
 
-    $user = User::query()->where('email', 'newuser@example.com')->first();
-    expect($user)->not->toBeNull()
-        ->and($user->hasRole(Roles::Operator->value))->toBeTrue();
+    $user = User::query()->where('email', 'newuser@example.com')->firstOrFail();
+
+    expect($user->hasRole(Roles::Operator->value))->toBeTrue();
 });
 
 it('getLayout returns value from SystemSettings', function (): void {

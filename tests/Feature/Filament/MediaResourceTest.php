@@ -38,30 +38,27 @@ function createMediaRecord(string $name, string $fileName): Media
 {
     $image = Image::create(['name' => $name]);
 
-    $image
+    return $image
         ->addMedia(UploadedFile::fake()->image($fileName))
         ->toMediaCollection(Image::COLLECTION_NAME);
-
-    return $image->getFirstMedia(Image::COLLECTION_NAME);
 }
 
 function createDocumentMediaRecord(string $name, string $fileName): Media
 {
     $document = Document::create(['name' => $name]);
 
-    $document
+    return $document
         ->addMedia(UploadedFile::fake()->createWithContent($fileName, "%PDF-1.4\n% Test PDF\n"))
         ->toMediaCollection(Document::COLLECTION_NAME);
-
-    return $document->getFirstMedia(Document::COLLECTION_NAME);
 }
 
 it('can render list media page and see records', function (): void {
     $media = createMediaRecord('Gallery image', 'gallery.png');
 
-    Livewire::test(ListMedia::class)
-        ->assertOk()
-        ->assertCanSeeTableRecords([$media]);
+    $component = Livewire::test(ListMedia::class);
+
+    $component->assertOk();
+    $component->assertCanSeeTableRecords([$media]);
 });
 
 it('can search media by name', function (): void {
@@ -91,10 +88,11 @@ it('can filter media library by collection and file type', function (): void {
 it('shows friendly media metadata in the library table', function (): void {
     $media = createMediaRecord('Readable image', 'readable.png');
 
-    Livewire::test(ListMedia::class)
-        ->assertCanSeeTableRecords([$media])
-        ->assertSee('Imagens')
-        ->assertSee('Imagem');
+    $component = Livewire::test(ListMedia::class)
+        ->assertCanSeeTableRecords([$media]);
+
+    $component->assertSee('Imagens');
+    $component->assertSee('Imagem');
 });
 
 it('can render the media view page', function (): void {
