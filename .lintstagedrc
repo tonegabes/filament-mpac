@@ -1,3 +1,3 @@
 {
-  "**/*.php": ["composer style:fix", "composer code:analyze"]
+  "**/*.php": ["composer lint:fix", "composer analyze"]
 }

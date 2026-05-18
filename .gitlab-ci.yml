@@ -78,7 +78,7 @@ code_analysis:
   dependencies:
     - composer_install
   script:
-    - composer code:analyze
+    - composer analyze
 
 style_check:
   stage: quality
@@ -90,7 +90,7 @@ style_check:
   dependencies:
     - composer_install
   script:
-    - composer style:check
+    - composer lint
 
 tests:
   stage: quality
@@ -102,7 +102,7 @@ tests:
   dependencies:
     - composer_install
   script:
-    - composer style:check
+    - composer test
 
 # --------------------------------------------------------
 # MERGE REQUEST BUILD
