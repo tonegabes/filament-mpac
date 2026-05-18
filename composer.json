@@ -59,13 +59,13 @@
   },
   "scripts": {
     "dd:check": "laradumps check stop-on-failure --dir=app,routes,config,resources,database --text=dump,dd",
-    "style:check": [
+    "lint": [
       "pint --test --no-interaction --ansi"
     ],
-    "style:fix": [
+    "lint:fix": [
       "pint --no-interaction --ansi"
     ],
-    "code:analyze": [
+    "analyze": [
       "phpstan analyze --memory-limit=4G --no-progress --no-interaction --ansi"
     ],
     "pre-autoload-dump": [

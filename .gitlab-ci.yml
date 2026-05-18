@@ -92,6 +92,18 @@ style_check:
   script:
     - composer style:check
 
+tests:
+  stage: quality
+  extends:
+    - .php_job
+    - .default_quality_rules
+  needs:
+    - composer_install
+  dependencies:
+    - composer_install
+  script:
+    - composer style:check
+
 # --------------------------------------------------------
 # MERGE REQUEST BUILD
 # --------------------------------------------------------
