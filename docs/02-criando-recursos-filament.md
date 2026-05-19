@@ -151,7 +151,7 @@ class CreateProduct extends CreateRecord
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Resources\Products\Pages;
+namespace App\Filament\Resources\Products\Pages;
 
 use App\Filament\Resources\Products\ProductResource;
 use Filament\Resources\Pages\EditRecord;
@@ -226,14 +226,7 @@ class ProductPolicy
 }
 ```
 
-E registre no Resource:
-
-```php
-public static function getModel(): string
-{
-    return static::$model;
-}
-```
+No projeto atual, o registro de policy é feito por convenção Laravel (`Model` -> `Policy`) e o Filament detecta automaticamente.
 
 Veja [Policies e Autorização](08-policies-e-autorizacao.md) para mais detalhes.
 
@@ -257,11 +250,27 @@ public static function getPages(): array
 class ViewProduct extends ViewRecord
 {
     protected static string $resource = ProductResource::class;
+}
+```
 
-    public static function infolist(Schema $schema): Schema
-    {
-        return ProductInfolist::configure($schema);
-    }
+No estado atual do projeto, o padrão adotado é manter `infolist()` no `Resource` (ex.: `DocumentResource`) e deixar a `ViewRecord` com ações e customizações de página.
+
+## 📁 Padrão de Resource somente leitura
+
+Recursos de arquivos no projeto (`Document`, `Image`, `Media`) usam majoritariamente:
+
+- listagem (`index`)
+- visualização (`view`)
+
+Exemplo:
+
+```php
+public static function getPages(): array
+{
+    return [
+        'index' => ListDocuments::route('/'),
+        'view' => ViewDocument::route('/{record}'),
+    ];
 }
 ```
 

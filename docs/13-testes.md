@@ -1,324 +1,139 @@
 # Testes
 
-Este documento explica como escrever testes para recursos Filament usando Pest, seguindo as convenções do projeto.
+Este documento descreve os padrões de testes atuais do projeto com Pest.
 
-## 📚 Visão Geral
+## 📚 Stack de testes
 
-O projeto usa **Pest** para testes. Todos os testes devem ser escritos usando a sintaxe do Pest e seguir os padrões estabelecidos.
+- Pest v4
+- PHPUnit 12
+- Plugin `pest-plugin-laravel`
+- Testes de Feature e Unit
 
-## 🏗️ Estrutura de Testes
+## 🏗️ Estrutura atual
 
-```
+```text
 tests/
 ├── Feature/
 │   ├── Filament/
 │   │   ├── UserResourceTest.php
 │   │   ├── RoleResourceTest.php
-│   │   └── PermissionResourceTest.php
-│   └── Policies/
-│       ├── UserPolicyTest.php
-│       └── RolePolicyTest.php
+│   │   ├── PermissionResourceTest.php
+│   │   ├── DocumentResourceTest.php
+│   │   ├── ImageResourceTest.php
+│   │   ├── MediaResourceTest.php
+│   │   ├── ManageSystemTest.php
+│   │   ├── LoginTest.php
+│   │   └── RegisterTest.php
+│   ├── Policies/
+│   │   ├── UserPolicyTest.php
+│   │   ├── RolePolicyTest.php
+│   │   └── PermissionPolicyTest.php
+│   └── Seeders/
+│       ├── PermissionSeederTest.php
+│       ├── RoleSeederTest.php
+│       └── UserSeederTest.php
 └── Unit/
-    └── Models/
-        └── UserTest.php
+    ├── Enums/
+    ├── Models/
+    ├── Services/Auth/
+    ├── Settings/
+    ├── Traits/
+    ├── Support/
+    └── Filament/Actions/
 ```
 
-## 🧪 Testando Resources Filament
+## 🧪 Padrão para testes Filament
 
-### Setup Básico
+Exemplo de setup típico:
 
 ```php
-<?php
-
-declare(strict_types=1);
-
-use App\Filament\Resources\Products\Pages\ListProducts;
-use App\Models\Product;
-use App\Models\User;
-use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
-
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
-    // Limpa cache de permissões
-    app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-    
-    // Seed permissões e roles
-    $this->seed(Database\Seeders\PermissionSeeder::class);
-    $this->seed(Database\Seeders\RoleSeeder::class);
+    app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
+    $this->seed(PermissionSeeder::class);
+    $this->seed(RoleSeeder::class);
 
-    // Cria usuário admin e autentica
     $admin = User::factory()->create();
-    $admin->assignRole(Roles::Admin->value);
+    $admin->assignRole(Roles::Developer->value);
 
     $this->actingAs($admin);
     Filament::setCurrentPanel(Filament::getPanel('admin'));
 });
 ```
 
-### Testando Listagem
+## ✅ Assertions comuns
+
+### Tabela
 
 ```php
-it('can render list products page and see records', function (): void {
-    $products = Product::factory()->count(3)->create();
-
-    Livewire::test(ListProducts::class)
-        ->assertCanSeeTableRecords($products);
-});
+Livewire::test(ListUsers::class)
+    ->assertCanSeeTableRecords($users)
+    ->searchTable('John')
+    ->assertCanSeeTableRecords([$user]);
 ```
 
-### Testando Busca
+### Formulário
 
 ```php
-it('can list and search products', function (): void {
-    $product = Product::factory()->create(['name' => 'Produto Teste']);
-
-    Livewire::test(ListProducts::class)
-        ->searchTable('Produto')
-        ->assertCanSeeTableRecords([$product])
-        ->searchTable('inexistente')
-        ->assertCanNotSeeTableRecords([$product]);
-});
+Livewire::test(CreateUser::class)
+    ->fillForm([
+        'name' => 'Novo Usuário',
+        'email' => 'novo@exemplo.com',
+        'username' => 'novo@exemplo.com',
+    ])
+    ->call('create')
+    ->assertHasNoFormErrors();
 ```
 
-### Testando Criação
+### Policy
 
 ```php
-it('can create a product', function (): void {
-    Livewire::test(CreateProduct::class)
-        ->fillForm([
-            'name' => 'Novo Produto',
-            'price' => 99.99,
-            'is_active' => true,
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    $this->assertDatabaseHas(Product::class, [
-        'name' => 'Novo Produto',
-        'price' => 99.99,
-        'is_active' => true,
-    ]);
-});
-```
-
-### Testando Edição
-
-```php
-it('can edit a product', function (): void {
-    $product = Product::factory()->create(['name' => 'Nome Original']);
-
-    Livewire::test(EditProduct::class, ['record' => $product->getRouteKey()])
-        ->fillForm([
-            'name' => 'Nome Atualizado',
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
-
-    expect($product->refresh()->name)->toBe('Nome Atualizado');
-});
-```
-
-### Testando Validação
-
-```php
-it('validates required fields when creating product', function (): void {
-    Livewire::test(CreateProduct::class)
-        ->fillForm([
-            'name' => '', // Campo obrigatório vazio
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['name']);
-});
-```
-
-## 🔐 Testando Policies
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use App\Models\Product;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
-
-it('allows admin to view any product', function (): void {
-    $admin = User::factory()->create();
-    $admin->assignRole(Roles::Admin->value);
-
-    expect($admin->can('viewAny', Product::class))->toBeTrue();
-});
-
-it('denies user without permission to create product', function (): void {
+it('denies user without permission to create users', function (): void {
     $user = User::factory()->create();
 
-    expect($user->can('create', Product::class))->toBeFalse();
+    expect($user->can('create', User::class))->toBeFalse();
 });
 ```
 
-## 📋 Assertions Comuns do Filament
+## ▶️ Execução recomendada
 
-### Tabelas
+Para manter velocidade e foco, use o menor escopo possível com `--compact`.
 
-```php
-// Ver registros na tabela
-->assertCanSeeTableRecords($records)
-
-// Não ver registros na tabela
-->assertCanNotSeeTableRecords($records)
-
-// Buscar na tabela
-->searchTable('termo')
-
-// Ordenar tabela
-->sortTable('name', 'asc')
-```
-
-### Formulários
-
-```php
-// Preencher formulário
-->fillForm(['field' => 'value'])
-
-// Verificar erros
-->assertHasFormErrors(['field'])
-
-// Verificar sem erros
-->assertHasNoFormErrors()
-
-// Chamar ação
-->call('create')
-->call('save')
-```
-
-### Notificações
-
-```php
-// Verificar notificação
-->assertNotified()
-
-// Verificar redirecionamento
-->assertRedirect()
-```
-
-## 🎯 Exemplo Completo: UserResourceTest
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use App\Enums\Roles;
-use App\Filament\Resources\Users\Pages\CreateUser;
-use App\Filament\Resources\Users\Pages\EditUser;
-use App\Filament\Resources\Users\Pages\ListUsers;
-use App\Models\Role;
-use App\Models\User;
-use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
-
-beforeEach(function (): void {
-    app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-    $this->seed(Database\Seeders\PermissionSeeder::class);
-    $this->seed(Database\Seeders\RoleSeeder::class);
-
-    $admin = User::factory()->create();
-    $admin->assignRole(Roles::Admin->value);
-
-    $this->actingAs($admin);
-    Filament::setCurrentPanel(Filament::getPanel('admin'));
-});
-
-it('can render list users page and see records', function (): void {
-    $users = User::factory()->count(3)->create();
-
-    Livewire::test(ListUsers::class)
-        ->assertCanSeeTableRecords($users);
-});
-
-it('can list and search users', function (): void {
-    $user = User::factory()->create(['name' => 'John Doe']);
-
-    Livewire::test(ListUsers::class)
-        ->searchTable('John')
-        ->assertCanSeeTableRecords([$user])
-        ->searchTable('unknown')
-        ->assertCanNotSeeTableRecords([$user]);
-});
-
-it('can create a user', function (): void {
-    $role = Role::first();
-
-    Livewire::test(CreateUser::class)
-        ->fillForm([
-            'name' => 'New User',
-            'email' => 'newuser@example.com',
-            'username' => 'newuser',
-            'is_active' => true,
-            'roles' => [$role->id],
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    $this->assertDatabaseHas(User::class, [
-        'name' => 'New User',
-        'email' => 'newuser@example.com',
-    ]);
-});
-
-it('can edit a user', function (): void {
-    $user = User::factory()->create(['name' => 'Original Name']);
-
-    Livewire::test(EditUser::class, ['record' => $user->getRouteKey()])
-        ->fillForm([
-            'name' => 'Updated Name',
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
-
-    expect($user->refresh()->name)->toBe('Updated Name');
-});
-```
-
-## 🏃 Executando Testes
-
-### Todos os Testes
+### Arquivo específico
 
 ```bash
-php artisan test
+php artisan test --compact tests/Feature/Filament/UserResourceTest.php
 ```
 
-### Arquivo Específico
+### Filtro por nome
 
 ```bash
-php artisan test tests/Feature/Filament/UserResourceTest.php
+php artisan test --compact --filter="can create a user"
 ```
 
-### Filtro por Nome
+### Suite completa (quando necessário)
 
 ```bash
-php artisan test --filter="can create a user"
+php artisan test --compact
 ```
 
 ## 🎯 Boas Práticas
 
-1. **RefreshDatabase**: Sempre use `RefreshDatabase` para limpar banco entre testes
-2. **Setup**: Configure usuário autenticado no `beforeEach`
-3. **Factories**: Use factories para criar dados de teste
-4. **Assertions Específicas**: Use assertions específicas do Filament
-5. **Nomes Descritivos**: Use nomes de teste descritivos
-6. **Um Teste, Uma Coisa**: Teste uma funcionalidade por vez
-7. **Arrange-Act-Assert**: Siga o padrão AAA
+1. Use `RefreshDatabase` para isolamento.
+2. Limpe cache de permissões no `beforeEach`.
+3. Faça seed de permissões/roles antes de asserts de acesso.
+4. Configure o painel atual com `Filament::setCurrentPanel(...)`.
+5. Teste fluxos reais do projeto (auth local/ldap, resources de arquivos, settings).
+6. Prefira testes pequenos e específicos em vez de cenários gigantes.
+
+## ⚠️ Observações do projeto
+
+- Recursos de arquivos (`Document`, `Image`, `Media`) hoje têm foco em listagem/visualização.
+- Não assuma factories de `Document`/`Image` se elas não existirem; use o padrão já adotado nos testes atuais.
+- Para autenticação, há testes dedicados em `LoginTest` e `RegisterTest`.
 
 ## 🔗 Próximos Passos
 
-- [Criando Recursos Filament](02-criando-recursos-filament.md) - Crie Resources testáveis
-- [Policies e Autorização](08-policies-e-autorizacao.md) - Teste autorização
+- [Sistema de Permissões](07-sistema-permissoes.md)
+- [Policies e Autorização](08-policies-e-autorizacao.md)

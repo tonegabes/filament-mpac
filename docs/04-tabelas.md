@@ -226,9 +226,9 @@ TextColumn::make('price')
 ])
 ```
 
-### Defer Filters (Padrão no Filament v4)
+### Defer Filters (Filament v5)
 
-No Filament v4, os filtros são deferidos por padrão (usuário precisa clicar em "Aplicar"). Para desabilitar:
+No Filament v5, você pode manter filtros deferidos ou aplicar automaticamente conforme a experiência desejada:
 
 ```php
 ->deferFilters(false)  // Aplica filtros automaticamente
@@ -347,11 +347,11 @@ class ProductsTable
                     ->label('Status')
                     ->placeholder('Todos'),
             ])
-            ->actions([
+            ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

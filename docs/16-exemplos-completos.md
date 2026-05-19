@@ -12,6 +12,8 @@ Este documento apresenta exemplos completos e práticos de como criar recursos s
 
 Vamos criar um Resource completo para `Product` seguindo todas as convenções.
 
+> Observação: `Product` é um exemplo didático. No estado atual do projeto, os recursos reais mais relevantes são `User`, `Document`, `Image`, `Media` e `ManageSystem`.
+
 ### Passo 1: Criar o Model
 
 ```php

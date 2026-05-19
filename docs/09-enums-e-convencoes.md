@@ -1,23 +1,16 @@
 # Enums e Convenções
 
-Este documento explica como usar Enums no projeto e as convenções estabelecidas.
+Este documento lista os enums realmente utilizados no projeto e como aplicá-los.
 
-## 📚 O que são Enums?
+## 📚 Enums atuais
 
-Enums são tipos de dados que permitem definir um conjunto fixo de valores nomeados. No projeto, usamos Enums para:
-- Grupos de navegação
-- Permissões
-- Roles
-- Layouts de página
-- Outras configurações
-
-## 🏗️ Estrutura de Enums
-
-```
+```text
 app/Enums/
+├── AuthMode.php
+├── FileCollection.php
 ├── NavGroups.php
-├── Roles.php
 ├── PageLayouts.php
+├── Roles.php
 └── Permissions/
     ├── UserPermissions.php
     ├── RolePermissions.php
@@ -25,340 +18,105 @@ app/Enums/
     └── SystemPermissions.php
 ```
 
-## 🧭 NavGroups (Grupos de Navegação)
+## 🧭 NavGroups
 
-### Estrutura
+Usado para agrupar navegação do painel:
 
-```php
-<?php
+- `Authorization`
+- `Tools`
+- `Settings`
+- `Files`
 
-declare(strict_types=1);
-
-namespace App\Enums;
-
-use Filament\Support\Contracts\HasIcon;
-use Filament\Support\Contracts\HasLabel;
-use ToneGabes\Filament\Icons\Enums\Phosphor;
-
-enum NavGroups: string implements HasIcon, HasLabel
-{
-    case Authorization = 'Autorização';
-    case Tools = 'Ferramentas';
-    case Settings = 'Configurações';
-    case Files = 'Arquivos';
-
-    public function getLabel(): string
-    {
-        return $this->value;
-    }
-
-    public function getIcon(): string
-    {
-        return match ($this) {
-            self::Authorization => (string) Phosphor::ShieldCheck->getLabel(),
-            self::Tools         => (string) Phosphor::Wrench->getLabel(),
-            self::Settings      => (string) Phosphor::Gear->getLabel(),
-            self::Files         => (string) Phosphor::File->getLabel(),
-        };
-    }
-}
-```
-
-### Uso em Resources
+Exemplo:
 
 ```php
-// ProductResource.php
 public static function getNavigationGroup(): string
 {
-    return NavGroups::Tools->value;
+    return NavGroups::Files->value;
 }
 ```
 
-### Uso em Páginas
+## 🔐 AuthMode
+
+Define o modo de autenticação:
+
+- `AuthMode::Local`
+- `AuthMode::Ldap`
+
+Uso principal:
+
+- `config/auth.php` (`auth.mode`)
+- `AuthModeHandlerResolver`
+- `AdminPanelProvider::configureRegistration()`
 
 ```php
-// ManageSystem.php
-public static function getNavigationGroup(): string
-{
-    return NavGroups::Settings->value;
-}
+$authMode = AuthMode::fromConfig(Config::string('auth.mode'));
 ```
 
-## 🔐 Permissions Enums
+## 📁 FileCollection
 
-### Estrutura
+Enum central para coleções de arquivos, disco e diretório:
+
+- `Images`
+- `Documents`
+- `SystemLogos`
+- `SystemBackgrounds`
+
+Também define MIME types aceitos para cada coleção.
 
 ```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Enums\Permissions;
-
-enum UserPermissions: string
-{
-    case All = 'users';
-    case View = 'users.view';
-    case Create = 'users.create';
-    case Update = 'users.update';
-    case Delete = 'users.delete';
-    case Restore = 'users.restore';
-    case ForceDelete = 'users.force-delete';
-}
+FileCollection::Documents->disk(); // documents
+FileCollection::SystemLogos->directory(); // system/logos
 ```
 
-### Uso
+## 👥 Roles
 
-```php
-// Em Policies
-return $user->can(UserPermissions::All);
+Roles atuais:
 
-// Em Resources
-public static function canViewAny(): bool
-{
-    return auth()->user()?->can(UserPermissions::All) ?? false;
-}
-```
+- `Developer`
+- `Admin`
+- `Operator`
+- `Guest`
 
-Veja [Sistema de Permissões](07-sistema-permissoes.md) para mais detalhes.
+Valores persistidos no banco estão em português (`Desenvolvedor`, `Administrador`, etc.).
 
-## 👥 Roles Enum
+## 🎨 PageLayouts
 
-### Estrutura
+Controla layout das páginas de auth:
 
-```php
-<?php
+- `Split`
+- `Centered`
+- `FullPage`
 
-declare(strict_types=1);
+Usado em `SystemSettings` e na página `ManageSystem`.
 
-namespace App\Enums;
+## 🛡️ Permission Enums
 
-enum Roles: string
-{
-    case Admin = 'admin';
-    case Editor = 'editor';
-    case Viewer = 'viewer';
+Enums de permissões:
 
-    public function getLabel(): string
-    {
-        return match ($this) {
-            self::Admin => 'Administrador',
-            self::Editor => 'Editor',
-            self::Viewer => 'Visualizador',
-        };
-    }
-}
-```
+- `UserPermissions`
+- `RolePermissions`
+- `PermissionPermissions`
+- `SystemPermissions`
 
-### Uso
+Cada enum é usado por policies, seeders e checks de acesso no painel.
 
-```php
-$user->assignRole(Roles::Admin);
-$user->hasRole(Roles::Admin);
-```
+## 🔧 BetterEnum
 
-## 🎨 PageLayouts Enum
+O projeto possui trait `App\Traits\BetterEnum` para utilitários em enums.
 
-### Estrutura
+Use quando precisar expor listas para selects, filtros ou serialização de opções.
 
-```php
-<?php
+## 🎯 Convenções
 
-declare(strict_types=1);
-
-namespace App\Enums;
-
-use Filament\Support\Contracts\HasDescription;
-use Filament\Support\Contracts\HasIcon;
-use Filament\Support\Contracts\HasLabel;
-use ToneGabes\Filament\Icons\Enums\Phosphor;
-
-enum PageLayouts: string implements HasLabel, HasDescription, HasIcon
-{
-    case Split = 'split';
-    case Centered = 'centered';
-    case FullPage = 'fullpage';
-
-    public function getLabel(): string
-    {
-        return match ($this) {
-            self::Split => 'Dividido',
-            self::Centered => 'Centralizado',
-            self::FullPage => 'Página Completa',
-        };
-    }
-
-    public function getDescription(): string
-    {
-        return match ($this) {
-            self::Split => 'Layout dividido com imagem e formulário',
-            self::Centered => 'Layout centralizado',
-            self::FullPage => 'Layout de página completa',
-        };
-    }
-
-    public function getIcon(): string
-    {
-        return match ($this) {
-            self::Split => (string) Phosphor::Columns->getLabel(),
-            self::Centered => (string) Phosphor::Circle->getLabel(),
-            self::FullPage => (string) Phosphor::Square->getLabel(),
-        };
-    }
-}
-```
-
-### Uso
-
-```php
-// Em Settings
-RadioList::make('auth_page_layout')
-    ->label('Layout da página de login')
-    ->options([
-        PageLayouts::Split->value => PageLayouts::Split->getLabel(),
-        PageLayouts::Centered->value => PageLayouts::Centered->getLabel(),
-        PageLayouts::FullPage->value => PageLayouts::FullPage->getLabel(),
-    ])
-    ->descriptions([
-        PageLayouts::Split->value => PageLayouts::Split->getDescription(),
-        PageLayouts::Centered->value => PageLayouts::Centered->getDescription(),
-        PageLayouts::FullPage->value => PageLayouts::FullPage->getDescription(),
-    ])
-    ->icons([
-        PageLayouts::Split->value => PageLayouts::Split->getIcon(),
-        PageLayouts::Centered->value => PageLayouts::Centered->getIcon(),
-        PageLayouts::FullPage->value => PageLayouts::FullPage->getIcon(),
-    ]);
-```
-
-## 🎯 Criando um Novo Enum
-
-### Passo 1: Criar o Enum
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Enums;
-
-enum Status: string
-{
-    case Active = 'active';
-    case Inactive = 'inactive';
-    case Pending = 'pending';
-
-    public function getLabel(): string
-    {
-        return match ($this) {
-            self::Active => 'Ativo',
-            self::Inactive => 'Inativo',
-            self::Pending => 'Pendente',
-        };
-    }
-
-    public function getColor(): string
-    {
-        return match ($this) {
-            self::Active => 'success',
-            self::Inactive => 'danger',
-            self::Pending => 'warning',
-        };
-    }
-}
-```
-
-### Passo 2: Usar no Model
-
-```php
-// Product.php
-protected function casts(): array
-{
-    return [
-        'status' => Status::class,
-    ];
-}
-```
-
-### Passo 3: Usar em Formulários
-
-```php
-// ProductForm.php
-Select::make('status')
-    ->label('Status')
-    ->options(collect(Status::cases())->mapWithKeys(fn ($status) => [
-        $status->value => $status->getLabel()
-    ]))
-    ->required();
-```
-
-## 🔧 Traits para Enums
-
-### BetterEnum Trait
-
-O projeto possui um trait `BetterEnum` que adiciona funcionalidades úteis:
-
-```php
-// app/Traits/BetterEnum.php
-trait BetterEnum
-{
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
-
-    public static function labels(): array
-    {
-        return array_map(
-            fn ($case) => $case->getLabel(),
-            self::cases()
-        );
-    }
-}
-```
-
-### Uso
-
-```php
-enum Status: string
-{
-    use BetterEnum;
-
-    case Active = 'active';
-    case Inactive = 'inactive';
-}
-```
-
-## 📋 Convenções
-
-### Nomenclatura
-
-- **PascalCase** para nomes de Enums: `NavGroups`, `UserPermissions`
-- **PascalCase** para cases: `Authorization`, `All`, `View`
-- **snake_case** para valores: `'users.view'`, `'authorization'`
-
-### Organização
-
-- Enums relacionados agrupados em pastas: `Permissions/`
-- Um Enum por arquivo
-- Namespace reflete a estrutura de pastas
-
-### Implementações
-
-- Use interfaces do Filament quando apropriado: `HasLabel`, `HasIcon`, `HasDescription`
-- Implemente métodos úteis: `getLabel()`, `getIcon()`, `getColor()`
-
-## 🎯 Boas Práticas
-
-1. **Use Enums**: Prefira Enums a strings mágicas
-2. **Type Safety**: Use type hints com Enums
-3. **Interfaces**: Implemente interfaces do Filament quando útil
-4. **Métodos Úteis**: Adicione métodos como `getLabel()`, `getColor()`
-5. **Organização**: Agrupe Enums relacionados em pastas
-6. **Documentação**: Documente Enums complexos
+1. Um enum por arquivo.
+2. Cases em `PascalCase`.
+3. Valores estáveis para persistência no banco/config.
+4. Evitar strings mágicas quando um enum já existe.
+5. Para novas coleções de arquivo, evoluir `FileCollection` antes de alterar forms/models.
 
 ## 🔗 Próximos Passos
 
-- [Sistema de Permissões](07-sistema-permissoes.md) - Veja Enums de permissões
-- [Traits](10-traits.md) - Entenda traits como BetterEnum
-- [Criando Recursos Filament](02-criando-recursos-filament.md) - Use Enums em Resources
+- [Sistema de Permissões](07-sistema-permissoes.md)
+- [Settings](11-settings.md)
+- [Panel Provider](15-panel-provider.md)

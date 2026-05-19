@@ -199,11 +199,6 @@ class ViewProduct extends ViewRecord
 {
     protected static string $resource = ProductResource::class;
 
-    public static function infolist(Schema $schema): Schema
-    {
-        return ProductInfolist::configure($schema);
-    }
-
     protected function getHeaderActions(): array
     {
         return [
@@ -213,6 +208,8 @@ class ViewProduct extends ViewRecord
     }
 }
 ```
+
+No padrão atual do projeto, o `infolist()` fica no `Resource` (ex.: `DocumentResource::infolist()`), e a página `ViewRecord` mantém apenas ações e customizações de comportamento.
 
 ### Infolist Schema
 
@@ -253,13 +250,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Pages\Auth\Login as BaseLogin;
+use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
+use Filament\Auth\Pages\Login as VendorLogin;
 
-class Login extends BaseLogin
+class Login extends VendorLogin
 {
-    // Customizações aqui
+    use UsesConfiguredAuthLayout;
+
+    public function getView(): string
+    {
+        return 'filament.pages.auth.login';
+    }
 }
 ```
+
+No projeto, o `Login` suporta autenticação por modo (`local` e `ldap`) através de `AuthModeHandlerResolver`.
 
 ### Register Customizado
 
@@ -270,19 +275,31 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Pages\Auth\Register as BaseRegister;
+use App\Enums\Roles;
+use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
+use App\Models\User;
+use Filament\Auth\Pages\Register as VendorRegister;
+use Illuminate\Database\Eloquent\Model;
 
-class Register extends BaseRegister
+class Register extends VendorRegister
 {
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        // Modifica dados antes de criar usuário
-        return $data;
-    }
+    use UsesConfiguredAuthLayout;
 
-    protected function afterCreate(): void
+    protected string $view = 'filament.pages.auth.register';
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function handleRegistration(array $data): Model
     {
-        // Executa após criar usuário
+        $data['username'] = $data['email'];
+        $data['is_active'] = true;
+
+        /** @var User $user */
+        $user = $this->getUserModel()::create($data);
+        $user->assignRole(Roles::Operator);
+
+        return $user;
     }
 }
 ```
@@ -309,11 +326,9 @@ E registrar no Panel Provider:
 // app/Providers/Filament/AdminPanelProvider.php
 $panel
     ->login(Login::class)
-    ->registration(Register::class)
-    ->passwordReset(
-        ResetPasswordRequest::class,
-        ResetPasswordAction::class,
-    );
+    // Registro e reset são aplicados somente se
+    // allowsLocalRegistration() e enable_registration forem true
+;
 ```
 
 ## 🎨 Customizando Views
