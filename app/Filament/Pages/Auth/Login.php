@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Enums\AuthMode;
 use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
 use App\Models\User;
+use App\Services\Auth\AuthModeHandler;
+use App\Services\Auth\AuthModeHandlerResolver;
 use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
@@ -28,27 +31,37 @@ class Login extends VendorLogin
 {
     use UsesConfiguredAuthLayout;
 
-    private LdapAuthService $ldapAuthService;
+    private AuthModeHandler $authModeHandler;
 
-    private LdapUserService $ldapUserService;
+    private ?LdapAuthService $ldapAuthService = null;
 
-    private bool $isLdapEnabled;
+    private ?LdapUserService $ldapUserService = null;
 
+    /**
+     * Create a new login page instance.
+     */
     public function __construct()
     {
-        $this->isLdapEnabled = Config::boolean('auth.ldap.enabled', false);
+        $authMode = AuthMode::fromConfig(Config::string('auth.mode'));
+        $this->authModeHandler = app(AuthModeHandlerResolver::class)->resolve($authMode);
 
-        if ($this->isLdapEnabled) {
-            $this->ldapAuthService = new LdapAuthService;
-            $this->ldapUserService = new LdapUserService;
+        if ($authMode === AuthMode::Ldap) {
+            $this->ldapAuthService = app(LdapAuthService::class);
+            $this->ldapUserService = app(LdapUserService::class);
         }
     }
 
+    /**
+     * Get the login view path.
+     */
     public function getView(): string
     {
         return 'filament.pages.auth.login';
     }
 
+    /**
+     * Authenticate the current user with the configured auth mode.
+     */
     public function authenticate(): ?LoginResponse
     {
         try {
@@ -62,39 +75,45 @@ class Login extends VendorLogin
         /** @var array<string, string> $data */
         $data = $this->form->getState();
 
-        if ($this->isLdapEnabled) {
-            $this->attemptLdapAuth($data);
-        } else {
-
-            /** @var SessionGuard $authGuard */
-            $authGuard = Filament::auth();
-
-            $authProvider = $authGuard->getProvider();
-            $credentials = $this->getCredentialsFromFormData($data);
-            $user = $authProvider->retrieveByCredentials($credentials);
-
-            if ((! $user) || (! $authProvider->validateCredentials($user, $credentials))) {
-                $this->userUndertakingMultiFactorAuthentication = null;
-
-                $this->fireFailedEvent($authGuard, $user, $credentials);
-                $this->throwFailureValidationException();
-            }
-
-            $this->checkMultiFactorAuthentication($user);
-
-            $this->attemptDefaultAuth(
-                $authGuard,
-                $user,
-                $credentials,
-                (bool) ($data['remember'] ?? false),
-            );
-        }
+        $this->authModeHandler->authenticate($this, $data);
 
         session()->regenerate();
 
         return app(LoginResponse::class);
     }
 
+    /**
+     * @param  array<string, string>  $data
+     */
+    public function attemptLocalAuth(array $data): void
+    {
+        /** @var SessionGuard $authGuard */
+        $authGuard = Filament::auth();
+
+        $authProvider = $authGuard->getProvider();
+        $credentials = $this->getCredentialsFromFormData($data);
+        $user = $authProvider->retrieveByCredentials($credentials);
+
+        if ((! $user) || (! $authProvider->validateCredentials($user, $credentials))) {
+            $this->userUndertakingMultiFactorAuthentication = null;
+
+            $this->fireFailedEvent($authGuard, $user, $credentials);
+            $this->throwFailureValidationException();
+        }
+
+        $this->checkMultiFactorAuthentication($user);
+
+        $this->attemptDefaultAuth(
+            $authGuard,
+            $user,
+            $credentials,
+            (bool) ($data['remember'] ?? false),
+        );
+    }
+
+    /**
+     * Validate if multi-factor authentication is required for the user.
+     */
     public function checkMultiFactorAuthentication(Authenticatable $user): void
     {
         if (
@@ -152,37 +171,37 @@ class Login extends VendorLogin
      */
     public function attemptLdapAuth(array $data): void
     {
-        $username = $this->normalizeUsername($data['username']);
+        $username = $this->normalizeUsername($data['username'] ?? null);
         $password = $data['password'] ?? '';
 
-        // Check if user is in LDAP
-        $ldapUser = $this->ldapUserService->findUserByUsername($username);
+        $ldapUser = $this->getLdapUserService()->findUserByUsername($username);
 
         if (! $ldapUser) {
             $this->throwFailureValidationException();
         }
 
-        // Validate the LDAP user is active
-        $validLogin = $this->ldapAuthService->authenticate($username, $password);
+        $validLogin = $this->getLdapAuthService()->authenticate($username, $password);
 
         if (! $validLogin) {
             $this->throwFailureValidationException();
         }
 
-        // Login the user
+        $user = $this->handleLocalUserRecord($username, $ldapUser);
+
+        $this->ensurePanelAccess($user);
+
         Filament::auth()->login(
-            user: $this->handleLocalUserRecord($username, $ldapUser),
+            user: $user,
             remember: (bool) ($data['remember'] ?? false),
         );
     }
 
+    /**
+     * Build the login form schema according to auth mode.
+     */
     public function form(Schema $schema): Schema
     {
-        $loginComponent = $this->getEmailFormComponent();
-
-        if ($this->isLdapEnabled) {
-            $loginComponent = $this->getUsernameFormComponent();
-        }
+        $loginComponent = $this->authModeHandler->loginComponent($this);
 
         return $schema
             ->components([
@@ -192,9 +211,12 @@ class Login extends VendorLogin
             ]);
     }
 
+    /**
+     * Get the username input component used by LDAP mode.
+     */
     protected function getUsernameFormComponent(): Component
     {
-        $emailDomain = $this->ldapAuthService->emailDomain;
+        $emailDomain = $this->getLdapAuthService()->emailDomain;
 
         return TextInput::make('username')
             ->label(__('filament-panels::pages/auth/login.form.username.label'))
@@ -207,11 +229,9 @@ class Login extends VendorLogin
     }
 
     /**
-     * @param  LdapUser  $ldapUser
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function handleLocalUserRecord(string $username, $ldapUser): User
+    private function handleLocalUserRecord(string $username, LdapUser $ldapUser): User
     {
         if (Config::boolean('auth.ldap.requires_local')) {
             $user = User::firstWhere('username', $username);
@@ -226,20 +246,23 @@ class Login extends VendorLogin
         $user = User::firstOrCreate(
             ['username' => $username],
             [
-                'name'      => $this->ldapUserService->getUserInfo('displayName', $ldapUser),
-                'email'     => $this->ldapUserService->getUserInfo('mail', $ldapUser),
-                'password'  => Hash::make(\Str::random(16)),
+                'name' => $this->getLdapUserService()->getUserInfo('displayName', $ldapUser),
+                'email' => $this->getLdapUserService()->getUserInfo('mail', $ldapUser),
+                'password' => Hash::make(\Str::random(16)),
                 'is_active' => true,
             ],
         );
 
-        if ($user->roles->isEmpty()) {
+        if ($user->roles()->doesntExist()) {
             $user->syncRoles([Config::string('auth.default_role')]);
         }
 
         return $user;
     }
 
+    /**
+     * Normalize the username before LDAP authentication.
+     */
     protected function normalizeUsername(?string $username): string
     {
         if (is_null($username)) {
@@ -258,5 +281,50 @@ class Login extends VendorLogin
         }
 
         return $str->toString();
+    }
+
+    /**
+     * Resolve LDAP auth service from memory or container.
+     */
+    private function getLdapAuthService(): LdapAuthService
+    {
+        return $this->ldapAuthService ?? app(LdapAuthService::class);
+    }
+
+    /**
+     * Resolve LDAP user service from memory or container.
+     */
+    private function getLdapUserService(): LdapUserService
+    {
+        return $this->ldapUserService ?? app(LdapUserService::class);
+    }
+
+    /**
+     * Build the default email component used by local authentication.
+     */
+    public function makeEmailLoginFormComponent(): Component
+    {
+        return $this->getEmailFormComponent();
+    }
+
+    /**
+     * Build the username component used by LDAP authentication.
+     */
+    public function makeUsernameLoginFormComponent(): Component
+    {
+        return $this->getUsernameFormComponent();
+    }
+
+    /**
+     * Ensure that user can access the current panel.
+     */
+    private function ensurePanelAccess(User $user): void
+    {
+        /** @var Panel $panel */
+        $panel = Filament::getCurrentOrDefaultPanel();
+
+        if (! $user->canAccessPanel($panel)) {
+            $this->throwFailureValidationException();
+        }
     }
 }

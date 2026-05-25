@@ -13,7 +13,7 @@ it('returns correct label for each layout', function (PageLayouts $layout, strin
 ]);
 
 it('returns non-empty icon string for each layout', function (PageLayouts $layout): void {
-    expect($layout->getIcon())->toBeString()->not->toBeEmpty();
+    expect($layout->getIcon())->not->toBeEmpty();
 })->with([
     PageLayouts::Split,
     PageLayouts::Centered,
@@ -38,34 +38,29 @@ it('returns extra text equal to value for each layout', function (PageLayouts $l
 
 it('provides BetterEnum names', function (): void {
     $names = PageLayouts::names();
-    expect($names)->toBeArray()
-        ->and($names)->toContain('Split', 'Centered', 'FullPage')
+    expect($names)->toContain('Split', 'Centered', 'FullPage')
         ->and($names)->toHaveCount(3);
 });
 
 it('provides BetterEnum values', function (): void {
     $values = PageLayouts::values();
-    expect($values)->toBeArray()
-        ->and($values)->toContain('layouts.auth.split', 'layouts.auth.centered', 'layouts.auth.fullpage')
+    expect($values)->toContain('layouts.auth.split', 'layouts.auth.centered', 'layouts.auth.fullpage')
         ->and($values)->toHaveCount(3);
 });
 
 it('provides BetterEnum options', function (): void {
     $options = PageLayouts::options();
-    expect($options)->toBeArray()
-        ->and($options)->toHaveKeys(['Split', 'Centered', 'FullPage'])
+    expect($options)->toHaveKeys(['Split', 'Centered', 'FullPage'])
         ->and($options['Split'])->toBe('layouts.auth.split');
 });
 
 it('provides BetterEnum asArray', function (): void {
     $arr = PageLayouts::asArray();
-    expect($arr)->toBeArray()
-        ->and($arr)->toHaveKeys(['Split', 'Centered', 'FullPage'])
+    expect($arr)->toHaveKeys(['Split', 'Centered', 'FullPage'])
         ->and($arr['FullPage'])->toBe('layouts.auth.fullpage');
 });
 
 it('returns a valid case from random', function (): void {
     $random = PageLayouts::random();
-    expect($random)->toBeInstanceOf(PageLayouts::class)
-        ->and(PageLayouts::cases())->toContain($random);
+    expect(PageLayouts::cases())->toContain($random);
 });

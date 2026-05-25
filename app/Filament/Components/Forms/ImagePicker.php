@@ -26,7 +26,10 @@ class ImagePicker extends Field
      */
     public function getImages(): Collection
     {
-        return Image::all();
+        return Image::query()
+            ->with('media')
+            ->latest()
+            ->get();
     }
 
     //     public function options(array $options): static

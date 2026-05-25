@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Images\Schemas;
 
-use App\Models\Image;
+use App\Enums\FileCollection;
+use App\Filament\Support\LibraryFileUpload;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ImageForm
 {
@@ -19,17 +17,7 @@ class ImageForm
             ->components([
                 Hidden::make('name')->default('Image Name Not Set'),
 
-                SpatieMediaLibraryFileUpload::make('image')
-                    ->label('Imagem')
-                    ->live()
-                    ->required()
-                    ->collection(Image::COLLECTION_NAME)
-                    ->acceptedFileTypes(Image::getMimeTypeMap())
-                    ->afterStateUpdated(function ($state, Set $set) {
-                        if ($state instanceof TemporaryUploadedFile) {
-                            $set('name', $state->getClientOriginalName());
-                        }
-                    }),
+                LibraryFileUpload::mediaLibrary('image', FileCollection::Images, 'Imagem'),
             ]);
     }
 }

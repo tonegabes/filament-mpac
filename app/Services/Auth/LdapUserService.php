@@ -8,7 +8,7 @@ use App\Traits\HasNotifications;
 use LdapRecord\LdapRecordException;
 use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 
-final class LdapUserService
+class LdapUserService
 {
     use HasNotifications;
 

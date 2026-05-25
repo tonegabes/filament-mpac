@@ -1,0 +1,168 @@
+stages:
+  - prepare
+  - quality
+  - build
+
+variables:
+  PHP_VERSION: "8.4"
+  COMPOSER_CACHE_DIR: "${CI_PROJECT_DIR}/.composer-cache"
+  COMPOSER_ALLOW_SUPERUSER: "1"
+  APP_IMAGE: "${MPAC_REGISTRY_URL}/${CI_PROJECT_PATH}"
+  BUILD_IMAGE: "docker:27.5.1-cli"
+  DOCKER_HOST: unix:///var/run/docker.sock
+  DOCKER_BUILDKIT: "1"
+
+default:
+  interruptible: true
+
+cache:
+  key:
+    files:
+      - composer.lock
+  paths:
+    - .composer-cache/
+
+# --------------------------------------------------------
+# SHARED RULES
+# --------------------------------------------------------
+
+.default_quality_rules:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# --------------------------------------------------------
+# SHARED PHP JOB
+# --------------------------------------------------------
+
+.php_job:
+  image: registry.mpac.mp.br/sistemas/docker-images/laravel-ci:php84-test
+  tags:
+    - code_analysis
+
+# --------------------------------------------------------
+# INSTALL DEPENDENCIES
+# --------------------------------------------------------
+
+composer_install:
+  stage: prepare
+  extends:
+    - .php_job
+    - .default_quality_rules
+
+  script:
+    - >
+      composer install
+      --no-interaction
+      --prefer-dist
+      --no-progress
+      --no-scripts
+
+  artifacts:
+    paths:
+      - vendor/
+    expire_in: 10min
+
+# --------------------------------------------------------
+# QUALITY CHECKS
+# --------------------------------------------------------
+
+code_analysis:
+  stage: quality
+  extends:
+    - .php_job
+    - .default_quality_rules
+  needs:
+    - composer_install
+  dependencies:
+    - composer_install
+  script:
+    - composer analyze
+
+style_check:
+  stage: quality
+  extends:
+    - .php_job
+    - .default_quality_rules
+  needs:
+    - composer_install
+  dependencies:
+    - composer_install
+  script:
+    - composer lint
+
+tests:
+  stage: quality
+  extends:
+    - .php_job
+    - .default_quality_rules
+  needs:
+    - composer_install
+  dependencies:
+    - composer_install
+  script:
+    - composer test
+
+# --------------------------------------------------------
+# MERGE REQUEST BUILD
+# --------------------------------------------------------
+
+build_mr_image:
+  stage: build
+  image: $BUILD_IMAGE
+  tags:
+    - production
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  before_script:
+    - |
+      echo "${CI_REGISTRY_PASSWORD}" | docker login "${MPAC_REGISTRY_URL}" \
+        -u "${CI_REGISTRY_USER}" \
+        --password-stdin
+    - docker buildx create --use --name builder || true
+    - docker buildx inspect --bootstrap
+  script:
+    - docker pull "${APP_IMAGE}:mr-${CI_MERGE_REQUEST_IID}" || true
+    - >
+      docker buildx build
+      --pull
+      --cache-from type=registry,ref=${APP_IMAGE}:mr-${CI_MERGE_REQUEST_IID}
+      --cache-to type=inline
+      --build-arg BUILDKIT_INLINE_CACHE=1
+      --tag "${APP_IMAGE}:${CI_COMMIT_SHORT_SHA}"
+      --tag "${APP_IMAGE}:mr-${CI_MERGE_REQUEST_IID}"
+      --push
+      .
+
+# --------------------------------------------------------
+# RELEASE / TAG BUILD
+# --------------------------------------------------------
+
+release_image:
+  stage: build
+  image: $BUILD_IMAGE
+  tags:
+    - production
+  resource_group: production-build
+  rules:
+    - if: $CI_COMMIT_TAG
+  before_script:
+    - |
+      echo "${CI_REGISTRY_PASSWORD}" | docker login "${MPAC_REGISTRY_URL}" \
+        -u "${CI_REGISTRY_USER}" \
+        --password-stdin
+    - docker buildx create --use --name builder || true
+    - docker buildx inspect --bootstrap
+  script:
+    - docker pull "${APP_IMAGE}:stable" || true
+    - >
+      docker buildx build
+      --pull
+      --cache-from type=registry,ref=${APP_IMAGE}:stable
+      --cache-to type=inline
+      --build-arg BUILDKIT_INLINE_CACHE=1
+      --tag "${APP_IMAGE}:${CI_COMMIT_TAG}"
+      --tag "${APP_IMAGE}:stable"
+      --push
+      .

@@ -39,15 +39,15 @@ return [
      */
     'repositories' => [
         'database' => [
-            'type'       => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
-            'model'      => null,
-            'table'      => null,
+            'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
+            'model' => null,
+            'table' => null,
             'connection' => null,
         ],
         'redis' => [
-            'type'       => Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository::class,
+            'type' => Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository::class,
             'connection' => null,
-            'prefix'     => null,
+            'prefix' => null,
         ],
     ],
 
@@ -66,9 +66,9 @@ return [
      */
     'cache' => [
         'enabled' => env('SETTINGS_CACHE_ENABLED', false),
-        'store'   => null,
-        'prefix'  => null,
-        'ttl'     => null,
+        'store' => null,
+        'prefix' => null,
+        'ttl' => null,
     ],
 
     /*
@@ -77,7 +77,7 @@ return [
      */
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
-        DateTimeZone::class      => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
+        DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
         //        Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
         Spatie\LaravelData\Data::class => Spatie\LaravelSettings\SettingsCasts\DataCast::class,
     ],

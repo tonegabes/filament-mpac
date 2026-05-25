@@ -152,7 +152,8 @@ Toggle::make('is_active')
 ```php
 SpatieMediaLibraryFileUpload::make('image')
     ->label('Imagem')
-    ->collection('images')
+    ->collection(FileCollection::Images->value)
+    ->disk(FileCollection::Images->disk())
     ->image()
     ->imageEditor()
     ->required();

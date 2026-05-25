@@ -119,12 +119,26 @@ Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentaç�
 
 ## 📖 Versões Utilizadas
 
-- **PHP**: 8.4.11
-- **Laravel**: v12
-- **Filament**: v4
-- **Livewire**: v3
-- **Pest**: v3
+- **PHP**: `^8.3` (ambiente atual em 8.4)
+- **Laravel**: v13
+- **Filament**: v5
+- **Livewire**: v4
+- **Pest**: v4
 - **Tailwind CSS**: v4
+
+## 🧩 Funcionalidades do Projeto Atual
+
+- Autenticação com modos **Local** e **LDAP**
+- Recursos de arquivos: **Document**, **Image** e **Media**
+- Configurações do sistema com **Spatie Settings**
+- Permissões e roles com **Spatie Permission**
+- Logs de atividade com **Spatie Activitylog**
+
+Veja também:
+
+- [Páginas Customizadas](05-paginas-customizadas.md) para autenticação e SettingsPage
+- [Panel Provider](15-panel-provider.md) para configuração do painel admin
+- [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) para biblioteca de arquivos e media
 
 ## 🔗 Links Úteis
 
@@ -143,4 +157,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Fevereiro 2026
+**Última atualização**: Maio 2026

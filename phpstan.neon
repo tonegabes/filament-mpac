@@ -1,20 +1,27 @@
 includes:
     - vendor/larastan/larastan/extension.neon
+    - vendor/mrpunyapal/peststan/extension.neon
     - vendor/nesbot/carbon/extension.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
     - phar://phpstan.phar/conf/bleedingEdge.neon
 
 parameters:
+    peststan:
+        testCaseClass: Tests\TestCase
+        pestConfigFiles:
+            - tests/Pest.php
 
     paths:
         - app
-        - bootstrap/app.php
+        - bootstrap
         - config
         - database
         - public
         - routes
+        - tests
 
-    # Level 10 is the highest level
-    level: max
+    level: 8
 
     ignoreErrors:
 
@@ -24,7 +31,8 @@ parameters:
       - config/log-viewer.php
       - config/settings.php
       - _ide_helper*.php
-      - tests
+      - bootstrap/cache
+
 
 #        - ./*/*/FileToBeExcluded.php
 #

@@ -4,11 +4,7 @@
     "array_indentation": true,
     "array_syntax": { "syntax": "short" },
     "binary_operator_spaces": {
-      "default": "single_space",
-      "operators": {
-        "=>": "align_single_space_minimal",
-        "=": "single_space"
-      }
+      "default": "single_space"
     },
     "blank_line_before_statement": {
       "statements": ["continue", "return"]
@@ -40,7 +36,6 @@
     "declare_strict_types": true,
     "fully_qualified_strict_types": true,
     "general_phpdoc_tag_rename": true,
-    "heredoc_to_nowdoc": true,
     "increment_style": {
       "style": "post"
     },
@@ -101,10 +96,6 @@
     },
     "ordered_interfaces": true,
     "ordered_traits": true,
-    "phpdoc_align": {
-      "align": "left",
-      "spacing": { "param": 2 }
-    },
     "phpdoc_indent": true,
     "phpdoc_inline_tag_normalizer": true,
     "phpdoc_no_access": true,
@@ -114,20 +105,10 @@
       "order": ["param", "return", "throws"]
     },
     "phpdoc_scalar": true,
-    "phpdoc_separation": {
-      "groups": [
-        ["deprecated", "link", "see", "since"],
-        ["author", "copyright", "license"],
-        ["category", "package", "subpackage"],
-        ["property", "property-read", "property-write"],
-        ["param", "return"]
-      ]
-    },
     "phpdoc_single_line_var_spacing": true,
     "phpdoc_trim": true,
     "phpdoc_types": true,
     "phpdoc_var_without_name": true,
-    "self_static_accessor": true,
     "short_scalar_cast": true,
     "single_class_element_per_statement": {
       "elements": ["const", "property"]

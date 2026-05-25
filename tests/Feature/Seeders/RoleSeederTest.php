@@ -27,8 +27,7 @@ it('creates Developer Admin and Operator roles', function (): void {
 it('assigns all permissions to Developer role', function (): void {
     $this->seed(Database\Seeders\RoleSeeder::class);
 
-    $developer = Role::where('name', Roles::Developer->value)->first();
-    expect($developer)->not->toBeNull();
+    $developer = Role::where('name', Roles::Developer->value)->firstOrFail();
 
     $allPermissions = array_merge(
         SystemPermissions::cases(),
@@ -44,8 +43,7 @@ it('assigns all permissions to Developer role', function (): void {
 it('assigns PanelsViewAdmin and UserPermissions to Admin role', function (): void {
     $this->seed(Database\Seeders\RoleSeeder::class);
 
-    $admin = Role::where('name', Roles::Admin->value)->first();
-    expect($admin)->not->toBeNull();
+    $admin = Role::where('name', Roles::Admin->value)->firstOrFail();
     expect($admin->hasPermissionTo(SystemPermissions::PanelsViewAdmin->value))->toBeTrue();
     expect($admin->hasPermissionTo(UserPermissions::All->value))->toBeTrue();
 });
@@ -53,7 +51,6 @@ it('assigns PanelsViewAdmin and UserPermissions to Admin role', function (): voi
 it('assigns PanelsViewOperator to Operator role', function (): void {
     $this->seed(Database\Seeders\RoleSeeder::class);
 
-    $operator = Role::where('name', Roles::Operator->value)->first();
-    expect($operator)->not->toBeNull();
+    $operator = Role::where('name', Roles::Operator->value)->firstOrFail();
     expect($operator->hasPermissionTo(SystemPermissions::PanelsViewOperator->value))->toBeTrue();
 });

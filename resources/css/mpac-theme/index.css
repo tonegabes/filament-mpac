@@ -1,4 +1,5 @@
 @import "./components/sidebar.css" layer(components);
+@import "../app.css";
 
 :root {
   --color-background-darker: #eff0f0;
@@ -30,7 +31,7 @@
   --color-border: var(--color-contrast-low);
 
   /* backgrounds */
-  --color-bg: var(--color-background);
+  --color-bg: var(--color-background-dark);
   --color-bg-secondary: var(--color-contrast-medium);
   --color-bg-inverse: var(--color-contrast-high);
 

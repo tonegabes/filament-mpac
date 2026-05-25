@@ -22,7 +22,7 @@ enum PageLayouts: string implements HasDescription, HasExtraText, HasIcon, HasLa
     public function getLabel(): string
     {
         return match ($this) {
-            self::Split    => 'Dividido',
+            self::Split => 'Dividido',
             self::Centered => 'Centralizado',
             self::FullPage => 'Tela inteira',
         };
@@ -31,7 +31,7 @@ enum PageLayouts: string implements HasDescription, HasExtraText, HasIcon, HasLa
     public function getIcon(): string
     {
         return match ($this) {
-            self::Split    => (string) Phosphor::ColumnsThin->getLabel(),
+            self::Split => (string) Phosphor::ColumnsThin->getLabel(),
             self::Centered => (string) Phosphor::ArrowsInThin->getLabel(),
             self::FullPage => (string) Phosphor::ArrowsOutSimpleThin->getLabel(),
         };
@@ -40,7 +40,7 @@ enum PageLayouts: string implements HasDescription, HasExtraText, HasIcon, HasLa
     public function getDescription(): string
     {
         return match ($this) {
-            self::Split    => 'Divide a página em duas colunas',
+            self::Split => 'Divide a página em duas colunas',
             self::Centered => 'Centraliza o conteúdo na página',
             self::FullPage => 'Ocupa a tela inteira',
         };
@@ -49,7 +49,7 @@ enum PageLayouts: string implements HasDescription, HasExtraText, HasIcon, HasLa
     public function getExtraText(): string
     {
         return match ($this) {
-            self::Split    => self::Split->value,
+            self::Split => self::Split->value,
             self::Centered => self::Centered->value,
             self::FullPage => self::FullPage->value,
         };

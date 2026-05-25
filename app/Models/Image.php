@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\HasFileUrl;
+use App\Enums\FileCollection;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -17,7 +18,7 @@ class Image extends Model implements HasFileUrl, HasMedia
     use InteractsWithMedia;
     use LogsActivity;
 
-    public const COLLECTION_NAME = 'images';
+    public const COLLECTION_NAME = FileCollection::Images->value;
 
     protected $fillable = ['name'];
 
@@ -26,7 +27,7 @@ class Image extends Model implements HasFileUrl, HasMedia
         $this
             ->addMediaCollection(self::COLLECTION_NAME)
             ->acceptsMimeTypes(self::getMimeTypeMap())
-            ->useDisk(self::COLLECTION_NAME)
+            ->useDisk(FileCollection::Images->disk())
         ;
     }
 
@@ -35,16 +36,7 @@ class Image extends Model implements HasFileUrl, HasMedia
      */
     public static function getMimeTypeMap(): array
     {
-        return [
-            'image/jpeg',
-            'image/jpg',
-            'image/png',
-            'image/gif',
-            'image/webp',
-            'image/svg+xml',
-            'image/avif',
-            'image/bmp',
-        ];
+        return FileCollection::Images->acceptedMimeTypes();
     }
 
     public function getFileUrl(): string

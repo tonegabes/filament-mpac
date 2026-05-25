@@ -1,40 +1,21 @@
 # Modelos e Relacionamentos
 
-Este documento explica as convenções de Models, relacionamentos Eloquent, Media Library e Activity Log.
+Este documento descreve os modelos reais do projeto, com foco em arquivos, Media Library e Activity Log.
 
-## 📚 Convenções de Models
+## 📚 Modelos Principais
 
-### Estrutura Básica
+O projeto atualmente trabalha com:
 
-```php
-<?php
+- `User`
+- `Role`
+- `Permission`
+- `Document`
+- `Image`
+- `Spatie\MediaLibrary\MediaCollections\Models\Media` (usado no `MediaResource`)
 
-declare(strict_types=1);
+## 👤 User
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Product extends Model
-{
-    protected $fillable = [
-        'name',
-        'price',
-        'is_active',
-    ];
-
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'is_active' => 'boolean',
-            'created_at' => 'datetime',
-        ];
-    }
-}
-```
-
-### Exemplo Real: User
+`User` implementa `FilamentUser`, usa `HasRoles`, `HasActiveScope` e `LogsActivity`.
 
 ```php
 // app/Models/User.php
@@ -54,107 +35,68 @@ class User extends Authenticatable implements FilamentUser
         'is_active',
     ];
 
-    protected function casts(): array
+    public function canAccessPanel(?Panel $panel): bool
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'is_active' => 'boolean',
-        ];
+        $panelId = $panel?->getId();
+
+        return $this->can("system.panels.view.{$panelId}");
     }
 }
 ```
 
-## 🔗 Relacionamentos Eloquent
+## 📁 Biblioteca de Arquivos
 
-### BelongsTo
+O domínio de arquivos é dividido em:
+
+- `Document`: documentos de escritório (PDF, Word, Excel, etc.)
+- `Image`: imagens para uso na aplicação
+- `Media`: visão agregada dos arquivos no `MediaResource`
+
+### FileCollection
+
+As coleções e discos são centralizados em `FileCollection`:
 
 ```php
-// Product.php
-public function category(): BelongsTo
+enum FileCollection: string
 {
-    return $this->belongsTo(Category::class);
+    case Images = 'images';
+    case Documents = 'documents';
+    case SystemLogos = 'system_logos';
+    case SystemBackgrounds = 'system_backgrounds';
 }
-
-// Uso
-$product->category;
-$product->category_id;
 ```
 
-### HasMany
+Mapeamento atual:
+
+- `Images` -> disco `images`
+- `Documents` -> disco `documents`
+- `SystemLogos` -> disco `public`, diretório `system/logos`
+- `SystemBackgrounds` -> disco `public`, diretório `system/backgrounds`
+
+## 📄 Model Document
 
 ```php
-// Category.php
-public function products(): HasMany
-{
-    return $this->hasMany(Product::class);
-}
-
-// Uso
-$category->products;
-```
-
-### BelongsToMany
-
-```php
-// User.php
-public function roles(): BelongsToMany
-{
-    return $this->belongsToMany(Role::class);
-}
-
-// Uso
-$user->roles;
-$user->roles()->attach($roleId);
-$user->roles()->detach($roleId);
-$user->roles()->sync([$roleId1, $roleId2]);
-```
-
-### HasOne
-
-```php
-// User.php
-public function profile(): HasOne
-{
-    return $this->hasOne(Profile::class);
-}
-
-// Uso
-$user->profile;
-```
-
-## 📁 Spatie Media Library
-
-### Configuração Básica
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Models;
-
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-
-class Product extends Model implements HasMedia
+// app/Models/Document.php
+class Document extends Model implements HasFileUrl, HasMedia
 {
     use InteractsWithMedia;
+    use LogsActivity;
 
-    public const COLLECTION_NAME = 'products';
+    protected $fillable = ['name'];
+
+    public const COLLECTION_NAME = FileCollection::Documents->value;
 
     public function registerMediaCollections(): void
     {
         $this
             ->addMediaCollection(self::COLLECTION_NAME)
-            ->acceptsMimeTypes(['image/jpeg', 'image/png'])
-            ->useDisk('public');
+            ->acceptsMimeTypes(self::getMimeTypeMap())
+            ->useDisk(FileCollection::Documents->disk());
     }
 }
 ```
 
-### Exemplo Real: Image
+## 🖼️ Model Image
 
 ```php
 // app/Models/Image.php
@@ -163,91 +105,57 @@ class Image extends Model implements HasFileUrl, HasMedia
     use InteractsWithMedia;
     use LogsActivity;
 
-    public const COLLECTION_NAME = 'images';
+    public const COLLECTION_NAME = FileCollection::Images->value;
+
+    protected $fillable = ['name'];
 
     public function registerMediaCollections(): void
     {
         $this
             ->addMediaCollection(self::COLLECTION_NAME)
             ->acceptsMimeTypes(self::getMimeTypeMap())
-            ->useDisk(self::COLLECTION_NAME);
-    }
-
-    public static function getMimeTypeMap(): array
-    {
-        return [
-            'image/jpeg',
-            'image/png',
-            'image/gif',
-            'image/webp',
-        ];
-    }
-
-    public function getFileUrl(): string
-    {
-        return $this->getFirstMediaUrl(self::COLLECTION_NAME);
-    }
-
-    public function getFilename(): string
-    {
-        return $this->getFirstMedia(self::COLLECTION_NAME)->file_name ?? '';
+            ->useDisk(FileCollection::Images->disk());
     }
 }
 ```
 
-### Conversões de Mídia
+## 🧩 Resource x Modelo
 
-```php
-public function registerMediaCollections(): void
-{
-    $this->addMediaCollection('images')
-        ->acceptsMimeTypes(['image/jpeg', 'image/png']);
+### DocumentResource
 
-    $this->addMediaConversion('thumb')
-        ->width(368)
-        ->height(232)
-        ->sharpen(10);
-}
-```
+- Modelo: `App\Models\Document`
+- Páginas registradas: `index` e `view`
+- `infolist()` definido no Resource
 
-### Uso em Formulários
+### ImageResource
 
-```php
-// ProductForm.php
-SpatieMediaLibraryFileUpload::make('image')
-    ->label('Imagem')
-    ->collection(Product::COLLECTION_NAME)
-    ->image()
-    ->imageEditor()
-    ->required();
-```
+- Modelo: `App\Models\Image`
+- Páginas registradas: `index` e `view`
+- `infolist()` definido no Resource
+
+### MediaResource
+
+- Modelo: `Spatie\MediaLibrary\MediaCollections\Models\Media`
+- Páginas registradas: `index` e `view`
+- Rotas de `create` e `edit` estão comentadas por padrão
+
+## 💾 Discos e Visibilidade
+
+Configuração atual em `config/filesystems.php`:
+
+- Disco `images`: `storage/app/public/images`, URL `/storage/images`
+- Disco `documents`: `storage/app/public/documents`, URL `/storage/documents`
+- Disco `public`: usado por logos/fundos do sistema
+
+Quando o arquivo precisar de acesso público, mantenha `visibility => public`.
 
 ## 📝 Activity Log
 
-### Configuração Básica
+`User`, `Document` e `Image` usam `spatie/laravel-activitylog` com `logOnly()` e `logOnlyDirty()`.
+
+Exemplo:
 
 ```php
-use Spatie\Activitylog\Models\Concerns\LogsActivity;
-use Spatie\Activitylog\Support\LogOptions;
-
-class Product extends Model
-{
-    use LogsActivity;
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly($this->fillable)
-            ->logOnlyDirty()
-            ->dontLogEmptyChanges();
-    }
-}
-```
-
-### Exemplo Real: User
-
-```php
-// app/Models/User.php
 public function getActivitylogOptions(): LogOptions
 {
     return LogOptions::defaults()
@@ -256,104 +164,16 @@ public function getActivitylogOptions(): LogOptions
 }
 ```
 
-### Logging Customizado
-
-```php
-public function getActivitylogOptions(): LogOptions
-{
-    return LogOptions::defaults()
-        ->logOnly(['name', 'email'])
-        ->logOnlyDirty()
-        ->setDescriptionForEvent(fn(string $eventName) => "Product {$eventName}");
-}
-```
-
-## 🎯 Traits em Models
-
-### HasActiveScope
-
-```php
-use App\Traits\HasActiveScope;
-
-class Product extends Model
-{
-    use HasActiveScope;
-
-    // Métodos disponíveis:
-    // - scopeIsActive()
-    // - activate()
-    // - deactivate()
-    // - isActive()
-    // - toggleActive()
-}
-```
-
-Veja [Traits](10-traits.md) para mais detalhes.
-
-## 🔍 Scopes
-
-### Global Scope
-
-```php
-protected static function booted(): void
-{
-    static::addGlobalScope('active', function (Builder $builder) {
-        $builder->where('is_active', true);
-    });
-}
-```
-
-### Local Scope
-
-```php
-public function scopePublished(Builder $query): Builder
-{
-    return $query->where('is_published', true)
-        ->where('published_at', '<=', now());
-}
-
-// Uso
-Product::published()->get();
-```
-
-## 📋 Accessors e Mutators
-
-### Accessor
-
-```php
-public function getFullNameAttribute(): string
-{
-    return "{$this->first_name} {$this->last_name}";
-}
-
-// Uso
-$user->full_name;
-```
-
-### Mutator
-
-```php
-public function setEmailAttribute(string $value): void
-{
-    $this->attributes['email'] = strtolower($value);
-}
-
-// Uso
-$user->email = 'TEST@EXAMPLE.COM'; // Salva como 'test@example.com'
-```
-
 ## 🎯 Boas Práticas
 
-1. **Type Hints**: Use type hints explícitos em relacionamentos
-2. **Fillable**: Defina `$fillable` ou `$guarded`
-3. **Casts**: Use método `casts()` em vez de propriedade `$casts`
-4. **Relacionamentos**: Defina relacionamentos com type hints
-5. **Media Library**: Use constantes para nomes de coleções
-6. **Activity Log**: Configure logging apropriado
-7. **Traits**: Use traits para funcionalidades reutilizáveis
+1. Use `FileCollection` para evitar strings mágicas de coleção/disco.
+2. Centralize regras de MIME type no enum/modelo.
+3. Mantenha `create/edit` desabilitado no `MediaResource` enquanto o fluxo oficial for somente leitura.
+4. Garanta que uploads públicos estejam em discos com URL configurada.
+5. Prefira reaproveitar `LibraryFileUpload` nos formulários.
 
 ## 🔗 Próximos Passos
 
-- [Traits](10-traits.md) - Veja traits disponíveis
-- [Schemas e Formulários](03-schemas-e-formularios.md) - Use relacionamentos em formulários
-- [Criando Recursos Filament](02-criando-recursos-filament.md) - Crie Resources para models
+- [Schemas e Formulários](03-schemas-e-formularios.md) para uploads com Media Library
+- [Settings](11-settings.md) para logos e fundos via `SystemSettings`
+- [Panel Provider](15-panel-provider.md) para navegação do grupo Arquivos

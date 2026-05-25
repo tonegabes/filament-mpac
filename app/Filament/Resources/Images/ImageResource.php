@@ -53,7 +53,7 @@ class ImageResource extends Resource
     {
         return [
             'index' => ListImages::route('/'),
-            'view'  => ViewImage::route('/{record}'),
+            'view' => ViewImage::route('/{record}'),
         ];
     }
 }

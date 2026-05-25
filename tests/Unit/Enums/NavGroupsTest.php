@@ -15,7 +15,7 @@ it('returns label equal to value for each nav group', function (NavGroups $group
 
 it('returns non-empty icon string for each nav group', function (NavGroups $group): void {
     $icon = $group->getIcon();
-    expect($icon)->toBeString()->not->toBeEmpty();
+    expect($icon)->not->toBeEmpty();
 })->with([
     NavGroups::Authorization,
     NavGroups::Tools,

@@ -38,11 +38,13 @@
     "laravel/pint": "^1.25.1",
     "laravel/sail": "^1.46",
     "mockery/mockery": "^1.6.12",
+    "mrpunyapal/peststan": "^0.2.10",
     "nunomaduro/collision": "^8.8.2",
     "pestphp/pest": "^4.0",
     "pestphp/pest-plugin-faker": "^4.0",
     "pestphp/pest-plugin-laravel": "^4.0",
     "phpstan/phpstan-deprecation-rules": "^2.0.3",
+    "phpstan/phpstan-phpunit": "^2.0",
     "phpunit/phpunit": "^12.0"
   },
   "autoload": {
@@ -59,13 +61,13 @@
   },
   "scripts": {
     "dd:check": "laradumps check stop-on-failure --dir=app,routes,config,resources,database --text=dump,dd",
-    "style:check": [
+    "lint": [
       "pint --test --no-interaction --ansi"
     ],
-    "style:fix": [
+    "lint:fix": [
       "pint --no-interaction --ansi"
     ],
-    "code:analyze": [
+    "analyze": [
       "phpstan analyze --memory-limit=4G --no-progress --no-interaction --ansi"
     ],
     "pre-autoload-dump": [
