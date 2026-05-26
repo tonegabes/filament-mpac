@@ -1,0 +1,68 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Policies;
+
+use App\Enums\Permissions\{{ PermissionEnumClass }};
+use App\Models\{{ ModelClass }};
+use App\Models\User;
+
+class {{ ModelClass }}Policy
+{
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(User $user): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::ViewAny);
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user, {{ ModelClass }} ${{ modelVariable }}): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::View);
+    }
+
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(User $user): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::Create);
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, {{ ModelClass }} ${{ modelVariable }}): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::Update);
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, {{ ModelClass }} ${{ modelVariable }}): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::Delete);
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, {{ ModelClass }} ${{ modelVariable }}): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::Restore);
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, {{ ModelClass }} ${{ modelVariable }}): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::ForceDelete);
+    }
+}
