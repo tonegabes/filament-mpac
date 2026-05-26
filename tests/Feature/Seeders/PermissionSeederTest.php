@@ -8,8 +8,13 @@ use App\Enums\Permissions\SystemPermissions;
 use App\Enums\Permissions\UserPermissions;
 use App\Models\Permission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\File;
 
 uses(RefreshDatabase::class);
+
+afterEach(function (): void {
+    File::delete(app_path('Enums/Permissions/GeneratedSeederPermissions.php'));
+});
 
 it('creates all permissions from enums', function (): void {
     $this->seed(Database\Seeders\PermissionSeeder::class);
@@ -26,4 +31,23 @@ it('creates all permissions from enums', function (): void {
     }
 
     expect(Permission::count())->toBe(count($expected));
+});
+
+it('discovers permission enums automatically', function (): void {
+    File::put(app_path('Enums/Permissions/GeneratedSeederPermissions.php'), <<<'PHP'
+<?php
+
+declare(strict_types=1);
+
+namespace App\Enums\Permissions;
+
+enum GeneratedSeederPermissions: string
+{
+    case View = 'generated.view';
+}
+PHP);
+
+    $this->seed(Database\Seeders\PermissionSeeder::class);
+
+    $this->assertDatabaseHas(Permission::class, ['name' => 'generated.view']);
 });
