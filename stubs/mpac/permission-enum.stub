@@ -1,0 +1,17 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Enums\Permissions;
+
+enum {{ EnumClass }}: string
+{
+    case All = '{{ resource }}';
+    case ViewAny = '{{ resource }}.view-any';
+    case View = '{{ resource }}.view';
+    case Create = '{{ resource }}.create';
+    case Update = '{{ resource }}.update';
+    case Delete = '{{ resource }}.delete';
+    case Restore = '{{ resource }}.restore';
+    case ForceDelete = '{{ resource }}.force-delete';
+}

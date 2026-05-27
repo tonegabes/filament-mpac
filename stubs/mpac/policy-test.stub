@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Enums\Permissions\{{ PermissionEnumClass }};
+use App\Models\Permission;
+use App\Models\{{ ModelClass }};
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+    foreach ({{ PermissionEnumClass }}::cases() as $permission) {
+        Permission::firstOrCreate(['name' => $permission->value]);
+    }
+});
+
+it('allows viewAny when user has {{ resource }}.view-any permission', function (): void {
+    $user = User::factory()->create();
+    $user->givePermissionTo({{ PermissionEnumClass }}::ViewAny->value);
+
+    expect($user->can('viewAny', {{ ModelClass }}::class))->toBeTrue();
+});
+
+it('denies viewAny when user lacks {{ resource }}.view-any permission', function (): void {
+    $user = User::factory()->create();
+
+    expect($user->can('viewAny', {{ ModelClass }}::class))->toBeFalse();
+});
+
+it('allows create when user has {{ resource }}.create permission', function (): void {
+    $user = User::factory()->create();
+    $user->givePermissionTo({{ PermissionEnumClass }}::Create->value);
+
+    expect($user->can('create', {{ ModelClass }}::class))->toBeTrue();
+});
+
+it('denies update when user lacks {{ resource }}.update permission', function (): void {
+    $user = User::factory()->create();
+    ${{ modelVariable }} = new {{ ModelClass }}();
+
+    expect($user->can('update', ${{ modelVariable }}))->toBeFalse();
+});

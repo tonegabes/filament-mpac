@@ -108,6 +108,30 @@ Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentaç�
 4. **Adicionar permissões**: [Sistema de Permissões](07-sistema-permissoes.md)
 5. **Escrever testes**: [Testes](13-testes.md)
 
+### Scaffold completo de recurso (MPAC)
+
+Para criar rapidamente um novo recurso completo no padrão do projeto:
+
+```bash
+php artisan make:mpac-model Evento --resource=eventos
+```
+
+Esse comando gera:
+
+- Model
+- Enum de permissões
+- Policy
+- Teste unitário do enum de permissões
+- Teste de feature da policy
+- Filament Resource com página `View`
+
+Opções:
+
+```bash
+php artisan make:mpac-model Evento --resource=eventos --migration --factory --seed
+php artisan make:mpac-model Evento --resource=eventos --force
+```
+
 ### Convenções Importantes
 
 - ✅ Sempre use **Phosphor Icons** (não Hero Icons)
