@@ -11,18 +11,31 @@ app/Enums/Permissions/
 ├── UserPermissions.php
 ├── RolePermissions.php
 ├── PermissionPermissions.php
-└── SystemPermissions.php
+├── SystemPermissions.php
+└── PanelPermissions.php
 ```
 
 ## 🔐 SystemPermissions (escopo atual)
 
 Permissões de sistema disponíveis:
 
-- `system.panels`
-- `system.panels.view.admin`
-- `system.panels.view.operator`
+- `system`
 - `system.log-viewer.access`
 - `system.settings.manage`
+
+## 🧭 PanelPermissions
+
+Permissões de acesso aos painéis Filament:
+
+- `panels`
+- `panels.view.admin`
+- `panels.view.gestor`
+
+O enum `PanelPermissions` também centraliza o mapeamento de `Panel` para permissão:
+
+```php
+PanelPermissions::fromPanel($panel);
+```
 
 ## 👤 Permissões por módulo
 
@@ -38,15 +51,12 @@ Observação: no estado atual, o domínio de arquivos (`documents`, `images`, `m
 
 ### PermissionSeeder
 
-`database/seeders/PermissionSeeder.php` popula permissões usando os enums:
+`database/seeders/PermissionSeeder.php` popula permissões descobrindo automaticamente os enums em `app/Enums/Permissions`:
 
 ```php
-$permissionsBag = [
-    ...SystemPermissions::cases(),
-    ...UserPermissions::cases(),
-    ...RolePermissions::cases(),
-    ...PermissionPermissions::cases(),
-];
+foreach (File::allFiles(app_path('Enums/Permissions')) as $file) {
+    // Cada enum backed encontrado contribui com seus cases.
+}
 ```
 
 ### RoleSeeder
@@ -55,13 +65,11 @@ $permissionsBag = [
 
 - `Roles::Developer`
 - `Roles::Admin`
-- `Roles::Operator`
 
 Distribuição atual:
 
 - `Developer`: permissões completas de system/users/roles/permissions.
 - `Admin`: acesso ao painel admin + permissões de usuários.
-- `Operator`: acesso ao painel operator.
 
 ## 🧭 Acesso ao painel Filament
 

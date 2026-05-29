@@ -10,7 +10,7 @@ Route::get('/', function () {
 });
 
 Route::get(
-    '/login',
+    '/entrar',
     fn () => redirect()->to((string)Filament::getLoginUrl())
 )->name('login');
 

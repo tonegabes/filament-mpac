@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\Permissions\PanelPermissions;
 use App\Enums\Permissions\PermissionPermissions;
 use App\Enums\Permissions\RolePermissions;
 use App\Enums\Permissions\SystemPermissions;
@@ -18,22 +19,18 @@ final class RoleSeeder extends Seeder
     {
         $roleDeveloper = Role::firstOrCreate(['name' => Roles::Developer->value]);
         $roleAdmin = Role::firstOrCreate(['name' => Roles::Admin->value]);
-        $roleOperator = Role::firstOrCreate(['name' => Roles::Operator->value]);
 
         $roleDeveloper->syncPermissions([
             ...SystemPermissions::cases(),
+            ...PanelPermissions::cases(),
             ...UserPermissions::cases(),
             ...RolePermissions::cases(),
             ...PermissionPermissions::cases(),
         ]);
 
         $roleAdmin->syncPermissions([
-            SystemPermissions::PanelsViewAdmin,
+            PanelPermissions::ViewAdmin,
             ...UserPermissions::cases(),
-        ]);
-
-        $roleOperator->syncPermissions([
-            SystemPermissions::PanelsViewOperator,
         ]);
     }
 }
