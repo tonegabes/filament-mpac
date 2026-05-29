@@ -65,7 +65,7 @@ final class PermissionSeeder extends Seeder
 
         sort($permissionEnumClasses);
 
-        return array_values($permissionEnumClasses);
+        return $permissionEnumClasses;
     }
 
     /**
@@ -79,6 +79,6 @@ final class PermissionSeeder extends Seeder
             $file->getRelativePathname(),
         );
 
-        return self::PERMISSIONS_ENUM_NAMESPACE.$relativePath;
+        return self::PERMISSIONS_ENUM_NAMESPACE . $relativePath;
     }
 }

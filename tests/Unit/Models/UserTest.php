@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Permissions\PanelPermissions;
 use App\Models\Permission;
 use App\Models\User;
 use Filament\Panel;
@@ -10,9 +11,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 it('canAccessPanel returns true when user has panel view permission', function (): void {
-    Permission::firstOrCreate(['name' => 'system.panels.view.admin']);
+    Permission::firstOrCreate(['name' => PanelPermissions::ViewAdmin->value]);
     $user = User::factory()->create();
-    $user->givePermissionTo('system.panels.view.admin');
+    $user->givePermissionTo(PanelPermissions::ViewAdmin->value);
 
     $panel = Panel::make()->id('admin');
 

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Permissions\PanelPermissions;
 use App\Enums\Permissions\PermissionPermissions;
 use App\Enums\Permissions\RolePermissions;
 use App\Enums\Permissions\SystemPermissions;
@@ -20,6 +21,7 @@ it('creates all permissions from enums', function (): void {
     $this->seed(Database\Seeders\PermissionSeeder::class);
 
     $expected = array_merge(
+        array_map(fn ($c) => $c->value, PanelPermissions::cases()),
         array_map(fn ($c) => $c->value, SystemPermissions::cases()),
         array_map(fn ($c) => $c->value, UserPermissions::cases()),
         array_map(fn ($c) => $c->value, RolePermissions::cases()),

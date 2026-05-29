@@ -19,6 +19,7 @@ final class RoleSeeder extends Seeder
     {
         $roleDeveloper = Role::firstOrCreate(['name' => Roles::Developer->value]);
         $roleAdmin = Role::firstOrCreate(['name' => Roles::Admin->value]);
+        $roleOperator = Role::firstOrCreate(['name' => Roles::Operator->value]);
 
         $roleDeveloper->syncPermissions([
             ...SystemPermissions::cases(),
@@ -31,6 +32,10 @@ final class RoleSeeder extends Seeder
         $roleAdmin->syncPermissions([
             PanelPermissions::ViewAdmin,
             ...UserPermissions::cases(),
+        ]);
+
+        $roleOperator->syncPermissions([
+            PanelPermissions::ViewAdmin,
         ]);
     }
 }

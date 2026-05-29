@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Permissions\PanelPermissions;
 use App\Enums\Permissions\PermissionPermissions;
 use App\Enums\Permissions\RolePermissions;
 use App\Enums\Permissions\SystemPermissions;
@@ -30,6 +31,7 @@ it('assigns all permissions to Developer role', function (): void {
     $developer = Role::where('name', Roles::Developer->value)->firstOrFail();
 
     $allPermissions = array_merge(
+        PanelPermissions::cases(),
         SystemPermissions::cases(),
         UserPermissions::cases(),
         RolePermissions::cases(),
@@ -40,17 +42,17 @@ it('assigns all permissions to Developer role', function (): void {
     }
 });
 
-it('assigns PanelsViewAdmin and UserPermissions to Admin role', function (): void {
+it('assigns panel access and UserPermissions to Admin role', function (): void {
     $this->seed(Database\Seeders\RoleSeeder::class);
 
     $admin = Role::where('name', Roles::Admin->value)->firstOrFail();
-    expect($admin->hasPermissionTo(SystemPermissions::PanelsViewAdmin->value))->toBeTrue();
+    expect($admin->hasPermissionTo(PanelPermissions::ViewAdmin->value))->toBeTrue();
     expect($admin->hasPermissionTo(UserPermissions::All->value))->toBeTrue();
 });
 
-it('assigns PanelsViewOperator to Operator role', function (): void {
+it('assigns panel access to Operator role', function (): void {
     $this->seed(Database\Seeders\RoleSeeder::class);
 
     $operator = Role::where('name', Roles::Operator->value)->firstOrFail();
-    expect($operator->hasPermissionTo(SystemPermissions::PanelsViewOperator->value))->toBeTrue();
+    expect($operator->hasPermissionTo(PanelPermissions::ViewAdmin->value))->toBeTrue();
 });

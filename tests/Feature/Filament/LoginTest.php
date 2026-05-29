@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Enums\Permissions\SystemPermissions;
+use App\Enums\Permissions\PanelPermissions;
 use App\Filament\Pages\Auth\Login;
 use App\Models\User;
 use App\Services\Auth\LdapAuthService;
@@ -60,7 +60,7 @@ uses(RefreshDatabase::class);
 beforeEach(function (): void {
     Config::set('auth.mode', 'local');
     Filament::setCurrentPanel(Filament::getPanel('admin'));
-    Permission::firstOrCreate(['name' => SystemPermissions::PanelsViewAdmin->value]);
+    Permission::firstOrCreate(['name' => PanelPermissions::ViewAdmin->value]);
 });
 
 it('renders login page with email field when auth mode is local', function (): void {
@@ -88,7 +88,7 @@ it('throws exception when auth mode is invalid', function (): void {
 
 it('authenticates with local credentials when auth mode is local', function (): void {
     $user = User::factory()->create();
-    $user->givePermissionTo(SystemPermissions::PanelsViewAdmin->value);
+    $user->givePermissionTo(PanelPermissions::ViewAdmin->value);
 
     Livewire::test(Login::class)
         ->set('data.email', $user->email)
@@ -104,7 +104,7 @@ it('authenticates with ldap credentials when user can access panel', function ()
     Config::set('auth.ldap.requires_local', true);
 
     $user = User::factory()->create(['username' => 'johndoe']);
-    $user->givePermissionTo(SystemPermissions::PanelsViewAdmin->value);
+    $user->givePermissionTo(PanelPermissions::ViewAdmin->value);
 
     $ldapUserService = new LoginTestLdapUserService;
     $ldapAuthService = new LoginTestLdapAuthService;
