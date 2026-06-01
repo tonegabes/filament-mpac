@@ -1,0 +1,6 @@
+services:
+  app:
+    image: ${APP_IMAGE:?error}:${APP_VERSION:?error}
+    build:
+      context: .
+      dockerfile: Dockerfile
