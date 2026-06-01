@@ -143,13 +143,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use Filament\Pages\Page;
 
 class Reports extends Page
 {
-    protected static ?string $navigationIcon = Phosphor::ChartBar;
+    protected static string|BackedEnum|null $navigationIcon = Phosphor::ChartBar;
 
-    protected static string $view = 'filament.pages.reports';
+    protected string $view = 'filament.pages.reports';
 
     protected static ?string $navigationLabel = 'Relatórios';
 
@@ -336,7 +337,7 @@ $panel
 ### Criar View Customizada
 
 ```php
-protected static string $view = 'filament.pages.custom-page';
+protected string $view = 'filament.pages.custom-page';
 ```
 
 ```blade

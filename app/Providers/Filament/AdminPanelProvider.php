@@ -5,13 +5,9 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Enums\NavGroups;
+use App\Enums\Panels;
 use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Pages\Auth\Login;
-use App\Filament\Pages\Auth\Password\ResetPasswordAction;
-use App\Filament\Pages\Auth\Password\ResetPasswordRequest;
-use App\Filament\Pages\Auth\Register;
-use App\Services\Auth\AuthModeHandlerResolver;
-use App\Settings\SystemSettings;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -37,12 +33,10 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $panel = $this->configureRegistration($panel);
-
         return $panel
             ->default()
-            ->id('admin')
-            ->path('admin')
+            ->id(Panels::Admin->value)
+            ->path(Panels::Admin->path())
             ->login(Login::class)
             ->sidebarWidth('16rem')
             ->profile()
@@ -88,41 +82,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
             ]);
-    }
-
-    /**
-     * Configure the registration page.
-     */
-    private function configureRegistration(Panel $panel): Panel
-    {
-        $authModeHandler = app(AuthModeHandlerResolver::class)->resolveFromConfig();
-
-        if (! $authModeHandler->allowsLocalRegistration()) {
-            return $panel;
-        }
-
-        $canRegister = false;
-
-        try {
-            $canRegister = app(SystemSettings::class)->enable_registration;
-        } catch (\Spatie\LaravelSettings\Exceptions\MissingSettings $e) {
-            return $panel;
-        } catch (\Illuminate\Database\QueryException $e) {
-            return $panel;
-        } catch (\Exception $e) {
-            throw $e;
-        }
-
-        if ($canRegister) {
-            $panel->registration(Register::class)
-                ->passwordReset(
-                    ResetPasswordRequest::class,
-                    ResetPasswordAction::class,
-                )
-            ;
-        }
-
-        return $panel;
     }
 
     /**

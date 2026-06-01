@@ -13,6 +13,7 @@ app/Enums/
 ├── Roles.php
 └── Permissions/
     ├── UserPermissions.php
+    ├── PanelPermissions.php
     ├── RolePermissions.php
     ├── PermissionPermissions.php
     └── SystemPermissions.php
@@ -75,8 +76,6 @@ Roles atuais:
 
 - `Developer`
 - `Admin`
-- `Operator`
-- `Guest`
 
 Valores persistidos no banco estão em português (`Desenvolvedor`, `Administrador`, etc.).
 
@@ -94,6 +93,7 @@ Usado em `SystemSettings` e na página `ManageSystem`.
 
 Enums de permissões:
 
+- `PanelPermissions`
 - `UserPermissions`
 - `RolePermissions`
 - `PermissionPermissions`

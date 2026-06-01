@@ -37,9 +37,13 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(?Panel $panel): bool
     {
-        $panelId = $panel?->getId();
+        $permission = PanelPermissions::fromPanel($panel);
 
-        return $this->can("system.panels.view.{$panelId}");
+        if ($permission === null) {
+            return false;
+        }
+
+        return $this->can($permission);
     }
 }
 ```

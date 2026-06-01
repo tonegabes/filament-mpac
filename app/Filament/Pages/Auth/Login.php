@@ -17,7 +17,6 @@ use Filament\Auth\MultiFactor\Contracts\HasBeforeChallengeHook;
 use Filament\Auth\Pages\Login as VendorLogin;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
-use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
@@ -149,16 +148,7 @@ class Login extends VendorLogin
      */
     public function attemptDefaultAuth(SessionGuard $authGuard, Authenticatable $user, array $credentials, bool $remember): void
     {
-        if (! $authGuard->attemptWhen($credentials, function (Authenticatable $user): bool {
-            if (! ($user instanceof FilamentUser)) {
-                return true;
-            }
-
-            /** @var Panel $panel */
-            $panel = Filament::getCurrentOrDefaultPanel();
-
-            return $user->canAccessPanel($panel);
-        }, $remember)) {
+        if (! $authGuard->attemptWhen(credentials: $credentials, remember: $remember)) {
             $this->fireFailedEvent($authGuard, $user, $credentials);
             $this->throwFailureValidationException();
         }

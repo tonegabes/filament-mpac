@@ -11,18 +11,30 @@ app/Enums/Permissions/
 ├── UserPermissions.php
 ├── RolePermissions.php
 ├── PermissionPermissions.php
-└── SystemPermissions.php
+├── SystemPermissions.php
+└── PanelPermissions.php
 ```
 
 ## 🔐 SystemPermissions (escopo atual)
 
 Permissões de sistema disponíveis:
 
-- `system.panels`
-- `system.panels.view.admin`
-- `system.panels.view.operator`
+- `system`
 - `system.log-viewer.access`
 - `system.settings.manage`
+
+## 🧭 PanelPermissions
+
+Permissões de acesso aos painéis Filament:
+
+- `panels`
+- `panels.view.admin`
+
+O enum `PanelPermissions` também centraliza o mapeamento de `Panel` para permissão:
+
+```php
+PanelPermissions::fromPanel($panel);
+```
 
 ## 👤 Permissões por módulo
 
@@ -38,15 +50,12 @@ Observação: no estado atual, o domínio de arquivos (`documents`, `images`, `m
 
 ### PermissionSeeder
 
-`database/seeders/PermissionSeeder.php` popula permissões usando os enums:
+`database/seeders/PermissionSeeder.php` popula permissões descobrindo automaticamente os enums em `app/Enums/Permissions`:
 
 ```php
-$permissionsBag = [
-    ...SystemPermissions::cases(),
-    ...UserPermissions::cases(),
-    ...RolePermissions::cases(),
-    ...PermissionPermissions::cases(),
-];
+foreach (File::allFiles(app_path('Enums/Permissions')) as $file) {
+    // Cada enum backed encontrado contribui com seus cases.
+}
 ```
 
 ### RoleSeeder
@@ -59,9 +68,9 @@ $permissionsBag = [
 
 Distribuição atual:
 
-- `Developer`: permissões completas de system/users/roles/permissions.
+- `Developer`: permissões completas de system/panels/users/roles/permissions.
 - `Admin`: acesso ao painel admin + permissões de usuários.
-- `Operator`: acesso ao painel operator.
+- `Operator`: acesso ao painel admin.
 
 ## 🧭 Acesso ao painel Filament
 
@@ -70,9 +79,13 @@ O acesso ao painel é validado no `User::canAccessPanel()`:
 ```php
 public function canAccessPanel(?Panel $panel): bool
 {
-    $panelId = $panel?->getId();
+    $permission = PanelPermissions::fromPanel($panel);
 
-    return $this->can("system.panels.view.{$panelId}");
+    if ($permission === null) {
+        return false;
+    }
+
+    return $this->can($permission);
 }
 ```
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Permissions\PanelPermissions;
 use App\Traits\HasActiveScope;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -78,9 +79,13 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(?Panel $panel): bool
     {
-        $panelId = $panel?->getId();
+        $permission = PanelPermissions::fromPanel($panel);
 
-        return $this->can("system.panels.view.{$panelId}");
+        if ($permission === null) {
+            return false;
+        }
+
+        return $this->can($permission);
     }
 
     public function getActivitylogOptions(): LogOptions
