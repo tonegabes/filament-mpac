@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Enums\Permissions\DocumentPermissions;
+use App\Enums\Permissions\ImagePermissions;
 use App\Enums\Permissions\PanelPermissions;
 use App\Enums\Permissions\PermissionPermissions;
 use App\Enums\Permissions\RolePermissions;
 use App\Enums\Permissions\SystemPermissions;
 use App\Enums\Permissions\UserPermissions;
+use App\Enums\Permissions\WildcardPermissions;
 use App\Enums\Roles;
 use App\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,28 +34,35 @@ it('assigns all permissions to Developer role', function (): void {
     $developer = Role::where('name', Roles::Developer->value)->firstOrFail();
 
     $allPermissions = array_merge(
+        WildcardPermissions::cases(),
         PanelPermissions::cases(),
         SystemPermissions::cases(),
         UserPermissions::cases(),
         RolePermissions::cases(),
         PermissionPermissions::cases(),
+        DocumentPermissions::cases(),
+        ImagePermissions::cases(),
     );
     foreach ($allPermissions as $perm) {
         expect($developer->hasPermissionTo($perm->value))->toBeTrue();
     }
 });
 
-it('assigns panel access and UserPermissions to Admin role', function (): void {
+it('assigns panel access and main resource permissions to Admin role', function (): void {
     $this->seed(Database\Seeders\RoleSeeder::class);
 
     $admin = Role::where('name', Roles::Admin->value)->firstOrFail();
     expect($admin->hasPermissionTo(PanelPermissions::ViewAdmin->value))->toBeTrue();
     expect($admin->hasPermissionTo(UserPermissions::All->value))->toBeTrue();
+    expect($admin->hasPermissionTo(DocumentPermissions::All->value))->toBeTrue();
+    expect($admin->hasPermissionTo(ImagePermissions::All->value))->toBeTrue();
 });
 
-it('assigns panel access to Operator role', function (): void {
+it('assigns panel and file permissions to Operator role', function (): void {
     $this->seed(Database\Seeders\RoleSeeder::class);
 
     $operator = Role::where('name', Roles::Operator->value)->firstOrFail();
     expect($operator->hasPermissionTo(PanelPermissions::ViewAdmin->value))->toBeTrue();
+    expect($operator->hasPermissionTo(DocumentPermissions::All->value))->toBeTrue();
+    expect($operator->hasPermissionTo(ImagePermissions::All->value))->toBeTrue();
 });

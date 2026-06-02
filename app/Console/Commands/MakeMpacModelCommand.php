@@ -60,7 +60,7 @@ class MakeMpacModelCommand extends Command
         }
 
         $this->createPermissionEnum($modelName, $resourceBase);
-        $this->createPolicy($modelName, $modelVariable);
+        $this->createPolicy($modelName, $modelVariable, $resourceBase);
         $this->createPermissionEnumTest($modelName, $resourceBase);
         $this->createPolicyTest($modelName, $modelVariable, $resourceBase);
 
@@ -123,7 +123,7 @@ class MakeMpacModelCommand extends Command
         );
     }
 
-    private function createPolicy(string $modelName, string $modelVariable): void
+    private function createPolicy(string $modelName, string $modelVariable, string $resourceBase): void
     {
         $targetPath = app_path("Policies/{$modelName}Policy.php");
 
@@ -134,6 +134,7 @@ class MakeMpacModelCommand extends Command
                 '{{ ModelClass }}' => $modelName,
                 '{{ modelVariable }}' => $modelVariable,
                 '{{ PermissionEnumClass }}' => "{$modelName}Permissions",
+                '{{ resource }}' => $resourceBase,
             ],
         );
     }

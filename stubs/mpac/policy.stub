@@ -65,4 +65,44 @@ class {{ ModelClass }}Policy
     {
         return $user->can({{ PermissionEnumClass }}::ForceDelete);
     }
+
+    /**
+     * Determine whether the user can delete any models.
+     */
+    public function deleteAny(User $user): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::Delete);
+    }
+
+    /**
+     * Determine whether the user can restore any models.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::Restore);
+    }
+
+    /**
+     * Determine whether the user can permanently delete any models.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::ForceDelete);
+    }
+
+    /**
+     * Determine whether the user can replicate models.
+     */
+    public function replicate(User $user): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::Replicate);
+    }
+
+    /**
+     * Determine whether the user can reorder models.
+     */
+    public function reorder(User $user): bool
+    {
+        return $user->can({{ PermissionEnumClass }}::Reorder);
+    }
 }

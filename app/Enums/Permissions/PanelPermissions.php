@@ -9,7 +9,7 @@ use Filament\Panel;
 
 enum PanelPermissions: string
 {
-    case All = 'panels';
+    case All = 'panels.*';
     case ViewAdmin = 'panels.view.admin';
 
     /**

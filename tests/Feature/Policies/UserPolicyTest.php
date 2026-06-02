@@ -11,19 +11,27 @@ uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-    foreach (UserPermissions::cases() as $perm) {
-        Permission::firstOrCreate(['name' => $perm->value]);
+
+    foreach (UserPermissions::cases() as $permission) {
+        Permission::firstOrCreate(['name' => $permission->value]);
     }
 });
 
-it('allows viewAny when user has users permission', function (): void {
+it('allows viewAny when user has users.view.any permission', function (): void {
+    $user = User::factory()->create();
+    $user->givePermissionTo(UserPermissions::ViewAny->value);
+
+    expect($user->can('viewAny', User::class))->toBeTrue();
+});
+
+it('allows viewAny when user has users wildcard permission', function (): void {
     $user = User::factory()->create();
     $user->givePermissionTo(UserPermissions::All->value);
 
     expect($user->can('viewAny', User::class))->toBeTrue();
 });
 
-it('denies viewAny when user lacks users permission', function (): void {
+it('denies viewAny when user lacks users.view.any permission', function (): void {
     $user = User::factory()->create();
 
     expect($user->can('viewAny', User::class))->toBeFalse();
@@ -65,4 +73,11 @@ it('denies update when user lacks users.update permission', function (): void {
     $target = User::factory()->create();
 
     expect($user->can('update', $target))->toBeFalse();
+});
+
+it('denies view when user lacks users.view permission', function (): void {
+    $user = User::factory()->create();
+    $target = User::factory()->create();
+
+    expect($user->can('view', $target))->toBeFalse();
 });
