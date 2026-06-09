@@ -18,17 +18,32 @@ beforeEach(function (): void {
     }
 });
 
-it('allows viewAny when user has {{ resource }}.view-any permission', function (): void {
+it('allows viewAny when user has {{ resource }}.view.any permission', function (): void {
     $user = User::factory()->create();
     $user->givePermissionTo({{ PermissionEnumClass }}::ViewAny->value);
 
     expect($user->can('viewAny', {{ ModelClass }}::class))->toBeTrue();
 });
 
-it('denies viewAny when user lacks {{ resource }}.view-any permission', function (): void {
+it('allows viewAny when user has {{ resource }} wildcard permission', function (): void {
+    $user = User::factory()->create();
+    $user->givePermissionTo({{ PermissionEnumClass }}::All->value);
+
+    expect($user->can('viewAny', {{ ModelClass }}::class))->toBeTrue();
+});
+
+it('denies viewAny when user lacks {{ resource }}.view.any permission', function (): void {
     $user = User::factory()->create();
 
     expect($user->can('viewAny', {{ ModelClass }}::class))->toBeFalse();
+});
+
+it('allows view when user has {{ resource }}.view permission', function (): void {
+    $user = User::factory()->create();
+    ${{ modelVariable }} = new {{ ModelClass }}();
+    $user->givePermissionTo({{ PermissionEnumClass }}::View->value);
+
+    expect($user->can('view', ${{ modelVariable }}))->toBeTrue();
 });
 
 it('allows create when user has {{ resource }}.create permission', function (): void {
@@ -38,9 +53,24 @@ it('allows create when user has {{ resource }}.create permission', function (): 
     expect($user->can('create', {{ ModelClass }}::class))->toBeTrue();
 });
 
+it('allows update when user has {{ resource }}.update permission', function (): void {
+    $user = User::factory()->create();
+    ${{ modelVariable }} = new {{ ModelClass }}();
+    $user->givePermissionTo({{ PermissionEnumClass }}::Update->value);
+
+    expect($user->can('update', ${{ modelVariable }}))->toBeTrue();
+});
+
 it('denies update when user lacks {{ resource }}.update permission', function (): void {
     $user = User::factory()->create();
     ${{ modelVariable }} = new {{ ModelClass }}();
 
     expect($user->can('update', ${{ modelVariable }}))->toBeFalse();
+});
+
+it('denies view when user lacks {{ resource }}.view permission', function (): void {
+    $user = User::factory()->create();
+    ${{ modelVariable }} = new {{ ModelClass }}();
+
+    expect($user->can('view', ${{ modelVariable }}))->toBeFalse();
 });

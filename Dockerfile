@@ -1,5 +1,13 @@
 FROM serversideup/php:8.4-frankenphp-alpine AS base
 
+ARG CI_PROJECT_URL
+ARG CI_COMMIT_SHA
+ARG CI_COMMIT_TAG
+
+LABEL org.opencontainers.image.source="$CI_PROJECT_URL"
+LABEL org.opencontainers.image.revision="$CI_COMMIT_SHA"
+LABEL org.opencontainers.image.version="$CI_COMMIT_TAG"
+
 USER root
 
 ENV LOG_CHANNEL=stderr \
@@ -11,6 +19,7 @@ ENV LOG_CHANNEL=stderr \
 RUN apk add --no-cache \
     bash curl ca-certificates \
     libpng-dev libzip-dev libxml2-dev \
+    poppler-utils \
     zip unzip
 
 RUN install-php-extensions intl exif ldap bcmath gd
@@ -31,7 +40,15 @@ RUN composer install \
 
 COPY --chown=www-data:www-data . .
 
-RUN composer dump-autoload --optimize --classmap-authoritative
+#
+# Ensure we don't ship (or load) locally-generated discovery caches that may
+# reference dev-only packages (e.g. laravel/boost) which are not installed in
+# this image (composer install --no-dev).
+#
+RUN rm -rf bootstrap/cache/* storage/framework/views/*
+
+RUN composer dump-autoload --optimize --classmap-authoritative --no-scripts && \
+    php artisan package:discover --ansi
 
 FROM node:20-alpine AS assets
 
@@ -59,12 +76,11 @@ RUN mkdir -p storage/framework/{cache,sessions,views} \
     storage/app/{public,private/livewire-tmp} && \
     chown -R www-data:www-data storage bootstrap/cache
 
-RUN php artisan filament:assets && \
+RUN CACHE_STORE=array php artisan optimize:clear && \
     php artisan storage:link && \
     php artisan route:cache && \
     php artisan view:cache && \
-    php artisan event:cache && \
-    php artisan filament:optimize
+    php artisan event:cache
 
 USER www-data
 

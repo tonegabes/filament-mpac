@@ -12,19 +12,27 @@ uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-    foreach (RolePermissions::cases() as $perm) {
-        Permission::firstOrCreate(['name' => $perm->value]);
+
+    foreach (RolePermissions::cases() as $permission) {
+        Permission::firstOrCreate(['name' => $permission->value]);
     }
 });
 
-it('allows viewAny when user has roles permission', function (): void {
+it('allows viewAny when user has roles.view.any permission', function (): void {
+    $user = User::factory()->create();
+    $user->givePermissionTo(RolePermissions::ViewAny->value);
+
+    expect($user->can('viewAny', Role::class))->toBeTrue();
+});
+
+it('allows viewAny when user has roles wildcard permission', function (): void {
     $user = User::factory()->create();
     $user->givePermissionTo(RolePermissions::All->value);
 
     expect($user->can('viewAny', Role::class))->toBeTrue();
 });
 
-it('denies viewAny when user lacks roles permission', function (): void {
+it('denies viewAny when user lacks roles.view.any permission', function (): void {
     $user = User::factory()->create();
 
     expect($user->can('viewAny', Role::class))->toBeFalse();
@@ -58,4 +66,11 @@ it('denies update when user lacks roles.update permission', function (): void {
     $role = Role::create(['name' => 'Editor', 'guard_name' => 'web']);
 
     expect($user->can('update', $role))->toBeFalse();
+});
+
+it('denies view when user lacks roles.view permission', function (): void {
+    $user = User::factory()->create();
+    $role = Role::create(['name' => 'Editor', 'guard_name' => 'web']);
+
+    expect($user->can('view', $role))->toBeFalse();
 });

@@ -6,12 +6,18 @@ namespace App\Enums\Permissions;
 
 enum {{ EnumClass }}: string
 {
-    case All = '{{ resource }}';
-    case ViewAny = '{{ resource }}.view-any';
-    case View = '{{ resource }}.view';
+    case All = '{{ resource }}.*';
+    case ViewAny = '{{ resource }}.view.any';
+    case ViewOwn = '{{ resource }}.view.own';
     case Create = '{{ resource }}.create';
-    case Update = '{{ resource }}.update';
-    case Delete = '{{ resource }}.delete';
-    case Restore = '{{ resource }}.restore';
-    case ForceDelete = '{{ resource }}.force-delete';
+    case UpdateAny = '{{ resource }}.update.any';
+    case UpdateOwn = '{{ resource }}.update.own';
+    case DeleteAny = '{{ resource }}.delete.any';
+    case DeleteOwn = '{{ resource }}.delete.own';
+    case RestoreAny = '{{ resource }}.restore.any';
+    case RestoreOwn = '{{ resource }}.restore.own';
+    case ForceDeleteAny = '{{ resource }}.force-delete.any';
+    case ForceDeleteOwn = '{{ resource }}.force-delete.own';
+    case Replicate = '{{ resource }}.replicate';
+    case Reorder = '{{ resource }}.reorder';
 }

@@ -14,7 +14,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can(UserPermissions::All);
+        return $user->can(UserPermissions::ViewAny);
     }
 
     /**
@@ -63,5 +63,45 @@ class UserPolicy
     public function forceDelete(User $user, User $model): bool
     {
         return $user->can(UserPermissions::ForceDelete);
+    }
+
+    /**
+     * Determine whether the user can delete any models.
+     */
+    public function deleteAny(User $user): bool
+    {
+        return $user->can(UserPermissions::Delete);
+    }
+
+    /**
+     * Determine whether the user can restore any models.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can(UserPermissions::Restore);
+    }
+
+    /**
+     * Determine whether the user can permanently delete any models.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can(UserPermissions::ForceDelete);
+    }
+
+    /**
+     * Determine whether the user can replicate models.
+     */
+    public function replicate(User $user): bool
+    {
+        return $user->can(UserPermissions::Replicate);
+    }
+
+    /**
+     * Determine whether the user can reorder models.
+     */
+    public function reorder(User $user): bool
+    {
+        return $user->can(UserPermissions::Reorder);
     }
 }

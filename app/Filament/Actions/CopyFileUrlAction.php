@@ -6,6 +6,7 @@ namespace App\Filament\Actions;
 
 use App\Contracts\HasFileUrl;
 use Filament\Actions\Action;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Js;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
@@ -24,6 +25,15 @@ class CopyFileUrlAction extends Action
             ->label(__('filament-actions::copy.link.label'))
             ->icon(Phosphor::Copy)
             ->keyBindings(['mod+c'])
+            ->visible(function (HasFileUrl $record): bool {
+                $user = auth()->user();
+
+                if (! $record instanceof Model || $user === null) {
+                    return false;
+                }
+
+                return $user->can('view', $record);
+            })
             ->tooltip(fn (HasFileUrl $record): string => $record->getFileUrl())
             ->alpineClickHandler(function (HasFileUrl $record): string {
                 $copyableState = Js::from($record->getFileUrl());

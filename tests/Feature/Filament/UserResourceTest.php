@@ -79,3 +79,13 @@ it('can edit a user', function (): void {
 
     expect($user->refresh()->name)->toBe('Updated Name');
 });
+
+it('denies list access when operator role lacks users.view.any permission', function (): void {
+    $operator = User::factory()->create();
+    $operator->assignRole(Roles::Operator->value);
+
+    $this->actingAs($operator);
+
+    Livewire::test(ListUsers::class)
+        ->assertForbidden();
+});

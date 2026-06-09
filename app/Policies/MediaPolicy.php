@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Enums\Permissions\RolePermissions;
-use App\Models\Role;
 use App\Models\User;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class RolePolicy
+class MediaPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can(RolePermissions::ViewAny);
+        return true;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Role $role): bool
+    public function view(User $user, Media $media): bool
     {
-        return $user->can(RolePermissions::View);
+        return true;
     }
 
     /**
@@ -31,39 +30,39 @@ class RolePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can(RolePermissions::Create);
+        return true;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Role $role): bool
+    public function update(User $user, Media $media): bool
     {
-        return $user->can(RolePermissions::Update);
+        return true;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Role $role): bool
+    public function delete(User $user, Media $media): bool
     {
-        return $user->can(RolePermissions::Delete);
+        return true;
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Role $role): bool
+    public function restore(User $user, Media $media): bool
     {
-        return $user->can(RolePermissions::Restore);
+        return true;
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Role $role): bool
+    public function forceDelete(User $user, Media $media): bool
     {
-        return $user->can(RolePermissions::ForceDelete);
+        return true;
     }
 
     /**
@@ -71,7 +70,7 @@ class RolePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can(RolePermissions::Delete);
+        return true;
     }
 
     /**
@@ -79,7 +78,7 @@ class RolePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can(RolePermissions::Restore);
+        return true;
     }
 
     /**
@@ -87,7 +86,7 @@ class RolePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can(RolePermissions::ForceDelete);
+        return true;
     }
 
     /**
@@ -95,7 +94,7 @@ class RolePolicy
      */
     public function replicate(User $user): bool
     {
-        return $user->can(RolePermissions::Replicate);
+        return true;
     }
 
     /**
@@ -103,6 +102,6 @@ class RolePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can(RolePermissions::Reorder);
+        return true;
     }
 }

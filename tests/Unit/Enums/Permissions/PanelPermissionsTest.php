@@ -6,7 +6,7 @@ use App\Enums\Permissions\PanelPermissions;
 use Filament\Panel;
 
 it('has expected cases and string values', function (): void {
-    expect(PanelPermissions::All->value)->toBe('panels')
+    expect(PanelPermissions::All->value)->toBe('panels.*')
         ->and(PanelPermissions::ViewAdmin->value)->toBe('panels.view.admin');
 });
 

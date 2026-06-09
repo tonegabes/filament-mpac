@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Enums\Permissions\RolePermissions;
-use App\Models\Role;
+use App\Enums\Permissions\DocumentPermissions;
+use App\Models\Document;
 use App\Models\User;
 
-class RolePolicy
+class DocumentPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can(RolePermissions::ViewAny);
+        return $user->can(DocumentPermissions::ViewAny);
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Role $role): bool
+    public function view(User $user, Document $document): bool
     {
-        return $user->can(RolePermissions::View);
+        return $user->can(DocumentPermissions::View);
     }
 
     /**
@@ -31,39 +31,39 @@ class RolePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can(RolePermissions::Create);
+        return $user->can(DocumentPermissions::Create);
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Role $role): bool
+    public function update(User $user, Document $document): bool
     {
-        return $user->can(RolePermissions::Update);
+        return $user->can(DocumentPermissions::Update);
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Role $role): bool
+    public function delete(User $user, Document $document): bool
     {
-        return $user->can(RolePermissions::Delete);
+        return $user->can(DocumentPermissions::Delete);
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Role $role): bool
+    public function restore(User $user, Document $document): bool
     {
-        return $user->can(RolePermissions::Restore);
+        return $user->can(DocumentPermissions::Restore);
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Role $role): bool
+    public function forceDelete(User $user, Document $document): bool
     {
-        return $user->can(RolePermissions::ForceDelete);
+        return $user->can(DocumentPermissions::ForceDelete);
     }
 
     /**
@@ -71,7 +71,7 @@ class RolePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can(RolePermissions::Delete);
+        return $user->can(DocumentPermissions::Delete);
     }
 
     /**
@@ -79,7 +79,7 @@ class RolePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can(RolePermissions::Restore);
+        return $user->can(DocumentPermissions::Restore);
     }
 
     /**
@@ -87,7 +87,7 @@ class RolePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can(RolePermissions::ForceDelete);
+        return $user->can(DocumentPermissions::ForceDelete);
     }
 
     /**
@@ -95,7 +95,7 @@ class RolePolicy
      */
     public function replicate(User $user): bool
     {
-        return $user->can(RolePermissions::Replicate);
+        return $user->can(DocumentPermissions::Replicate);
     }
 
     /**
@@ -103,6 +103,6 @@ class RolePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can(RolePermissions::Reorder);
+        return $user->can(DocumentPermissions::Reorder);
     }
 }

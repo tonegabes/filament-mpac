@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\Permissions\PanelPermissions;
 use App\Filament\Pages\Auth\Login;
+use App\Models\Permission;
 use App\Models\User;
 use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
@@ -12,7 +13,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Permission;
 
 final class LoginTestLdapUserService extends LdapUserService
 {

@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Enums\Permissions\SystemPermissions;
 use App\Models\User;
+use App\Policies\MediaPolicy;
 use App\Services\Auth\AuthModeHandlerResolver;
 use App\Services\Auth\LdapAuthModeHandler;
 use App\Services\Auth\LdapAuthService;
@@ -15,9 +16,19 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class AuthServiceProvider extends ServiceProvider
 {
+    /**
+     * The policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected $policies = [
+        Media::class => MediaPolicy::class,
+    ];
+
     /**
      * Register any application services.
      */
@@ -40,6 +51,8 @@ final class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerPolicies();
+
         $this->configureGates();
 
         if (! app()->isProduction()) {

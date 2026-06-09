@@ -78,7 +78,7 @@ code_analysis:
   dependencies:
     - composer_install
   script:
-    - composer analyze
+    - composer code:analyze
 
 style_check:
   stage: quality
@@ -90,7 +90,7 @@ style_check:
   dependencies:
     - composer_install
   script:
-    - composer lint
+    - composer style:check
 
 tests:
   stage: quality
