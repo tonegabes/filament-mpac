@@ -7,11 +7,12 @@ use Filament\Panel;
 
 it('has expected cases and string values', function (): void {
     expect(PanelPermissions::All->value)->toBe('panels.*')
-        ->and(PanelPermissions::ViewAdmin->value)->toBe('panels.view.admin');
+        ->and(PanelPermissions::ViewAdmin->value)->toBe('panels.view.admin')
+        ->and(PanelPermissions::ViewApp->value)->toBe('panels.view.app');
 });
 
-it('has exactly two cases', function (): void {
-    expect(PanelPermissions::cases())->toHaveCount(2);
+it('has exactly three cases', function (): void {
+    expect(PanelPermissions::cases())->toHaveCount(3);
 });
 
 it('resolves panel access permissions from filament panels', function (): void {

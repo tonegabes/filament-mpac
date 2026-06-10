@@ -26,7 +26,7 @@ class Register extends VendorRegister
 
         /** @var User $user */
         $user = $this->getUserModel()::create($data);
-        $user->assignRole(Roles::Operator);
+        $user->assignRole(Roles::User);
 
         return $user;
     }

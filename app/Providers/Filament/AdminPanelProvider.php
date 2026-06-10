@@ -7,7 +7,14 @@ namespace App\Providers\Filament;
 use App\Enums\NavGroups;
 use App\Enums\Panels;
 use App\Enums\Permissions\SystemPermissions;
+use App\Filament\Components\Navigation\PanelSwitcher;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Resources\Documents\DocumentResource;
+use App\Filament\Resources\Images\ImageResource;
+use App\Filament\Resources\Media\MediaResource;
+use App\Filament\Resources\Permissions\PermissionResource;
+use App\Filament\Resources\Roles\RoleResource;
+use App\Filament\Resources\Users\UserResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -47,23 +54,24 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Emerald,
             ])
             ->viteTheme('resources/css/mpac-theme/index.css')
-            ->discoverResources(
-                in: app_path('Filament/Resources'),
-                for: 'App\Filament\Resources'
-            )
-            ->discoverPages(
-                in: app_path('Filament/Pages'),
-                for: 'App\Filament\Pages'
-            )
+            ->resources([
+                DocumentResource::class,
+                ImageResource::class,
+                MediaResource::class,
+                UserResource::class,
+                RoleResource::class,
+                PermissionResource::class,
+            ])
             ->pages([])
-            ->discoverWidgets(
-                in: app_path('Filament/Widgets'),
-                for: 'App\Filament\Widgets'
-            )
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
+            ->widgets([
+                AccountWidget::class,
+                FilamentInfoWidget::class,
+            ])
+            ->userMenuItems(PanelSwitcher::userMenuItems())
             ->navigationGroups($this->configureNavigationGroups())
             ->navigationItems($this->configureNavigationItems())
             ->middleware([

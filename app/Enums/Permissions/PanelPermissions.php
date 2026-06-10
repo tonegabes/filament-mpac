@@ -11,6 +11,7 @@ enum PanelPermissions: string
 {
     case All = 'panels.*';
     case ViewAdmin = 'panels.view.admin';
+    case ViewApp = 'panels.view.app';
 
     /**
      * Resolve the permission required to access a Filament panel.
@@ -23,6 +24,7 @@ enum PanelPermissions: string
 
         return match (Panels::tryFrom($panel->getId())) {
             Panels::Admin => self::ViewAdmin,
+            Panels::App => self::ViewApp,
             null => null,
         };
     }

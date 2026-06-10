@@ -7,16 +7,12 @@ use App\Enums\Permissions\{{ EnumClass }};
 it('has expected cases and string values', function (): void {
     expect({{ EnumClass }}::All->value)->toBe('{{ resource }}.*')
         ->and({{ EnumClass }}::ViewAny->value)->toBe('{{ resource }}.view.any')
-        ->and({{ EnumClass }}::ViewOwn->value)->toBe('{{ resource }}.view.own')
+        ->and({{ EnumClass }}::View->value)->toBe('{{ resource }}.view')
         ->and({{ EnumClass }}::Create->value)->toBe('{{ resource }}.create')
-        ->and({{ EnumClass }}::UpdateAny->value)->toBe('{{ resource }}.update.any')
-        ->and({{ EnumClass }}::UpdateOwn->value)->toBe('{{ resource }}.update.own')
-        ->and({{ EnumClass }}::DeleteAny->value)->toBe('{{ resource }}.delete.any')
-        ->and({{ EnumClass }}::DeleteOwn->value)->toBe('{{ resource }}.delete.own')
-        ->and({{ EnumClass }}::RestoreAny->value)->toBe('{{ resource }}.restore.any')
-        ->and({{ EnumClass }}::RestoreOwn->value)->toBe('{{ resource }}.restore.own')
-        ->and({{ EnumClass }}::ForceDeleteAny->value)->toBe('{{ resource }}.force-delete.any')
-        ->and({{ EnumClass }}::ForceDeleteOwn->value)->toBe('{{ resource }}.force-delete.own')
+        ->and({{ EnumClass }}::Update->value)->toBe('{{ resource }}.update')
+        ->and({{ EnumClass }}::Delete->value)->toBe('{{ resource }}.delete')
+        ->and({{ EnumClass }}::Restore->value)->toBe('{{ resource }}.restore')
+        ->and({{ EnumClass }}::ForceDelete->value)->toBe('{{ resource }}.force-delete')
         ->and({{ EnumClass }}::Replicate->value)->toBe('{{ resource }}.replicate')
         ->and({{ EnumClass }}::Reorder->value)->toBe('{{ resource }}.reorder');
 });

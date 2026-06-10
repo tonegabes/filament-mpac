@@ -25,7 +25,7 @@ beforeEach(function (): void {
     Filament::setCurrentPanel(Filament::getPanel('admin'));
 });
 
-it('creates user with username from email and is_active true and Operator role', function (): void {
+it('creates user with username from email and is_active true and User role', function (): void {
     Livewire::test(Register::class)
         ->fillForm([
             'name' => 'New User',
@@ -45,7 +45,7 @@ it('creates user with username from email and is_active true and Operator role',
 
     $user = User::query()->where('email', 'newuser@example.com')->firstOrFail();
 
-    expect($user->hasRole(Roles::Operator->value))->toBeTrue();
+    expect($user->hasRole(Roles::User->value))->toBeTrue();
 });
 
 it('getLayout returns value from SystemSettings', function (): void {
