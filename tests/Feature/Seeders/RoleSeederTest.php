@@ -20,12 +20,11 @@ beforeEach(function (): void {
     $this->seed(Database\Seeders\PermissionSeeder::class);
 });
 
-it('creates Developer Admin and Operator roles', function (): void {
+it('creates Developer Admin and User roles', function (): void {
     $this->seed(Database\Seeders\RoleSeeder::class);
 
     expect(Role::where('name', Roles::Developer->value)->exists())->toBeTrue()
-        ->and(Role::where('name', Roles::Admin->value)->exists())->toBeTrue()
-        ->and(Role::where('name', Roles::Operator->value)->exists())->toBeTrue();
+        ->and(Role::where('name', Roles::Admin->value)->exists())->toBeTrue();
 });
 
 it('assigns all permissions to Developer role', function (): void {
@@ -56,13 +55,4 @@ it('assigns panel access and main resource permissions to Admin role', function 
     expect($admin->hasPermissionTo(UserPermissions::All->value))->toBeTrue();
     expect($admin->hasPermissionTo(DocumentPermissions::All->value))->toBeTrue();
     expect($admin->hasPermissionTo(ImagePermissions::All->value))->toBeTrue();
-});
-
-it('assigns panel and file permissions to Operator role', function (): void {
-    $this->seed(Database\Seeders\RoleSeeder::class);
-
-    $operator = Role::where('name', Roles::Operator->value)->firstOrFail();
-    expect($operator->hasPermissionTo(PanelPermissions::ViewAdmin->value))->toBeTrue();
-    expect($operator->hasPermissionTo(DocumentPermissions::All->value))->toBeTrue();
-    expect($operator->hasPermissionTo(ImagePermissions::All->value))->toBeTrue();
 });

@@ -12,15 +12,11 @@
                     </div>
                     <div class="flex items-center space-x-4">
                         @auth
-                            <a href="{{ route('filament.admin.pages.dashboard') }}"
+                            <a href="{{ route('dashboard') }}"
                                 class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700">
                                 Dashboard
                             </a>
                         @else
-                            <a href="{{ route('filament.admin.auth.login') }}"
-                                class="font-medium text-slate-600 transition-colors hover:text-slate-900">
-                                Login
-                            </a>
                             <a href="{{ route('filament.admin.auth.login') }}"
                                 class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700">
                                 Entrar
@@ -284,14 +280,14 @@ php artisan migrate --seed</code></pre>
                 </div>
                 <div class="flex flex-col justify-center gap-4 sm:flex-row">
                     @guest
-                        <a href="{{ route('filament.admin.auth.login') }}"
+                        <a href="{{ route('login') }}"
                             class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-blue-700">
                             <x-phosphor-sign-in
                                 class="mr-2 size-6" />
                             Entrar no Sistema
                         </a>
                     @else
-                        <a href="{{ route('filament.admin.pages.dashboard') }}"
+                        <a href="{{ route('dashboard') }}"
                             class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-blue-700">
                             <x-phosphor-house
                                 class="mr-2 size-6" />

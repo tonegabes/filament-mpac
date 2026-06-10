@@ -81,10 +81,10 @@ it('can edit a user', function (): void {
 });
 
 it('denies list access when operator role lacks users.view.any permission', function (): void {
-    $operator = User::factory()->create();
-    $operator->assignRole(Roles::Operator->value);
+    $user = User::factory()->create();
+    $user->assignRole(Roles::User->value);
 
-    $this->actingAs($operator);
+    $this->actingAs($user);
 
     Livewire::test(ListUsers::class)
         ->assertForbidden();

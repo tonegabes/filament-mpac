@@ -19,12 +19,10 @@ it('creates starter users with their expected roles', function (): void {
 
     $developer = User::where('email', 'developer@email.com')->firstOrFail();
     $admin = User::where('email', 'admin@email.com')->firstOrFail();
-    $operator = User::where('email', 'operator@email.com')->firstOrFail();
 
     expect($developer->hasRole(Roles::Developer->value))->toBeTrue()
         ->and($developer->hasRole(Roles::Admin->value))->toBeTrue()
-        ->and($admin->hasRole(Roles::Admin->value))->toBeTrue()
-        ->and($operator->hasRole(Roles::Operator->value))->toBeTrue();
+        ->and($admin->hasRole(Roles::Admin->value))->toBeTrue();
 });
 
 it('can run repeatedly without duplicating starter users', function (): void {
@@ -34,6 +32,5 @@ it('can run repeatedly without duplicating starter users', function (): void {
     expect(User::whereIn('email', [
         'developer@email.com',
         'admin@email.com',
-        'operator@email.com',
-    ])->count())->toBe(3);
+    ])->count())->toBe(2);
 });

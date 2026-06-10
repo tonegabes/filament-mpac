@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Components\Navigation\PanelSwitcher;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Password\ResetPasswordAction;
 use App\Filament\Pages\Auth\Password\ResetPasswordRequest;
@@ -42,16 +43,15 @@ class AppPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->viteTheme('resources/css/mpac-theme/index.css')
-            ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\Filament\App\Resources')
-            ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\Filament\App\Pages')
+            ->resources([])
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\Filament\App\Widgets')
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
+            ->userMenuItems(PanelSwitcher::userMenuItems())
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

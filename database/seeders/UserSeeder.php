@@ -46,19 +46,19 @@ final class UserSeeder extends Seeder
             Roles::Admin,
         ]);
 
-        // Operator
-        $userOperator = User::firstOrCreate(
+        // User
+        $userUser = User::firstOrCreate(
             [
-                'username' => 'operator',
-                'email' => 'operator@email.com',
+                'username' => 'user',
+                'email' => 'user@email.com',
             ],
             [
-                'name' => 'Operador',
-                'password' => Hash::make('operator'),
+                'name' => 'Usuário',
+                'password' => Hash::make('user'),
                 'is_active' => true,
             ],
         );
-        $userOperator->syncRoles([Roles::Operator]);
+        $userUser->syncRoles([Roles::User]);
 
     }
 }
