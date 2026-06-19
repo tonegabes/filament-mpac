@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc54ccc3c0b4b49b79da1eb9e66039b1",
+    "content-hash": "97cb9d7141f498fa2dd9931913230ebf",
     "packages": [
         {
             "name": "al-saloul/filament-image-gallery",
@@ -1988,6 +1988,140 @@
             "time": "2025-12-03T09:33:47+00:00"
         },
         {
+            "name": "giggsey/libphonenumber-for-php",
+            "version": "9.0.32",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/giggsey/libphonenumber-for-php.git",
+                "reference": "0945459d64ac6f583825bd5b9fa0645bfe791c72"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/0945459d64ac6f583825bd5b9fa0645bfe791c72",
+                "reference": "0945459d64ac6f583825bd5b9fa0645bfe791c72",
+                "shasum": ""
+            },
+            "require": {
+                "giggsey/locale": "^2.7",
+                "php": "^8.1",
+                "symfony/polyfill-mbstring": "^1.31"
+            },
+            "replace": {
+                "giggsey/libphonenumber-for-php-lite": "self.version"
+            },
+            "require-dev": {
+                "ext-dom": "*",
+                "friendsofphp/php-cs-fixer": "^3.71",
+                "infection/infection": "^0.29|^0.31.0",
+                "nette/php-generator": "^4.1",
+                "php-coveralls/php-coveralls": "^2.7",
+                "phpstan/extension-installer": "^1.4.3",
+                "phpstan/phpstan": "^2.1.7",
+                "phpstan/phpstan-deprecation-rules": "^2.0.1",
+                "phpstan/phpstan-phpunit": "^2.0.4",
+                "phpstan/phpstan-strict-rules": "^2.0.3",
+                "phpunit/phpunit": "^10.5.45",
+                "symfony/console": "^6.4",
+                "symfony/filesystem": "^6.4",
+                "symfony/process": "^6.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "9.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "libphonenumber\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Joshua Gigg",
+                    "email": "giggsey@gmail.com",
+                    "homepage": "https://giggsey.com/"
+                }
+            ],
+            "description": "A library for parsing, formatting, storing and validating international phone numbers, a PHP Port of Google's libphonenumber.",
+            "homepage": "https://github.com/giggsey/libphonenumber-for-php",
+            "keywords": [
+                "geocoding",
+                "geolocation",
+                "libphonenumber",
+                "mobile",
+                "phonenumber",
+                "validation"
+            ],
+            "support": {
+                "issues": "https://github.com/giggsey/libphonenumber-for-php/issues",
+                "source": "https://github.com/giggsey/libphonenumber-for-php"
+            },
+            "time": "2026-06-05T07:34:44+00:00"
+        },
+        {
+            "name": "giggsey/locale",
+            "version": "2.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/giggsey/Locale.git",
+                "reference": "fe741e99ae6ccbe8132f3d63d8ec89924e689778"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/giggsey/Locale/zipball/fe741e99ae6ccbe8132f3d63d8ec89924e689778",
+                "reference": "fe741e99ae6ccbe8132f3d63d8ec89924e689778",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "ext-json": "*",
+                "friendsofphp/php-cs-fixer": "^3.66",
+                "infection/infection": "^0.29|^0.32.0",
+                "php-coveralls/php-coveralls": "^2.7",
+                "phpstan/extension-installer": "^1.4.3",
+                "phpstan/phpstan": "^2.1.7",
+                "phpstan/phpstan-deprecation-rules": "^2.0.1",
+                "phpstan/phpstan-phpunit": "^2.0.4",
+                "phpstan/phpstan-strict-rules": "^2.0.3",
+                "phpunit/phpunit": "^10.5.45",
+                "symfony/console": "^6.4",
+                "symfony/filesystem": "^6.4",
+                "symfony/finder": "^6.4",
+                "symfony/process": "^6.4",
+                "symfony/var-exporter": "^6.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Giggsey\\Locale\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joshua Gigg",
+                    "email": "giggsey@gmail.com",
+                    "homepage": "https://giggsey.com/"
+                }
+            ],
+            "description": "Locale functions required by libphonenumber-for-php",
+            "support": {
+                "issues": "https://github.com/giggsey/Locale/issues",
+                "source": "https://github.com/giggsey/Locale/tree/2.9.0"
+            },
+            "time": "2026-02-24T15:32:13+00:00"
+        },
+        {
             "name": "graham-campbell/result-type",
             "version": "v1.1.4",
             "source": {
@@ -2465,6 +2599,172 @@
                 }
             ],
             "time": "2026-05-23T22:00:21+00:00"
+        },
+        {
+            "name": "janczakb/blade-gravity-icons",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/janczakb/blade-gravity-icons.git",
+                "reference": "bed2ac2a10377200c1751c5c5b55df36ef2cc3a8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/janczakb/blade-gravity-icons/zipball/bed2ac2a10377200c1751c5c5b55df36ef2cc3a8",
+                "reference": "bed2ac2a10377200c1751c5c5b55df36ef2cc3a8",
+                "shasum": ""
+            },
+            "require": {
+                "blade-ui-kit/blade-icons": "^1.8",
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bjanczak\\BladeGravityIcons\\BladeGravityIconsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bjanczak\\BladeGravityIcons\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bartek Janczak",
+                    "email": "barek122@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Complete Gravity UI icon set for Laravel Blade and Filament (MIT, Yandex).",
+            "homepage": "https://github.com/janczakb/blade-gravity-icons",
+            "keywords": [
+                "blade",
+                "filament",
+                "gravity-ui",
+                "icons",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/janczakb/blade-gravity-icons/issues",
+                "source": "https://github.com/janczakb/blade-gravity-icons/tree/v1.0.0"
+            },
+            "time": "2026-06-12T01:47:51+00:00"
+        },
+        {
+            "name": "janczakb/filament-flex-fields",
+            "version": "v2.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/janczakb/filament-flex-fields.git",
+                "reference": "9c6c101627c57a399d7f4663679e914eb1d97cc4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/janczakb/filament-flex-fields/zipball/9c6c101627c57a399d7f4663679e914eb1d97cc4",
+                "reference": "9c6c101627c57a399d7f4663679e914eb1d97cc4",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "giggsey/libphonenumber-for-php": "^9.0",
+                "janczakb/blade-gravity-icons": "^1.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0",
+                "phpstan/phpstan": "^2.0",
+                "spatie/laravel-sluggable": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bjanczak\\FilamentFlexFields\\FilamentFlexFieldsServiceProvider"
+                    ]
+                },
+                "suggest": {
+                    "spatie/laravel-tags": "Optional Spatie Tags integration via FlexSpatieTagsField (set use_spatie_tags in field config).",
+                    "spatie/laravel-sluggable": "Optional model-based slug generation for SlugField via spatieModel().",
+                    "spatie/laravel-medialibrary": "Optional Spatie Media Library integration via FlexSpatieMediaLibraryFileUpload.",
+                    "spatie/laravel-translatable": "Optional JSON translation storage for translatable TitleSlugField titles via spatieTranslatable().",
+                    "filament/spatie-laravel-media-library-plugin": "Optional Filament Spatie Media Library file upload base class for FlexSpatieMediaLibraryFileUpload."
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bjanczak\\FilamentFlexFields\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "Bartek Janczak",
+                    "email": "barek122@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "68 Filament v5 form components with unified design system, lazy CSS/JS, optional JSON custom fields, layout primitives, and built-in Playground — one plugin for modern Laravel admin forms.",
+            "homepage": "https://github.com/janczakb/filament-flex-fields",
+            "keywords": [
+                "Forms",
+                "address-autocomplete",
+                "admin-panel",
+                "alpinejs",
+                "choice-cards",
+                "cms-fields",
+                "code-splitting",
+                "country-picker",
+                "currency-field",
+                "custom-fields",
+                "dynamic-fields",
+                "filament",
+                "filament-forms",
+                "filament-plugin",
+                "filament-v5",
+                "flex-fields",
+                "form-components",
+                "geocoding",
+                "international-phone",
+                "json-attributes",
+                "laravel",
+                "lazy-loading",
+                "map-picker",
+                "mapbox",
+                "matrix-choice",
+                "phone-input",
+                "slug-field",
+                "tailwindcss",
+                "translatable"
+            ],
+            "support": {
+                "issues": "https://github.com/janczakb/filament-flex-fields/issues",
+                "source": "https://github.com/janczakb/filament-flex-fields/tree/v2.7.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/janczakb",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-17T21:35:51+00:00"
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",
