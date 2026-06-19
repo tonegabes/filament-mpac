@@ -15,6 +15,7 @@ use App\Filament\Resources\Media\MediaResource;
 use App\Filament\Resources\Permissions\PermissionResource;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Users\UserResource;
+use Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -89,6 +90,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
+                FilamentFlexFieldsPlugin::make(),
             ]);
     }
 
