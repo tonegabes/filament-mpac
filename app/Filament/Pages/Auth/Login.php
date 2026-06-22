@@ -214,7 +214,6 @@ class Login extends VendorLogin
             ->autocomplete()
             ->suffix($emailDomain)
             ->autofocus()
-            ->extraInputAttributes(['tabindex' => 1])
         ;
     }
 
