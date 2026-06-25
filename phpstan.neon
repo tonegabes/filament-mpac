@@ -7,6 +7,9 @@ includes:
     - phar://phpstan.phar/conf/bleedingEdge.neon
 
 parameters:
+    parallel:
+        maximumNumberOfProcesses: 1
+
     peststan:
         testCaseClass: Tests\TestCase
         pestConfigFiles:
