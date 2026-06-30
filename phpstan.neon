@@ -27,12 +27,14 @@ parameters:
     level: 8
 
     ignoreErrors:
+        -
+            message: '#Access to constant on internal class Laravel\\Pulse\\Recorders\\.#'
+            path: config/pulse.php
+        -
+            message: '#Call to static method defaultVendorCacheKeys\(\) of internal class Laravel\\Pulse\\Pulse#'
+            path: config/pulse.php
 
     excludePaths:
-      - database\migrations\2025_08_13_193244_create_permission_tables.php
-      - database\migrations\2025_09_22_180234_create_activity_log_table.php
-      - config/log-viewer.php
-      - config/settings.php
       - _ide_helper*.php
       - bootstrap/cache
 

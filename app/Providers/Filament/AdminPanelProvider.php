@@ -129,6 +129,14 @@ class AdminPanelProvider extends PanelProvider
                 ->openUrlInNewTab()
                 ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess))
             ,
+
+            NavigationItem::make('Pulse')
+                ->group(NavGroups::Tools->value)
+                ->icon(Phosphor::Pulse)
+                ->url('/' . Config::string('pulse.path'))
+                ->openUrlInNewTab()
+                ->visible(fn () => Auth::user()?->can(SystemPermissions::PulseAccess))
+            ,
         ];
     }
 }
