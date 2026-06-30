@@ -21,6 +21,7 @@
     "filament/spatie-laravel-settings-plugin": "~5.0",
     "janczakb/filament-flex-fields": "^2.7",
     "laravel/framework": "^13.0",
+    "laravel/pulse": "^1.7",
     "laravel/tinker": "^3.0",
     "opcodesio/log-viewer": "^3.19",
     "spatie/laravel-activitylog": "^5.0",
