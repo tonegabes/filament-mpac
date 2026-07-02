@@ -1,5 +1,13 @@
 {
   "preset": "psr12",
+  "exclude": [
+    "node_modules",
+    "vendor",
+    "tmp",
+    "resources",
+    "storage",
+    "bootstrap/cache"
+  ],
   "rules": {
     "array_indentation": true,
     "array_syntax": { "syntax": "short" },

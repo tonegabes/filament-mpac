@@ -70,6 +70,12 @@
     "lint:fix": [
       "pint --no-interaction --ansi"
     ],
+    "lint:dirty": [
+      "pint --test --dirty --no-interaction --ansi"
+    ],
+    "lint:fix:dirty": [
+      "pint --dirty --no-interaction --ansi"
+    ],
     "analyze": [
       "phpstan analyze --memory-limit=4G --no-progress --no-interaction --ansi"
     ],
