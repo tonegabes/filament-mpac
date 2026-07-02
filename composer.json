@@ -48,7 +48,8 @@
     "phpstan/phpstan-deprecation-rules": "^2.0.3",
     "phpstan/phpstan-phpunit": "^2.0",
     "phpunit/phpunit": "^12.0",
-    "tonegabes/laravel-make-model-plus": "^1.0"
+    "tonegabes/laravel-make-model-plus": "^1.0",
+    "tonegabes/mp-coding-standards": "^1.1"
   },
   "autoload": {
     "psr-4": {
@@ -65,16 +66,16 @@
   "scripts": {
     "dd:check": "laradumps check stop-on-failure --dir=app,routes,config,resources,database --text=dump,dd",
     "lint": [
-      "pint --test --no-interaction --ansi"
+      "pint --test --no-interaction --ansi --config=vendor/tonegabes/mp-coding-standards/pint.json"
     ],
     "lint:fix": [
-      "pint --no-interaction --ansi"
+      "pint --no-interaction --ansi --config=vendor/tonegabes/mp-coding-standards/pint.json"
     ],
     "lint:dirty": [
-      "pint --test --dirty --no-interaction --ansi"
+      "pint --test --dirty --no-interaction --ansi --config=vendor/tonegabes/mp-coding-standards/pint.json"
     ],
     "lint:fix:dirty": [
-      "pint --dirty --no-interaction --ansi"
+      "pint --dirty --no-interaction --ansi --config=vendor/tonegabes/mp-coding-standards/pint.json"
     ],
     "analyze": [
       "phpstan analyze --memory-limit=4G --no-progress --no-interaction --ansi"
