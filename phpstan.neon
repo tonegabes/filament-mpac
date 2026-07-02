@@ -5,6 +5,7 @@ includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
     - vendor/phpstan/phpstan-phpunit/rules.neon
     - phar://phpstan.phar/conf/bleedingEdge.neon
+    - vendor/calebdw/larastan-livewire/extension.neon
 
 parameters:
     parallel:
@@ -20,6 +21,7 @@ parameters:
         - bootstrap
         - config
         - database
+        - resources/views
         - public
         - routes
         - tests

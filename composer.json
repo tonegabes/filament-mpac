@@ -32,6 +32,7 @@
   },
   "require-dev": {
     "barryvdh/laravel-ide-helper": "^3.6",
+    "calebdw/larastan-livewire": "^2.5",
     "fakerphp/faker": "^1.24.1",
     "friendsofphp/php-cs-fixer": "^3.88.2",
     "larastan/larastan": "^3.7.2",
@@ -64,7 +65,6 @@
     }
   },
   "scripts": {
-    "dd:check": "laradumps check stop-on-failure --dir=app,routes,config,resources,database --text=dump,dd",
     "lint": [
       "pint --test --no-interaction --ansi --config=vendor/tonegabes/mp-coding-standards/pint.json"
     ],
