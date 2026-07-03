@@ -9,6 +9,7 @@ use App\Enums\Panels;
 use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Components\Navigation\PanelSwitcher;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\Settings\ManageSystem;
 use App\Filament\Resources\Documents\DocumentResource;
 use App\Filament\Resources\Images\ImageResource;
 use App\Filament\Resources\Media\MediaResource;
@@ -63,7 +64,9 @@ class AdminPanelProvider extends PanelProvider
                 RoleResource::class,
                 PermissionResource::class,
             ])
-            ->pages([])
+            ->pages([
+                ManageSystem::class,
+            ])
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
