@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Blade::anonymousComponentPath(resource_path('views/layouts'), 'layouts');
 
-        Model::shouldBeStrict();
+        Model::shouldBeStrict(! app()->isProduction());
 
         if (app()->isProduction()) {
             $this->configureProductionUrl();
