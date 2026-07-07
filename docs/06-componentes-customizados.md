@@ -4,7 +4,7 @@ Este documento explica como criar componentes de formulário customizados no Fil
 
 ## 📚 O que são Componentes Customizados?
 
-Componentes customizados são campos de formulário criados especificamente para o projeto, que encapsulam lógica e UI reutilizáveis. No projeto, temos exemplos como `ImagePicker` e `IconPicker`.
+Componentes customizados são campos de formulário criados especificamente para o projeto, que encapsulam lógica e UI reutilizáveis. No projeto, o principal exemplo é o `IconPicker`.
 
 ## 🏗️ Estrutura de um Componente
 
@@ -15,100 +15,10 @@ Um componente customizado consiste em:
 
 ```
 app/Filament/Components/Forms/
-├── ImagePicker.php
 └── IconPicker.php
 
 resources/views/filament/components/forms/
-├── image-picker.blade.php
 └── icon-picker.blade.php
-```
-
-## 🖼️ Exemplo: ImagePicker
-
-### Classe PHP
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Filament\Components\Forms;
-
-use App\Models\Image;
-use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
-use Filament\Forms\Components\Concerns\HasOptions;
-use Filament\Forms\Components\Field;
-use Illuminate\Database\Eloquent\Collection;
-
-class ImagePicker extends Field
-{
-    use HasExtraInputAttributes;
-    use HasOptions;
-
-    protected string $view = 'filament.components.forms.image-picker';
-
-    public string $imageUrl = '#';
-
-    public ?string $imageName = null;
-
-    /**
-     * @return Collection<int, Image>
-     */
-    public function getImages(): Collection
-    {
-        return Image::all();
-    }
-}
-```
-
-### View Blade
-
-```blade
-{{-- resources/views/filament/components/forms/image-picker.blade.php --}}
-@php
-    $id = $getId();
-    $statePath = $getStatePath();
-    $extraInputAttributeBag = $getExtraInputAttributeBag()->class(['opacity-0 absolute pointer-events-none']);
-    $images = $getImages();
-@endphp
-
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
-    class="fi-fo-image-picker"
->
-    @if ($images->isEmpty())
-        <span class="fi-fo-image-picker__empty">Sem imagens na biblioteca.</span>
-    @else
-        <div class="fi-fo-image-picker__items">
-            @foreach ($images as $image)
-                @php
-                    $inputId = "{$id}-{$image->name}";
-                    $imageUrl = $image->getFileUrl();
-                @endphp
-
-                <div class="fi-fo-image-picker__item">
-                    <input
-                        id="{{ $inputId }}"
-                        name="{{ $id }}"
-                        type="radio"
-                        value="{{ $image->getFilename() }}"
-                        wire:model="{{ $statePath }}"
-                        wire:loading.attr="disabled"
-                        {{ $extraInputAttributeBag }}
-                    >
-                    <x-filament::button
-                        :for="$inputId"
-                        tag="label"
-                        class="fi-fo-image-picker__button"
-                    >
-                        <img src="{{ $imageUrl }}" alt="">
-                    </x-filament::button>
-                </div>
-            @endforeach
-        </div>
-    @endif
-</x-dynamic-component>
 ```
 
 ## 🎨 Exemplo: IconPicker
