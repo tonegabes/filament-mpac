@@ -37,7 +37,6 @@ Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentaç�
 
 6. [Componentes Customizados](06-componentes-customizados.md)
    - Criando componentes de formulário
-   - IconPicker
    - Views Blade
 
 ### Autorização e Permissões

@@ -4,7 +4,7 @@ Este documento explica como criar componentes de formulário customizados no Fil
 
 ## 📚 O que são Componentes Customizados?
 
-Componentes customizados são campos de formulário criados especificamente para o projeto, que encapsulam lógica e UI reutilizáveis. No projeto, o principal exemplo é o `IconPicker`.
+Componentes customizados são campos de formulário criados especificamente para o projeto, que encapsulam lógica e UI reutilizáveis.
 
 ## 🏗️ Estrutura de um Componente
 
@@ -15,90 +15,10 @@ Um componente customizado consiste em:
 
 ```
 app/Filament/Components/Forms/
-└── IconPicker.php
+└── CustomField.php
 
 resources/views/filament/components/forms/
-└── icon-picker.blade.php
-```
-
-## 🎨 Exemplo: IconPicker
-
-### Classe PHP
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Filament\Components\Forms;
-
-use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
-use Filament\Forms\Components\Concerns\HasOptions;
-use Filament\Forms\Components\Field;
-use ToneGabes\Filament\Icons\Enums\Phosphor;
-
-class IconPicker extends Field
-{
-    use HasExtraInputAttributes;
-    use HasOptions;
-
-    protected string $view = 'filament.components.forms.icon-picker';
-
-    public string $icon = '';
-
-    /**
-     * @return Phosphor[]
-     */
-    public function getIcons(): array
-    {
-        return Phosphor::cases();
-    }
-}
-```
-
-### View Blade
-
-```blade
-{{-- resources/views/filament/components/forms/icon-picker.blade.php --}}
-@php
-    $id = $getId();
-    $statePath = $getStatePath();
-    $extraInputAttributeBag = $getExtraInputAttributeBag()->class(['opacity-0 absolute pointer-events-none']);
-@endphp
-
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
-    class="fi-fo-toggle-buttons-wrp"
->
-    <div class="grid grid-cols-6 gap-4">
-        @foreach ($getIcons() as $icon)
-            @php
-                $inputId = "{$id}-{$icon->getLabel()}";
-            @endphp
-
-            <div class="fi-fo-toggle-buttons-btn-ctn w-full">
-                <input
-                    id="{{ $inputId }}"
-                    name="{{ $id }}"
-                    type="radio"
-                    value="{{ $icon->getLabel() }}"
-                    wire:model="{{ $statePath }}"
-                    wire:loading.attr="disabled"
-                    {{ $extraInputAttributeBag }}
-                >
-                <x-filament::button
-                    :for="$inputId"
-                    tag="label"
-                    class="w-full justify-start"
-                >
-                    @svg($icon->getLabel(), ['class' => 'size-10'])
-                    <span>{{ $icon->value }}</span>
-                </x-filament::button>
-            </div>
-        @endforeach
-    </div>
-</x-dynamic-component>
+└── custom-field.blade.php
 ```
 
 ## 🔧 Criando um Componente Customizado
