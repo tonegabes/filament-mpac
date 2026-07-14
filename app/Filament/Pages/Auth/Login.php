@@ -12,10 +12,12 @@ use App\Services\Auth\AuthModeHandlerResolver;
 use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
+use Filament\Actions\Action;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\MultiFactor\Contracts\HasBeforeChallengeHook;
 use Filament\Auth\Pages\Login as VendorLogin;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
 use Filament\Panel;
 use Filament\Schemas\Components\Component;
@@ -25,6 +27,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use LdapRecord\Models\ActiveDirectory\User as LdapUser;
+use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class Login extends VendorLogin
 {
@@ -217,6 +220,29 @@ class Login extends VendorLogin
         ;
     }
 
+    protected function getPasswordFormComponent(): Component
+    {
+        /** @var TextInput $password */
+        $password = parent::getPasswordFormComponent();
+
+        return $password->prefixIcon(Phosphor::Lock);
+    }
+
+    protected function getRememberFormComponent(): Component
+    {
+        /** @var Checkbox $remember */
+        $remember = parent::getRememberFormComponent();
+
+        return $remember->label('Lembrar meu acesso');
+    }
+
+    protected function getAuthenticateFormAction(): Action
+    {
+        $submitAction = parent::getAuthenticateFormAction();
+
+        return $submitAction->label('Entrar');
+    }
+
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -225,7 +251,7 @@ class Login extends VendorLogin
         if (Config::boolean('auth.ldap.requires_local')) {
             $user = User::firstWhere('username', $username);
 
-            if (! $user || $user->isInactive()) {
+            if (! $user || $user->is_active === false) {
                 $this->throwFailureValidationException();
             }
 

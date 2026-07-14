@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\Permissions\PanelPermissions;
-use App\Traits\HasActiveScope;
+use App\Traits\HasIsActiveScope;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,11 +31,10 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable implements FilamentUser
 {
-    use HasActiveScope;
-
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 
+    use HasIsActiveScope;
     use HasRoles;
     use LogsActivity;
     use Notifiable;

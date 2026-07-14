@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -11,13 +12,14 @@ use Illuminate\Support\Facades\DB;
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
  */
-trait HasActiveScope
+trait HasIsActiveScope
 {
     /**
      * @param  Builder<Model>  $query
      * @return Builder<Model>
      */
-    public function scopeIsActive(Builder $query): Builder
+    #[Scope]
+    protected function isActive(Builder $query): Builder
     {
         $query->where('is_active', true);
 
@@ -47,30 +49,12 @@ trait HasActiveScope
     }
 
     /**
-     * Check if the model is active.
-     */
-    public function isActive(): bool
-    {
-        /* @var Model $this */
-        return (bool) $this->is_active;
-    }
-
-    /**
-     * Check if the model is inactive.
-     */
-    public function isInactive(): bool
-    {
-        /* @var Model $this */
-        return ! $this->isActive();
-    }
-
-    /**
      * Toggle the active state of the model.
      */
     public function toggleActive(): bool
     {
         /* @var Model $this */
-        return $this->update(['is_active' => ! $this->isActive()]);
+        return $this->update(['is_active' => ! $this->is_active]);
     }
 
     /**
@@ -78,7 +62,7 @@ trait HasActiveScope
      *
      * @param  Builder<Model>  $query
      */
-    public function scopeActiveCount(Builder $query): int
+    public function countActive(Builder $query): int
     {
         return $query->where('is_active', true)->count();
     }
