@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum Roles: string
+enum UserRole: string
 {
     case Developer = 'Desenvolvedor';
     case Admin = 'Administrador';
@@ -17,5 +17,10 @@ enum Roles: string
             self::Admin => 'Administrative access to manage system',
             self::User => 'Regular user access',
         };
+    }
+
+    public static function default(): self
+    {
+        return self::User;
     }
 }

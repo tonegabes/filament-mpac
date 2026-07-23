@@ -2,24 +2,27 @@
 
 declare(strict_types=1);
 
-use App\Enums\Roles;
+use App\Enums\UserRole;
 use App\Filament\Resources\Permissions\Pages\CreatePermission;
 use App\Filament\Resources\Permissions\Pages\ListPermissions;
 use App\Models\Permission;
 use App\Models\User;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RoleSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
-    app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-    $this->seed(Database\Seeders\PermissionSeeder::class);
-    $this->seed(Database\Seeders\RoleSeeder::class);
+    app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
+    $this->seed(PermissionSeeder::class);
+    $this->seed(RoleSeeder::class);
 
     $developer = User::factory()->create();
-    $developer->assignRole(Roles::Developer->value);
+    $developer->assignRole(UserRole::Developer->value);
 
     $this->actingAs($developer);
     Filament::setCurrentPanel(Filament::getPanel('admin'));

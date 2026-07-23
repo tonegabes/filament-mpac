@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+use App\Enums\AuthMode;
+use App\Enums\UserRole;
+use App\Models\User;
 
 return [
     /*
@@ -63,7 +66,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', User::class),
         ],
 
         // 'users' => [
@@ -119,7 +122,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'default_role' => App\Enums\Roles::User->value,
+    'default_role' => UserRole::default()->value,
 
     /*
     |--------------------------------------------------------------------------
@@ -130,7 +133,7 @@ return [
     |
     */
 
-    'mode' => env('AUTH_MODE', App\Enums\AuthMode::Local->value),
+    'mode' => env('AUTH_MODE', AuthMode::Local->value),
 
     /*
     |--------------------------------------------------------------------------

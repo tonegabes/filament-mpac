@@ -62,9 +62,9 @@ foreach (File::allFiles(app_path('Enums/Permissions')) as $file) {
 
 `database/seeders/RoleSeeder.php` cria e sincroniza:
 
-- `Roles::Developer`
-- `Roles::Admin`
-- `Roles::Operator`
+- `UserRole::Developer`
+- `UserRole::Admin`
+- `UserRole::Operator`
 
 Distribuição atual:
 

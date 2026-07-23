@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Enums\Roles;
+use App\Enums\UserRole;
 use App\Filament\Resources\Documents\Pages\ListDocuments;
 use App\Filament\Resources\Documents\Pages\ViewDocument;
 use App\Models\Document;
 use App\Models\User;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RoleSeeder;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
@@ -14,18 +16,19 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
-    app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-    $this->seed(Database\Seeders\PermissionSeeder::class);
-    $this->seed(Database\Seeders\RoleSeeder::class);
+    app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
+    $this->seed(PermissionSeeder::class);
+    $this->seed(RoleSeeder::class);
 
     Storage::fake(Document::COLLECTION_NAME);
 
     $user = User::factory()->create();
-    $user->assignRole(Roles::Developer->value);
+    $user->assignRole(UserRole::Developer->value);
 
     $this->actingAs($user);
     Filament::setCurrentPanel(Filament::getPanel('admin'));

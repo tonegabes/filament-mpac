@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\Roles;
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -26,8 +26,8 @@ final class UserSeeder extends Seeder
             ]
         );
         $userDeveloper->syncRoles([
-            Roles::Developer,
-            Roles::Admin,
+            UserRole::Developer,
+            UserRole::Admin,
         ]);
 
         // Admin
@@ -43,7 +43,7 @@ final class UserSeeder extends Seeder
             ]
         );
         $userAdmin->syncRoles([
-            Roles::Admin,
+            UserRole::Admin,
         ]);
 
         // User
@@ -58,7 +58,7 @@ final class UserSeeder extends Seeder
                 'is_active' => true,
             ],
         );
-        $userUser->syncRoles([Roles::User]);
+        $userUser->syncRoles([UserRole::User]);
 
     }
 }

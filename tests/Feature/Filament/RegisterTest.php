@@ -3,20 +3,23 @@
 declare(strict_types=1);
 
 use App\Enums\PageLayouts;
-use App\Enums\Roles;
+use App\Enums\UserRole;
 use App\Filament\Pages\Auth\Register;
 use App\Models\User;
 use App\Settings\SystemSettings;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RoleSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
-    app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-    $this->seed(Database\Seeders\PermissionSeeder::class);
-    $this->seed(Database\Seeders\RoleSeeder::class);
+    app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
+    $this->seed(PermissionSeeder::class);
+    $this->seed(RoleSeeder::class);
 
     $settings = app(SystemSettings::class);
     $settings->enable_registration = true;
@@ -45,7 +48,7 @@ it('creates user with username from email and is_active true and User role', fun
 
     $user = User::query()->where('email', 'newuser@example.com')->firstOrFail();
 
-    expect($user->hasRole(Roles::User->value))->toBeTrue();
+    expect($user->hasRole(UserRole::User->value))->toBeTrue();
 });
 
 it('getLayout returns value from SystemSettings', function (): void {

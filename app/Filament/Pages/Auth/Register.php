@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use App\Enums\Roles;
+use App\Enums\UserRole;
 use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
 use App\Models\User;
 use Filament\Auth\Pages\Register as VendorRegister;
@@ -26,7 +26,7 @@ class Register extends VendorRegister
 
         /** @var User $user */
         $user = $this->getUserModel()::create($data);
-        $user->assignRole(Roles::User);
+        $user->assignRole(UserRole::User);
 
         return $user;
     }

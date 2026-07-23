@@ -10,7 +10,7 @@ app/Enums/
 ├── FileCollection.php
 ├── NavGroups.php
 ├── PageLayouts.php
-├── Roles.php
+├── UserRole.php
 └── Permissions/
     ├── UserPermissions.php
     ├── PanelPermissions.php
@@ -70,7 +70,7 @@ FileCollection::Documents->disk(); // documents
 FileCollection::SystemLogos->directory(); // system/logos
 ```
 
-## 👥 Roles
+## 👥 UserRole
 
 Roles atuais:
 

@@ -10,27 +10,29 @@ use App\Enums\Permissions\RolePermissions;
 use App\Enums\Permissions\SystemPermissions;
 use App\Enums\Permissions\UserPermissions;
 use App\Enums\Permissions\WildcardPermissions;
-use App\Enums\Roles;
+use App\Enums\UserRole;
 use App\Models\Role;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
-    $this->seed(Database\Seeders\PermissionSeeder::class);
+    $this->seed(PermissionSeeder::class);
 });
 
 it('creates Developer Admin and User roles', function (): void {
-    $this->seed(Database\Seeders\RoleSeeder::class);
+    $this->seed(RoleSeeder::class);
 
-    expect(Role::where('name', Roles::Developer->value)->exists())->toBeTrue()
-        ->and(Role::where('name', Roles::Admin->value)->exists())->toBeTrue();
+    expect(Role::where('name', UserRole::Developer->value)->exists())->toBeTrue()
+        ->and(Role::where('name', UserRole::Admin->value)->exists())->toBeTrue();
 });
 
 it('assigns all permissions to Developer role', function (): void {
-    $this->seed(Database\Seeders\RoleSeeder::class);
+    $this->seed(RoleSeeder::class);
 
-    $developer = Role::where('name', Roles::Developer->value)->firstOrFail();
+    $developer = Role::where('name', UserRole::Developer->value)->firstOrFail();
 
     $allPermissions = array_merge(
         WildcardPermissions::cases(),
@@ -48,9 +50,9 @@ it('assigns all permissions to Developer role', function (): void {
 });
 
 it('assigns panel access and main resource permissions to Admin role', function (): void {
-    $this->seed(Database\Seeders\RoleSeeder::class);
+    $this->seed(RoleSeeder::class);
 
-    $admin = Role::where('name', Roles::Admin->value)->firstOrFail();
+    $admin = Role::where('name', UserRole::Admin->value)->firstOrFail();
     expect($admin->hasPermissionTo(PanelPermissions::ViewAdmin->value))->toBeTrue();
     expect($admin->hasPermissionTo(UserPermissions::All->value))->toBeTrue();
     expect($admin->hasPermissionTo(DocumentPermissions::All->value))->toBeTrue();

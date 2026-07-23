@@ -2,25 +2,28 @@
 
 declare(strict_types=1);
 
-use App\Enums\Roles;
+use App\Enums\UserRole;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\Role;
 use App\Models\User;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RoleSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
-    app()->make(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-    $this->seed(Database\Seeders\PermissionSeeder::class);
-    $this->seed(Database\Seeders\RoleSeeder::class);
+    app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
+    $this->seed(PermissionSeeder::class);
+    $this->seed(RoleSeeder::class);
 
     $admin = User::factory()->create();
-    $admin->assignRole(Roles::Admin->value);
+    $admin->assignRole(UserRole::Admin->value);
 
     $this->actingAs($admin);
     Filament::setCurrentPanel(Filament::getPanel('admin'));
@@ -82,7 +85,7 @@ it('can edit a user', function (): void {
 
 it('denies list access when operator role lacks users.view.any permission', function (): void {
     $user = User::factory()->create();
-    $user->assignRole(Roles::User->value);
+    $user->assignRole(UserRole::User->value);
 
     $this->actingAs($user);
 

@@ -8,7 +8,7 @@ use App\Enums\Permissions\DocumentPermissions;
 use App\Enums\Permissions\ImagePermissions;
 use App\Enums\Permissions\PanelPermissions;
 use App\Enums\Permissions\UserPermissions;
-use App\Enums\Roles;
+use App\Enums\UserRole;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
 
@@ -16,9 +16,9 @@ final class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        $roleDeveloper = Role::firstOrCreate(['name' => Roles::Developer->value]);
-        $roleAdmin = Role::firstOrCreate(['name' => Roles::Admin->value]);
-        $roleUser = Role::firstOrCreate(['name' => Roles::User->value]);
+        $roleDeveloper = Role::firstOrCreate(['name' => UserRole::Developer->value]);
+        $roleAdmin = Role::firstOrCreate(['name' => UserRole::Admin->value]);
+        $roleUser = Role::firstOrCreate(['name' => UserRole::User->value]);
 
         $roleDeveloper->syncPermissions(['*']);
 

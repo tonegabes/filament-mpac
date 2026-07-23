@@ -55,7 +55,7 @@ beforeEach(function (): void {
     $this->seed(RoleSeeder::class);
 
     $admin = User::factory()->create();
-    $admin->assignRole(Roles::Developer->value);
+    $admin->assignRole(UserRole::Developer->value);
 
     $this->actingAs($admin);
     Filament::setCurrentPanel(Filament::getPanel('admin'));
