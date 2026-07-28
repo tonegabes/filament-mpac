@@ -1,19 +1,39 @@
 # Componentes Customizados
 
-Este documento explica como criar componentes de formulário customizados no Filament, seguindo as convenções do projeto.
+Este documento explica como criar componentes Filament no projeto e o que existe hoje no código.
 
-## 📚 O que são Componentes Customizados?
+## 📚 Estado atual
 
-Componentes customizados são campos de formulário criados especificamente para o projeto, que encapsulam lógica e UI reutilizáveis.
+Não há campos de formulário customizados em `app/Filament/Components/Forms/` (os antigos `IconPicker` e `ImagePicker` foram removidos).
 
-## 🏗️ Estrutura de um Componente
+O componente ativo no projeto é de navegação:
 
-Um componente customizado consiste em:
-
-1. **Classe PHP**: Define a lógica e propriedades do componente
-2. **View Blade**: Define a renderização HTML/UI
-
+```text
+app/Filament/Components/
+└── Navigation/
+    └── PanelSwitcher.php
 ```
+
+### PanelSwitcher
+
+Monta ações do menu do usuário para trocar entre painéis (`App\Enums\Panels`: `app` e `admin`), respeitando `User::canAccessPanel()`.
+
+```php
+use App\Filament\Components\Navigation\PanelSwitcher;
+
+PanelSwitcher::userMenuItems();
+```
+
+Para campos ricos de formulário, preferir pacotes já integrados (ex.: `janczakb/filament-flex-fields`) em vez de recriar pickers locais.
+
+## 🏗️ Estrutura de um Componente de Formulário
+
+Se precisar criar um campo novo:
+
+1. **Classe PHP**: lógica e propriedades
+2. **View Blade**: renderização
+
+```text
 app/Filament/Components/Forms/
 └── CustomField.php
 
@@ -21,9 +41,7 @@ resources/views/filament/components/forms/
 └── custom-field.blade.php
 ```
 
-## 🔧 Criando um Componente Customizado
-
-### Passo 1: Criar a Classe
+### Passo 1: Classe
 
 ```php
 <?php
@@ -38,10 +56,8 @@ class CustomField extends Field
 {
     protected string $view = 'filament.components.forms.custom-field';
 
-    // Propriedades customizadas
     public string $customProperty = '';
 
-    // Métodos públicos para configuração
     public function customMethod(string $value): static
     {
         $this->customProperty = $value;
@@ -49,7 +65,6 @@ class CustomField extends Field
         return $this;
     }
 
-    // Métodos para a view
     public function getCustomData(): string
     {
         return $this->customProperty;
@@ -57,10 +72,9 @@ class CustomField extends Field
 }
 ```
 
-### Passo 2: Criar a View
+### Passo 2: View
 
 ```blade
-{{-- resources/views/filament/components/forms/custom-field.blade.php --}}
 @php
     $id = $getId();
     $statePath = $getStatePath();
@@ -83,7 +97,7 @@ class CustomField extends Field
 </x-dynamic-component>
 ```
 
-### Passo 3: Usar no Formulário
+### Passo 3: Uso
 
 ```php
 use App\Filament\Components\Forms\CustomField;
@@ -94,92 +108,21 @@ CustomField::make('field_name')
     ->required();
 ```
 
-## 🎯 Traits Úteis
+## 🎯 Traits Úteis do Filament
 
-### HasExtraInputAttributes
-
-Permite adicionar atributos HTML extras ao input:
-
-```php
-use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
-
-class MyField extends Field
-{
-    use HasExtraInputAttributes;
-    
-    // Na view:
-    // {{ $getExtraInputAttributeBag() }}
-}
-```
-
-### HasOptions
-
-Para componentes que precisam de opções:
-
-```php
-use Filament\Forms\Components\Concerns\HasOptions;
-
-class MyField extends Field
-{
-    use HasOptions;
-    
-    public function options(array $options): static
-    {
-        $this->options = $options;
-        return $this;
-    }
-}
-```
-
-## 🔄 Integração com Livewire
-
-Componentes customizados funcionam automaticamente com Livewire através do `wire:model`:
-
-```blade
-<input
-    wire:model="{{ $statePath }}"
-    wire:loading.attr="disabled"
->
-```
-
-## 🎨 Estilização
-
-Use classes Tailwind CSS para estilizar:
-
-```blade
-<div class="grid grid-cols-6 gap-4">
-    <!-- Conteúdo -->
-</div>
-```
-
-Para dark mode:
-
-```blade
-<div class="bg-white dark:bg-gray-800">
-    <!-- Conteúdo -->
-</div>
-```
-
-## 📋 Variáveis Disponíveis na View
-
-- `$getId()`: ID único do campo
-- `$getStatePath()`: Caminho do estado no Livewire
-- `$getExtraInputAttributeBag()`: Atributos HTML extras
-- `$field`: Instância do campo
-- `$getFieldWrapperView()`: View do wrapper do campo
+- `HasExtraInputAttributes` — atributos HTML extras no input
+- `HasOptions` — listas de opções para selects/cards
 
 ## 🎯 Boas Práticas
 
-1. **Extenda Field**: Sempre estenda `Filament\Forms\Components\Field`
-2. **Use Traits**: Aproveite traits como `HasExtraInputAttributes` e `HasOptions`
-3. **View Separada**: Sempre crie view Blade separada
-4. **Type Hints**: Use type hints explícitos
-5. **Documentação**: Documente métodos públicos com PHPDoc
-6. **Reutilização**: Crie componentes reutilizáveis
-7. **Testes**: Escreva testes para componentes complexos
+1. Extenda `Filament\Forms\Components\Field` para campos de formulário.
+2. Prefira Phosphor Icons (`ToneGabes\Filament\Icons\Enums\Phosphor`).
+3. Não reintroduza pickers removidos sem necessidade clara; avalie flex-fields primeiro.
+4. Documente métodos públicos com PHPDoc e escreva testes para lógica não trivial.
+5. Mantenha a view Blade enxuta; lógica fica na classe PHP.
 
 ## 🔗 Próximos Passos
 
-- [Schemas e Formulários](03-schemas-e-formularios.md) - Use componentes em formulários
-- [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) - Entenda modelos usados nos componentes
-- [Testes](13-testes.md) - Teste componentes customizados
+- [Schemas e Formulários](03-schemas-e-formularios.md)
+- [Panel Provider](15-panel-provider.md)
+- [Testes](13-testes.md)

@@ -12,7 +12,7 @@ app/
 ├── Enums/                  # Enumeradores (NavGroups, Permissions, etc.)
 ├── Filament/               # Recursos Filament
 │   ├── Actions/            # Ações customizadas
-│   ├── Components/         # Componentes de formulário customizados
+│   ├── Components/         # Componentes Filament (ex.: Navigation/PanelSwitcher)
 │   ├── Pages/              # Páginas customizadas (Auth, Settings)
 │   └── Resources/          # Resources CRUD
 │       └── {Entity}/

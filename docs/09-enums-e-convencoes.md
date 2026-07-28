@@ -10,13 +10,17 @@ app/Enums/
 ├── FileCollection.php
 ├── NavGroups.php
 ├── PageLayouts.php
+├── Panels.php
 ├── UserRole.php
 └── Permissions/
     ├── UserPermissions.php
     ├── PanelPermissions.php
     ├── RolePermissions.php
     ├── PermissionPermissions.php
-    └── SystemPermissions.php
+    ├── SystemPermissions.php
+    ├── DocumentPermissions.php
+    ├── ImagePermissions.php
+    └── WildcardPermissions.php
 ```
 
 ## 🧭 NavGroups
@@ -82,12 +86,31 @@ use Spatie\MediaLibrary\MediaCollections\MediaCollection as SpatieMediaCollectio
 
 ## 👥 UserRole
 
-Roles atuais:
+Roles atuais (`app/Enums/UserRole.php`):
 
-- `Developer`
-- `Admin`
+| Case | Valor persistido | Descrição |
+| --- | --- | --- |
+| `Developer` | `Desenvolvedor` | Acesso total (wildcard no seeder) |
+| `Admin` | `Administrador` | Administração do sistema |
+| `User` | `Usuário` | Usuário regular (role padrão) |
 
-Valores persistidos no banco estão em português (`Desenvolvedor`, `Administrador`, etc.).
+Helpers:
+
+```php
+UserRole::default(); // User
+$user->assignRole(UserRole::User);
+```
+
+Não existe mais `Operator` / `Enums\Roles`.
+
+## 🪟 Panels
+
+Enum dos painéis Filament (`app` e `admin`):
+
+- `Panels::App` → path `/`, permissão `panels.view.app`
+- `Panels::Admin` → path `/admin`, permissão `panels.view.admin`
+
+Usado por `PanelPermissions::fromPanel()` e `PanelSwitcher`.
 
 ## 🎨 PageLayouts
 
@@ -113,7 +136,7 @@ Cada enum é usado por policies, seeders e checks de acesso no painel.
 
 ## 🔧 BetterEnum
 
-O projeto possui trait `App\Traits\BetterEnum` para utilitários em enums.
+O projeto possui trait `App\Traits\BetterEnum` para utilitários em enums (`names()`, `values()`, `options()`, `asArray()`, `random()`).
 
 Use quando precisar expor listas para selects, filtros ou serialização de opções.
 

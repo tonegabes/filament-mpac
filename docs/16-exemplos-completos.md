@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Traits\HasActiveScope;
+use App\Traits\HasIsActiveScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,8 +32,8 @@ use Spatie\Activitylog\Support\LogOptions;
 
 class Product extends Model
 {
-    use HasActiveScope;
     use HasFactory;
+    use HasIsActiveScope;
     use LogsActivity;
 
     protected $fillable = [
