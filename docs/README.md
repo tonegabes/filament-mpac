@@ -1,6 +1,6 @@
 # Documentação do Sistema
 
-Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentação foi criada para facilitar o entendimento e desenvolvimento de novas features seguindo as convenções estabelecidas no projeto.
+Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a arquitetura e desenvolver features no padrão do projeto.
 
 ## 📚 Índice
 
@@ -32,19 +32,19 @@ Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentaç�
 
 5. [Páginas Customizadas](05-paginas-customizadas.md)
    - SettingsPage
-   - Páginas de autenticação
+   - Login/registro (local e LDAP)
    - ViewRecord
 
 6. [Componentes Customizados](06-componentes-customizados.md)
-   - Criando componentes de formulário
-   - Views Blade
+   - PanelSwitcher
+   - Como criar campos de formulário
 
 ### Autorização e Permissões
 
 7. [Sistema de Permissões](07-sistema-permissoes.md)
    - Spatie Laravel Permission
    - Enums de Permissões
-   - Verificação de permissões
+   - Roles (`UserRole`)
 
 8. [Policies e Autorização](08-policies-e-autorizacao.md)
    - Criando Policies
@@ -54,12 +54,12 @@ Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentaç�
 ### Recursos do Laravel
 
 9. [Enums e Convenções](09-enums-e-convencoes.md)
-   - NavGroups
+   - NavGroups, Panels, UserRole
    - Enums de permissões
    - Convenções de uso
 
 10. [Traits](10-traits.md)
-    - HasActiveScope
+    - HasIsActiveScope
     - HasNotifications
     - BetterEnum
 
@@ -85,7 +85,7 @@ Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentaç�
     - Relacionamentos Eloquent
     - Media Library e Activity Log
 
-### Configuração
+### Configuração e Operação
 
 15. [Panel Provider](15-panel-provider.md)
     - AdminPanelProvider
@@ -97,19 +97,23 @@ Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentaç�
     - Exemplo completo: Página de configurações
     - Fluxo completo de desenvolvimento
 
+17. [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
+    - Setup local
+    - Upgrade de dependências
+    - Auth local/LDAP e pitfalls
+
 ## 🚀 Guia Rápido
 
 ### Para começar a desenvolver:
 
-1. **Leia primeiro**: [Estrutura do Projeto](01-estrutura-do-projeto.md)
-2. **Criar um Resource**: [Criando Recursos Filament](02-criando-recursos-filament.md)
-3. **Configurar formulários**: [Schemas e Formulários](03-schemas-e-formularios.md)
-4. **Adicionar permissões**: [Sistema de Permissões](07-sistema-permissoes.md)
-5. **Escrever testes**: [Testes](13-testes.md)
+1. **Setup**: [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
+2. **Leia**: [Estrutura do Projeto](01-estrutura-do-projeto.md)
+3. **Criar um Resource**: [Criando Recursos Filament](02-criando-recursos-filament.md)
+4. **Configurar formulários**: [Schemas e Formulários](03-schemas-e-formularios.md)
+5. **Adicionar permissões**: [Sistema de Permissões](07-sistema-permissoes.md)
+6. **Escrever testes**: [Testes](13-testes.md)
 
 ### Scaffold completo de recurso (MPAC)
-
-Para criar rapidamente um novo recurso completo no padrão do projeto:
 
 ```bash
 php artisan make:mpac-model Evento --resource=eventos
@@ -146,15 +150,19 @@ php artisan make:mpac-model Evento --resource=eventos --force
 - **Laravel**: v13
 - **Filament**: v5
 - **Livewire**: v4
-- **Pest**: v4
+- **Pest**: v5
+- **PHPUnit**: v13
 - **Tailwind CSS**: v4
+- **ldaprecord-laravel**: v4
+- **spatie/laravel-permission**: v8
 
 ## 🧩 Funcionalidades do Projeto Atual
 
 - Autenticação com modos **Local** e **LDAP**
+- Painéis **app** e **admin** com `PanelSwitcher`
 - Recursos de arquivos: **Document**, **Image** e **Media**
 - Configurações do sistema com **Spatie Settings**
-- Permissões e roles com **Spatie Permission**
+- Permissões e roles com **Spatie Permission** (`UserRole`: Developer, Admin, User)
 - Logs de atividade com **Spatie Activitylog**
 
 Veja também:
@@ -180,4 +188,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Maio 2026
+**Última atualização**: Julho 2026

@@ -4,8 +4,8 @@ Este documento descreve os padrões de testes atuais do projeto com Pest.
 
 ## 📚 Stack de testes
 
-- Pest v4
-- PHPUnit 12
+- Pest v5
+- PHPUnit 13
 - Plugin `pest-plugin-laravel`
 - Testes de Feature e Unit
 

@@ -15,14 +15,14 @@ O projeto atualmente trabalha com:
 
 ## 👤 User
 
-`User` implementa `FilamentUser`, usa `HasRoles`, `HasActiveScope` e `LogsActivity`.
+`User` implementa `FilamentUser`, usa `HasRoles`, `HasIsActiveScope` e `LogsActivity`.
 
 ```php
 // app/Models/User.php
 class User extends Authenticatable implements FilamentUser
 {
-    use HasActiveScope;
     use HasFactory;
+    use HasIsActiveScope;
     use HasRoles;
     use LogsActivity;
     use Notifiable;
