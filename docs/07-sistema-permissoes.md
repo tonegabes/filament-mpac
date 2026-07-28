@@ -1,6 +1,6 @@
 # Sistema de Permissões
 
-Este documento descreve o sistema atual de permissões usando `spatie/laravel-permission`.
+Este documento descreve o sistema atual de permissões usando `spatie/laravel-permission` (^8).
 
 ## 📚 Visão Geral
 
@@ -12,12 +12,13 @@ app/Enums/Permissions/
 ├── RolePermissions.php
 ├── PermissionPermissions.php
 ├── SystemPermissions.php
-└── PanelPermissions.php
+├── PanelPermissions.php
+├── DocumentPermissions.php
+├── ImagePermissions.php
+└── WildcardPermissions.php
 ```
 
-## 🔐 SystemPermissions (escopo atual)
-
-Permissões de sistema disponíveis:
+## 🔐 SystemPermissions
 
 - `system`
 - `system.log-viewer.access`
@@ -25,56 +26,47 @@ Permissões de sistema disponíveis:
 
 ## 🧭 PanelPermissions
 
-Permissões de acesso aos painéis Filament:
-
-- `panels`
+- `panels.*`
 - `panels.view.admin`
+- `panels.view.app`
 
-O enum `PanelPermissions` também centraliza o mapeamento de `Panel` para permissão:
-
-```php
-PanelPermissions::fromPanel($panel);
-```
+Mapeamento painel → permissão via `PanelPermissions::fromPanel($panel)` e o enum `App\Enums\Panels` (`admin`, `app`).
 
 ## 👤 Permissões por módulo
 
-Atualmente os módulos com enum completo de CRUD são:
+Módulos com enum CRUD completo:
 
 - `users.*`
 - `roles.*`
 - `permissions.*`
-
-Observação: no estado atual, o domínio de arquivos (`documents`, `images`, `media`) não possui enum de permissões dedicado.
+- `documents.*`
+- `images.*`
 
 ## 🌱 Seeders oficiais
 
 ### PermissionSeeder
 
-`database/seeders/PermissionSeeder.php` popula permissões descobrindo automaticamente os enums em `app/Enums/Permissions`:
-
-```php
-foreach (File::allFiles(app_path('Enums/Permissions')) as $file) {
-    // Cada enum backed encontrado contribui com seus cases.
-}
-```
+`database/seeders/PermissionSeeder.php` popula permissões descobrindo automaticamente os enums em `app/Enums/Permissions`.
 
 ### RoleSeeder
 
 `database/seeders/RoleSeeder.php` cria e sincroniza:
 
-- `UserRole::Developer`
-- `UserRole::Admin`
-- `UserRole::Operator`
+- `UserRole::Developer` (`Desenvolvedor`)
+- `UserRole::Admin` (`Administrador`)
+- `UserRole::User` (`Usuário`)
 
 Distribuição atual:
 
-- `Developer`: permissões completas de system/panels/users/roles/permissions.
-- `Admin`: acesso ao painel admin + permissões de usuários.
-- `Operator`: acesso ao painel admin.
+| Role | Permissões |
+| --- | --- |
+| `Developer` | `*` (todas) |
+| `Admin` | painel admin + users + documents + images |
+| `User` | `panels.view.app` |
+
+Role padrão para novos usuários (registro local / LDAP sem role): `config('auth.default_role')` → `UserRole::default()` = `User`.
 
 ## 🧭 Acesso ao painel Filament
-
-O acesso ao painel é validado no `User::canAccessPanel()`:
 
 ```php
 public function canAccessPanel(?Panel $panel): bool
@@ -116,6 +108,13 @@ public static function canAccess(): bool
 NavigationItem::make('Log Viewer')
     ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess));
 ```
+
+## ⚠️ Pitfalls
+
+1. Após criar um enum de permissões, rode o seeder (ou `migrate:fresh --seed` em local).
+2. Cache de permissões: limpe com `PermissionRegistrar::forgetCachedPermissions()` nos testes.
+3. Upgrade para `spatie/laravel-permission` 8: revise breaking changes de API se customizar guards/teams.
+4. Não use mais `UserRole::Operator` — foi substituído por `UserRole::User`.
 
 ## 🎯 Boas Práticas
 

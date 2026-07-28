@@ -244,64 +244,71 @@ class ProductInfolist
 
 ### Login Customizado
 
+`app/Filament/Pages/Auth/Login.php` estende o login do Filament e resolve o modo via `AuthModeHandlerResolver`:
+
 ```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Filament\Pages\Auth;
-
-use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
-use Filament\Auth\Pages\Login as VendorLogin;
-
 class Login extends VendorLogin
 {
     use UsesConfiguredAuthLayout;
 
-    public function getView(): string
+    public function __construct()
     {
-        return 'filament.pages.auth.login';
+        $authMode = AuthMode::fromConfig(Config::string('auth.mode'));
+        $this->authModeHandler = app(AuthModeHandlerResolver::class)->resolve($authMode);
+        // Em modo LDAP, também resolve LdapAuthService / LdapUserService
+    }
+
+    public function authenticate(): ?LoginResponse
+    {
+        $this->rateLimit(5);
+        $data = $this->form->getState();
+        $this->authModeHandler->authenticate($this, $data);
+        session()->regenerate();
+
+        return app(LoginResponse::class);
     }
 }
 ```
 
-No projeto, o `Login` suporta autenticação por modo (`local` e `ldap`) através de `AuthModeHandlerResolver`.
+#### Fluxo por modo
+
+| Modo (`AUTH_MODE`) | Handler | Campo de login | Comportamento |
+| --- | --- | --- | --- |
+| `local` | `LocalAuthModeHandler` | e-mail | `attemptLocalAuth()` + MFA se habilitado |
+| `ldap` | `LdapAuthModeHandler` | username + suffix de domínio | busca LDAP, autentica, sincroniza usuário local |
+
+Config relevante (`.env` / `config/auth.php`):
+
+- `AUTH_MODE=local|ldap`
+- `auth.default_role` → role atribuída a usuários LDAP sem papel
+- `LDAP_AUTH_REQUIRES_LOCAL` → se `true`, exige usuário local ativo pré-existente
+- `LDAP_AUTH_EMAIL_DOMAIN` → sufixo exibido no input de username
+
+#### Labels e ícones
+
+Customizações atuais na UI de login:
+
+- senha com `prefixIcon(Phosphor::Lock)`
+- checkbox “Lembrar meu acesso”
+- botão “Entrar”
+
+Layout visual vem de `UsesConfiguredAuthLayout` + `SystemSettings` (`PageLayouts`).
 
 ### Register Customizado
 
+Registro local só é habilitado quando o modo de auth permite (`allowsLocalRegistration()`) e a configuração do painel libera registro.
+
 ```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Filament\Pages\Auth;
-
-use App\Enums\UserRole;
-use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
-use App\Models\User;
-use Filament\Auth\Pages\Register as VendorRegister;
-use Illuminate\Database\Eloquent\Model;
-
-class Register extends VendorRegister
+protected function handleRegistration(array $data): Model
 {
-    use UsesConfiguredAuthLayout;
+    $data['username'] = $data['email'];
+    $data['is_active'] = true;
 
-    protected string $view = 'filament.pages.auth.register';
+    /** @var User $user */
+    $user = $this->getUserModel()::create($data);
+    $user->assignRole(UserRole::User);
 
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    protected function handleRegistration(array $data): Model
-    {
-        $data['username'] = $data['email'];
-        $data['is_active'] = true;
-
-        /** @var User $user */
-        $user = $this->getUserModel()::create($data);
-        $user->assignRole(UserRole::Operator);
-
-        return $user;
-    }
+    return $user;
 }
 ```
 
