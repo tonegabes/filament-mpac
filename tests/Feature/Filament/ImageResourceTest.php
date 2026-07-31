@@ -25,7 +25,7 @@ beforeEach(function (): void {
     $this->seed(PermissionSeeder::class);
     $this->seed(RoleSeeder::class);
 
-    Storage::fake(Image::COLLECTION_NAME);
+    Storage::fake(Image::fileCollection()->value);
 
     $user = User::factory()->create();
     $user->assignRole(UserRole::Developer->value);
@@ -40,7 +40,7 @@ function createImageRecord(string $name, string $fileName): Image
 
     $image
         ->addMedia(UploadedFile::fake()->image($fileName))
-        ->toMediaCollection(Image::COLLECTION_NAME);
+        ->toMediaCollection(Image::fileCollection()->value);
 
     return $image->refresh();
 }

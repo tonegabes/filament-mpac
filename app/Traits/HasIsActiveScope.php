@@ -10,16 +10,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 /**
- * @mixin \Illuminate\Database\Eloquent\Model
+ * @mixin Model
+ *
+ * @property bool $is_active
  */
 trait HasIsActiveScope
 {
     /**
-     * @param  Builder<Model>  $query
-     * @return Builder<Model>
+     * @param  Builder<covariant Model>  $query
+     * @return Builder<covariant Model>
      */
     #[Scope]
-    protected function isActive(Builder $query): Builder
+    protected function active(Builder $query): Builder
     {
         $query->where('is_active', true);
 
@@ -31,11 +33,26 @@ trait HasIsActiveScope
     }
 
     /**
+     * Determine if the model is active.
+     */
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    /**
+     * Determine if the model is inactive.
+     */
+    public function isInactive(): bool
+    {
+        return ! $this->isActive();
+    }
+
+    /**
      * Activate the model.
      */
     public function activate(): bool
     {
-        /* @var Model $this */
         return $this->update(['is_active' => true]);
     }
 
@@ -44,7 +61,6 @@ trait HasIsActiveScope
      */
     public function deactivate(): bool
     {
-        /* @var Model $this */
         return $this->update(['is_active' => false]);
     }
 
@@ -53,16 +69,16 @@ trait HasIsActiveScope
      */
     public function toggleActive(): bool
     {
-        /* @var Model $this */
         return $this->update(['is_active' => ! $this->is_active]);
     }
 
     /**
      * Count the number of active models.
      *
-     * @param  Builder<Model>  $query
+     * @param  Builder<covariant Model>  $query
      */
-    public function countActive(Builder $query): int
+    #[Scope]
+    protected function activeCount(Builder $query): int
     {
         return $query->where('is_active', true)->count();
     }

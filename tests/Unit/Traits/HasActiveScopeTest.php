@@ -7,11 +7,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('filters active users with scopeIsActive', function (): void {
+it('filters active users with scopeActive', function (): void {
     User::factory()->count(2)->create(['is_active' => true]);
     User::factory()->count(1)->create(['is_active' => false]);
 
-    $active = User::query()->isActive()->get();
+    $active = User::query()->active()->get();
 
     expect($active)->toHaveCount(2);
 });

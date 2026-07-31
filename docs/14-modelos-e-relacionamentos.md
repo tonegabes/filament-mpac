@@ -77,6 +77,8 @@ Mapeamento atual:
 - `SystemLogos` -> disco `public`, diretório `system/logos`
 - `SystemBackgrounds` -> disco `public`, diretório `system/backgrounds`
 
+Models com Spatie Media Library expõem a coleção via `fileCollection()`:
+
 ## 📄 Model Document
 
 ```php
@@ -88,14 +90,19 @@ class Document extends Model implements HasFileUrl, HasMedia
 
     protected $fillable = ['name'];
 
-    public const COLLECTION_NAME = FileCollection::Documents->value;
+    public static function fileCollection(): MediaCollection
+    {
+        return FileCollection::Documents;
+    }
 
     public function registerMediaCollections(): void
     {
+        $collection = self::fileCollection();
+
         $this
-            ->addMediaCollection(self::COLLECTION_NAME)
-            ->acceptsMimeTypes(self::getMimeTypeMap())
-            ->useDisk(FileCollection::Documents->disk());
+            ->addMediaCollection($collection->value)
+            ->acceptsMimeTypes($collection->acceptedMimeTypes())
+            ->useDisk($collection->disk());
     }
 }
 ```
@@ -109,14 +116,14 @@ class Image extends Model implements HasFileUrl, HasMedia
     use InteractsWithMedia;
     use LogsActivity;
 
-    public const COLLECTION_NAME = FileCollection::Images->value;
+    public const fileCollection()->value = FileCollection::Images->value;
 
     protected $fillable = ['name'];
 
     public function registerMediaCollections(): void
     {
         $this
-            ->addMediaCollection(self::COLLECTION_NAME)
+            ->addMediaCollection(self::fileCollection()->value)
             ->acceptsMimeTypes(self::getMimeTypeMap())
             ->useDisk(FileCollection::Images->disk());
     }

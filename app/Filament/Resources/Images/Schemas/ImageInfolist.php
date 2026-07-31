@@ -16,8 +16,7 @@ class ImageInfolist
         return $schema
             ->components([
                 SpatieMediaLibraryImageEntry::make('image')
-                    ->collection(Image::COLLECTION_NAME)
-                ,
+                    ->collection(Image::fileCollection()->value),
 
                 TextEntry::make('name'),
             ]);

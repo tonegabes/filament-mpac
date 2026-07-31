@@ -21,7 +21,7 @@ it('returns expected mime types for documents', function (): void {
 });
 
 it('has collection name constant', function (): void {
-    expect(Document::COLLECTION_NAME)->toBe('documents');
+    expect(Document::fileCollection()->value)->toBe('documents');
 });
 
 it('can be used anywhere a file url record is expected', function (): void {
