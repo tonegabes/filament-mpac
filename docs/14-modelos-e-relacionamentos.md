@@ -77,7 +77,7 @@ Mapeamento atual:
 - `SystemLogos` -> disco `public`, diretório `system/logos`
 - `SystemBackgrounds` -> disco `public`, diretório `system/backgrounds`
 
-Models com Spatie Media Library expõem a coleção via `fileCollection()`:
+Models com Spatie Media Library expõem a coleção via `fileCollection(): FileCollection` (não há mais `COLLECTION_NAME`).
 
 ## 📄 Model Document
 
@@ -90,7 +90,7 @@ class Document extends Model implements HasFileUrl, HasMedia
 
     protected $fillable = ['name'];
 
-    public static function fileCollection(): MediaCollection
+    public static function fileCollection(): FileCollection
     {
         return FileCollection::Documents;
     }
@@ -107,6 +107,8 @@ class Document extends Model implements HasFileUrl, HasMedia
 }
 ```
 
+`Document::getMimeTypeMap()` ainda existe como atalho para `FileCollection::Documents->acceptedMimeTypes()`, mas formulários novos devem preferir `LibraryFileUpload` + `FileCollection`.
+
 ## 🖼️ Model Image
 
 ```php
@@ -116,16 +118,21 @@ class Image extends Model implements HasFileUrl, HasMedia
     use InteractsWithMedia;
     use LogsActivity;
 
-    public const fileCollection()->value = FileCollection::Images->value;
-
     protected $fillable = ['name'];
+
+    public static function fileCollection(): FileCollection
+    {
+        return FileCollection::Images;
+    }
 
     public function registerMediaCollections(): void
     {
+        $collection = self::fileCollection();
+
         $this
-            ->addMediaCollection(self::fileCollection()->value)
-            ->acceptsMimeTypes(self::getMimeTypeMap())
-            ->useDisk(FileCollection::Images->disk());
+            ->addMediaCollection($collection->value)
+            ->acceptsMimeTypes($collection->acceptedMimeTypes())
+            ->useDisk($collection->disk());
     }
 }
 ```

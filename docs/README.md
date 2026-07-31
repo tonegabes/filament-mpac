@@ -59,7 +59,7 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
    - Convenções de uso
 
 10. [Traits](10-traits.md)
-    - HasIsActiveScope
+    - HasIsActiveScope (`active` / `activeCount` / `isActive`)
     - HasNotifications
     - BetterEnum
 
@@ -98,9 +98,9 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
     - Fluxo completo de desenvolvimento
 
 17. [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
-    - Setup local
+    - Setup local e scripts lint/format/analyze
     - Upgrade de dependências
-    - Auth local/LDAP e pitfalls
+    - Auth local/LDAP, Pulse/Log Viewer e pitfalls
 
 ## 🚀 Guia Rápido
 
@@ -160,10 +160,11 @@ php artisan make:mpac-model Evento --resource=eventos --force
 
 - Autenticação com modos **Local** e **LDAP**
 - Painéis **app** e **admin** com `PanelSwitcher`
-- Recursos de arquivos: **Document**, **Image** e **Media**
+- Recursos de arquivos: **Document**, **Image** e **Media** (`FileCollection` + `LibraryFileUpload`)
 - Configurações do sistema com **Spatie Settings**
 - Permissões e roles com **Spatie Permission** (`UserRole`: Developer, Admin, User)
 - Logs de atividade com **Spatie Activitylog**
+- Monitoramento: **Laravel Pulse** (`system.pulse.access`) e **Log Viewer** (`system.log-viewer.access`)
 
 Veja também:
 

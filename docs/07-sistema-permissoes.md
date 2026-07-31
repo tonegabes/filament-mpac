@@ -20,9 +20,10 @@ app/Enums/Permissions/
 
 ## 🔐 SystemPermissions
 
-- `system`
-- `system.log-viewer.access`
-- `system.settings.manage`
+- `system.*` (`SystemPermissions::All`)
+- `system.log-viewer.access` (`LogViewerAccess`) — rota `/log-viewer`
+- `system.pulse.access` (`PulseAccess`) — rota `/pulse` (gate `viewPulse`)
+- `system.settings.manage` (`SystemSettingsManage`)
 
 ## 🧭 PanelPermissions
 
@@ -107,7 +108,15 @@ public static function canAccess(): bool
 ```php
 NavigationItem::make('Log Viewer')
     ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess));
+
+NavigationItem::make('Pulse')
+    ->visible(fn () => Auth::user()?->can(SystemPermissions::PulseAccess));
 ```
+
+Autorização das ferramentas:
+
+- Log Viewer: `AuthServiceProvider` → `LogViewer::auth(...)` + `SystemPermissions::LogViewerAccess`
+- Pulse: `AppServiceProvider::configurePulse()` → `Gate::define('viewPulse', ...)` + `SystemPermissions::PulseAccess`
 
 ## ⚠️ Pitfalls
 

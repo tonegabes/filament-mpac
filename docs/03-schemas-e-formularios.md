@@ -149,13 +149,26 @@ Toggle::make('is_active')
 
 ### FileUpload (Spatie Media Library)
 
+Prefira o helper do projeto `LibraryFileUpload`, que já aplica coleção, disco, MIME types e preenche `name` a partir do arquivo:
+
+```php
+use App\Enums\FileCollection;
+use App\Filament\Support\LibraryFileUpload;
+
+LibraryFileUpload::mediaLibrary('image', FileCollection::Images, 'Imagem');
+LibraryFileUpload::mediaLibrary('file', FileCollection::Documents, 'Arquivo');
+```
+
+Para uploads públicos (logos/fundos em `SystemSettings`), use `LibraryFileUpload::publicImage(...)`.
+
+Se precisar do componente Filament cru:
+
 ```php
 SpatieMediaLibraryFileUpload::make('image')
     ->label('Imagem')
     ->collection(Image::fileCollection()->value)
     ->disk(Image::fileCollection()->disk())
-    ->image()
-    ->imageEditor()
+    ->acceptedFileTypes(Image::fileCollection()->acceptedMimeTypes())
     ->required();
 ```
 
@@ -288,6 +301,11 @@ Select::make('category_id')
 
 ```php
 // app/Filament/Resources/Documents/Schemas/DocumentForm.php
+use App\Enums\FileCollection;
+use App\Filament\Support\LibraryFileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Schemas\Schema;
+
 class DocumentForm
 {
     public static function configure(Schema $schema): Schema
@@ -296,17 +314,7 @@ class DocumentForm
             ->components([
                 Hidden::make('name')->default('Document Name Not Set'),
 
-                SpatieMediaLibraryFileUpload::make('file')
-                    ->label('Arquivo')
-                    ->live()
-                    ->required()
-                    ->acceptedFileTypes(Document::getMimeTypeMap())
-                    ->collection(Document::fileCollection()->value)
-                    ->afterStateUpdated(function ($state, Set $set) {
-                        if ($state instanceof TemporaryUploadedFile) {
-                            $set('name', $state->getClientOriginalName());
-                        }
-                    }),
+                LibraryFileUpload::mediaLibrary('file', FileCollection::Documents, 'Arquivo'),
             ]);
     }
 }

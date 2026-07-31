@@ -18,10 +18,13 @@ Comandos úteis do `composer.json`:
 | Script | Função |
 | --- | --- |
 | `composer test` | limpa config e roda a suite Pest |
-| `composer analyze` | PHPStan |
-| `composer lint` / `lint:fix` | Pint via coding standards do MP |
+| `composer analyze` | PHPStan (Larastan + pest-plugin-phpstan) |
+| `composer lint` / `lint:dirty` | Pint em modo `--test` (não altera arquivos) |
+| `composer format` / `format:dirty` | Pint aplicando correções |
 | `composer fresh:db` | `migrate:fresh --seed` |
 | `composer dev` | serve + queue + pail + vite |
+
+Pint usa o config de `vendor/tonegabes/mpac-essentials/pint.json`. Prefira esses scripts a invocar o `.php-cs-fixer.php` da raiz (ele ainda referencia o pacote antigo `mp-coding-standards`, removido do `composer.json`).
 
 ## 📦 Versões atuais (composer)
 
@@ -37,9 +40,19 @@ Stack relevante após o bump de dependências:
 | PHPUnit | `^13.0` |
 | `directorytree/ldaprecord-laravel` | `^4.0.4` |
 | `spatie/laravel-permission` | `^8.3` |
+| `laravel/pulse` | `^1.7` |
+| `opcodesio/log-viewer` | `^3.19` |
+| `tonegabes/mpac-essentials` | `^1.1` |
 | `janczakb/filament-flex-fields` | `^2.7` |
 
 Fonte da verdade: `composer.json` / `composer.lock`.
+
+PHPStan (`phpstan.neon`, level 8) inclui:
+
+- `larastan/larastan`
+- `calebdw/larastan-livewire`
+- `pestphp/pest-plugin-phpstan`
+- ignores pontuais em `config/pulse.php` para APIs internas do Pulse
 
 ## 🔄 Workflow de update de dependências
 
@@ -55,6 +68,7 @@ Fonte da verdade: `composer.json` / `composer.lock`.
 - **Pest 4 → 5** e **PHPUnit 12 → 13**: revise plugins e asserts se algo quebrar na suite.
 - **ldaprecord-laravel 3 → 4**: valide fluxo LDAP (`AUTH_MODE=ldap`) em staging.
 - **spatie/laravel-permission 6 → 8**: seeders/roles atuais usam a API estável do projeto; evite APIs removidas de teams/guards customizados sem checar o changelog do pacote.
+- **mp-coding-standards → mpac-essentials**: scripts de lint/format usam Pint do essentials; não reintroduza o pacote antigo sem alinhar `.php-cs-fixer.php`.
 
 ## 🔐 Auth local vs LDAP
 
@@ -78,7 +92,7 @@ Pitfalls:
 - Username LDAP é normalizado (lowercase, trim, remove domínio se colado no valor).
 - Registro local só existe no modo local e quando o panel provider habilita registration.
 
-## 🧭 Painéis
+## 🧭 Painéis e ferramentas
 
 Dois painéis (`App\Enums\Panels`):
 
@@ -86,6 +100,26 @@ Dois painéis (`App\Enums\Panels`):
 - `admin` → `/admin` (permissão `panels.view.admin`)
 
 Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
+
+Ferramentas no grupo Tools do admin:
+
+| Ferramenta | Path | Permissão | Gate / auth |
+| --- | --- | --- | --- |
+| Log Viewer | `/log-viewer` | `system.log-viewer.access` | `LogViewer::auth` |
+| Pulse | `/pulse` | `system.pulse.access` | `viewPulse` |
+
+## 📁 Media Library (pitfalls)
+
+- Models usam `Document::fileCollection()` / `Image::fileCollection()` → `FileCollection`.
+- Formulários oficiais usam `LibraryFileUpload::mediaLibrary(...)`.
+- Não recriar `COLLECTION_NAME` nos models.
+- Discos: `images`, `documents`, `public` (logos/fundos).
+
+## ✅ Active scope (pitfalls)
+
+- Query: `Model::query()->active()` e `->activeCount()`.
+- Instância: `$model->isActive()` / `isInactive()`.
+- Não use `->isActive()` como scope de query (isso chama o método de instância e falha no builder).
 
 ## 🐛 Troubleshooting comum
 
@@ -97,6 +131,9 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | Login LDAP falha com usuário novo | `requires_local` ou falta de sync | revisar `auth.ldap.requires_local` e criação em `Login::handleLocalUserRecord()` |
 | Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |
 | Testes de role quebrando com `Operator` | rename para `UserRole::User` | atualizar asserts/factories para `User` |
+| `composer lint:fix` não existe | script renomeado | use `composer format` / `format:dirty` |
+| `/pulse` ou `/log-viewer` 403 | falta permissão | conceder `PulseAccess` / `LogViewerAccess` (Developer tem `*`) |
+| PHP-CS-Fixer falha ao exigir `mp-coding-standards` | arquivo legado | use `composer format`; alinhe ou remova `.php-cs-fixer.php` se ainda for necessário |
 
 ## 🧪 Verificação mínima após mudanças de auth/deps
 
@@ -104,11 +141,16 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 php artisan test --compact tests/Feature/Filament/LoginTest.php
 php artisan test --compact tests/Feature/Seeders/RoleSeederTest.php
 php artisan test --compact tests/Unit/Services/Auth/
+php artisan test --compact tests/Unit/Traits/HasActiveScopeTest.php
+php artisan test --compact tests/Unit/Models/ImageTest.php
+php artisan test --compact tests/Unit/Models/DocumentTest.php
 ```
 
 ## 🔗 Próximos Passos
 
 - [Páginas Customizadas](05-paginas-customizadas.md) — login/registro
 - [Sistema de Permissões](07-sistema-permissoes.md)
+- [Traits](10-traits.md) — `HasIsActiveScope`
+- [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) — media library
 - [Testes](13-testes.md)
 - [Panel Provider](15-panel-provider.md)
