@@ -1,23 +1,31 @@
 # Traits
 
-Este documento explica os Traits disponíveis no projeto e como criar e usar traits customizadas.
+Este documento explica os Traits disponíveis no projeto e como usá-los.
 
-## 📚 O que são Traits?
+## 📚 Traits disponíveis
 
-Traits são mecanismos de reutilização de código em PHP. Permitem que classes compartilhem métodos sem herança múltipla. No projeto, temos vários traits úteis.
-
-## 🏗️ Traits Disponíveis
-
-```
+```text
 app/Traits/
-├── HasActiveScope.php
+├── HasIsActiveScope.php
 ├── HasNotifications.php
 └── BetterEnum.php
 ```
 
-## ✅ HasActiveScope
+## ✅ HasIsActiveScope
 
-O trait `HasActiveScope` adiciona funcionalidades relacionadas ao campo `is_active` em modelos.
+Trait para modelos com coluna booleana `is_active`. Usado por `User`.
+
+API atual (Laravel `#[Scope]`):
+
+| Método | Tipo | Uso |
+| --- | --- | --- |
+| `active()` | query scope | `User::query()->active()->get()` |
+| `activeCount()` | query scope | `User::query()->activeCount()` |
+| `isActive()` | instância | `$user->isActive()` |
+| `isInactive()` | instância | `$user->isInactive()` |
+| `activate()` | instância | `$user->activate()` |
+| `deactivate()` | instância | `$user->deactivate()` |
+| `toggleActive()` | instância | `$user->toggleActive()` |
 
 ### Estrutura
 
@@ -28,18 +36,24 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
-trait HasActiveScope
+/**
+ * @mixin Model
+ *
+ * @property bool $is_active
+ */
+trait HasIsActiveScope
 {
     /**
-     * Scope para filtrar apenas registros ativos.
-     *
-     * @param  Builder<Model>  $query
-     * @return Builder<Model>
+     * @param  Builder<covariant Model>  $query
+     * @return Builder<covariant Model>
      */
-    public function scopeIsActive(Builder $query): Builder
+    #[Scope]
+    protected function active(Builder $query): Builder
     {
         $query->where('is_active', true);
 
@@ -50,52 +64,36 @@ trait HasActiveScope
         return $query;
     }
 
-    /**
-     * Ativa o modelo.
-     */
-    public function activate(): bool
-    {
-        return $this->update(['is_active' => true]);
-    }
-
-    /**
-     * Desativa o modelo.
-     */
-    public function deactivate(): bool
-    {
-        return $this->update(['is_active' => false]);
-    }
-
-    /**
-     * Verifica se o modelo está ativo.
-     */
     public function isActive(): bool
     {
         return (bool) $this->is_active;
     }
 
-    /**
-     * Verifica se o modelo está inativo.
-     */
     public function isInactive(): bool
     {
         return ! $this->isActive();
     }
 
-    /**
-     * Alterna o estado ativo do modelo.
-     */
+    public function activate(): bool
+    {
+        return $this->update(['is_active' => true]);
+    }
+
+    public function deactivate(): bool
+    {
+        return $this->update(['is_active' => false]);
+    }
+
     public function toggleActive(): bool
     {
-        return $this->update(['is_active' => ! $this->isActive()]);
+        return $this->update(['is_active' => ! $this->is_active]);
     }
 
     /**
-     * Conta o número de modelos ativos.
-     *
-     * @param  Builder<Model>  $query
+     * @param  Builder<covariant Model>  $query
      */
-    public function scopeActiveCount(Builder $query): int
+    #[Scope]
+    protected function activeCount(Builder $query): int
     {
         return $query->where('is_active', true)->count();
     }
@@ -105,46 +103,43 @@ trait HasActiveScope
 ### Uso em Models
 
 ```php
-// Product.php
-use App\Traits\HasActiveScope;
+use App\Traits\HasIsActiveScope;
 
-class Product extends Model
+class User extends Authenticatable
 {
-    use HasActiveScope;
-
-    // ...
+    use HasIsActiveScope;
 }
 ```
 
-### Exemplos de Uso
+### Exemplos
 
 ```php
-// Filtrar apenas ativos
-$activeProducts = Product::isActive()->get();
-
-// Ativar um produto
-$product->activate();
-
-// Desativar um produto
-$product->deactivate();
-
-// Verificar se está ativo
-if ($product->isActive()) {
-    // ...
-}
-
-// Alternar estado
-$product->toggleActive();
+// Filtrar ativos (scope de query)
+$activeUsers = User::query()->active()->get();
 
 // Contar ativos
-$count = Product::activeCount();
+$count = User::query()->activeCount();
+
+// Estado e mutações na instância
+$user->isActive();
+$user->isInactive();
+$user->activate();
+$user->deactivate();
+$user->toggleActive();
 ```
+
+### Armadilha comum
+
+Não confunda:
+
+- `User::query()->active()` — scope de query
+- `$user->isActive()` — método de instância
+
+O nome antigo `HasActiveScope` / `scopeIsActive()` / `Product::isActive()` **não existe mais**.
 
 ## 🔔 HasNotifications
 
 Trait para gerenciar notificações relacionadas ao modelo.
-
-### Uso
 
 ```php
 use App\Traits\HasNotifications;
@@ -152,42 +147,12 @@ use App\Traits\HasNotifications;
 class User extends Model
 {
     use HasNotifications;
-    
-    // Métodos de notificação disponíveis
 }
 ```
 
 ## 🎯 BetterEnum
 
-Trait que adiciona funcionalidades úteis a Enums.
-
-### Estrutura
-
-```php
-trait BetterEnum
-{
-    /**
-     * Retorna array de valores do Enum.
-     */
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
-
-    /**
-     * Retorna array de labels do Enum.
-     */
-    public static function labels(): array
-    {
-        return array_map(
-            fn ($case) => $case->getLabel(),
-            self::cases()
-        );
-    }
-}
-```
-
-### Uso
+Utilitários para enums (`values()`, `labels()`, etc.).
 
 ```php
 enum Status: string
@@ -206,75 +171,20 @@ enum Status: string
     }
 }
 
-// Uso
-Status::values();  // ['active', 'inactive']
-Status::labels();  // ['Ativo', 'Inativo']
+Status::values(); // ['active', 'inactive']
+Status::labels(); // ['Ativo', 'Inativo']
 ```
 
-## 🔧 Criando um Trait Customizado
+## 🔧 Criando um Trait
 
-### Exemplo: HasSlug
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Traits;
-
-use Illuminate\Support\Str;
-
-trait HasSlug
-{
-    /**
-     * Boot do trait.
-     */
-    public static function bootHasSlug(): void
-    {
-        static::creating(function ($model) {
-            if (empty($model->slug)) {
-                $model->slug = Str::slug($model->name);
-            }
-        });
-
-        static::updating(function ($model) {
-            if ($model->isDirty('name') && empty($model->slug)) {
-                $model->slug = Str::slug($model->name);
-            }
-        });
-    }
-
-    /**
-     * Scope para buscar por slug.
-     */
-    public function scopeWhereSlug($query, string $slug)
-    {
-        return $query->where('slug', $slug);
-    }
-}
-```
-
-### Uso
-
-```php
-class Product extends Model
-{
-    use HasSlug;
-
-    protected $fillable = ['name', 'slug'];
-}
-```
-
-## 🎯 Boas Práticas
-
-1. **Organização**: Coloque traits em `app/Traits/`
-2. **Nomenclatura**: Use nomes descritivos começando com verbo (`Has`, `Can`, etc.)
-3. **Documentação**: Documente métodos públicos
-4. **Type Hints**: Use type hints explícitos
-5. **Boot Methods**: Use `boot{TraitName}` para inicialização
-6. **Scopes**: Adicione scopes úteis quando apropriado
+1. Coloque em `app/Traits/`
+2. Prefira nomes `Has*` / `Can*`
+3. Use type hints e PHPDoc
+4. Para scopes Eloquent modernos, use `#[Scope]` em métodos `protected`
+5. Use `boot{TraitName}` quando precisar de hooks de modelo
 
 ## 🔗 Próximos Passos
 
-- [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) - Veja como usar traits em models
-- [Enums e Convenções](09-enums-e-convencoes.md) - Veja BetterEnum em ação
+- [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md)
+- [Enums e Convenções](09-enums-e-convencoes.md)
+- [Setup e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)

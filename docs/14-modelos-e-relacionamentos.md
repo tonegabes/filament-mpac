@@ -2,9 +2,7 @@
 
 Este documento descreve os modelos reais do projeto, com foco em arquivos, Media Library e Activity Log.
 
-## 📚 Modelos Principais
-
-O projeto atualmente trabalha com:
+## 📚 Modelos principais
 
 - `User`
 - `Role`
@@ -15,14 +13,14 @@ O projeto atualmente trabalha com:
 
 ## 👤 User
 
-`User` implementa `FilamentUser`, usa `HasRoles`, `HasActiveScope` e `LogsActivity`.
+`User` implementa `FilamentUser`, usa `HasRoles`, `HasIsActiveScope` e `LogsActivity`.
 
 ```php
 // app/Models/User.php
 class User extends Authenticatable implements FilamentUser
 {
-    use HasActiveScope;
     use HasFactory;
+    use HasIsActiveScope;
     use HasRoles;
     use LogsActivity;
     use Notifiable;
@@ -48,7 +46,9 @@ class User extends Authenticatable implements FilamentUser
 }
 ```
 
-## 📁 Biblioteca de Arquivos
+Filtro de usuários ativos: `User::query()->active()`.
+
+## 📁 Biblioteca de arquivos
 
 O domínio de arquivos é dividido em:
 
@@ -58,26 +58,33 @@ O domínio de arquivos é dividido em:
 
 ### FileCollection
 
-As coleções e discos são centralizados em `FileCollection`:
+Coleções, discos, diretórios e MIME types ficam em `App\Enums\FileCollection`:
+
+| Case | Valor | Disco | Diretório |
+| --- | --- | --- | --- |
+| `Images` | `images` | `images` | — |
+| `Documents` | `documents` | `documents` | — |
+| `SystemLogos` | `system_logos` | `public` | `system/logos` |
+| `SystemBackgrounds` | `system_backgrounds` | `public` | `system/backgrounds` |
+
+### Padrão `fileCollection()`
+
+Models com Spatie Media Library **não** usam mais constante `COLLECTION_NAME`. Cada model expõe:
 
 ```php
-enum FileCollection: string
-{
-    case Images = 'images';
-    case Documents = 'documents';
-    case SystemLogos = 'system_logos';
-    case SystemBackgrounds = 'system_backgrounds';
-}
+public static function fileCollection(): FileCollection
 ```
 
-Mapeamento atual:
+Use esse método em forms, tests, URLs e registro de coleções:
 
-- `Images` -> disco `images`
-- `Documents` -> disco `documents`
-- `SystemLogos` -> disco `public`, diretório `system/logos`
-- `SystemBackgrounds` -> disco `public`, diretório `system/backgrounds`
+```php
+Image::fileCollection()->value;              // 'images'
+Image::fileCollection()->disk();             // 'images'
+Image::fileCollection()->acceptedMimeTypes();
+Document::fileCollection()->value;           // 'documents'
+```
 
-Models com Spatie Media Library expõem a coleção via `fileCollection()`:
+`Document` ainda mantém `getMimeTypeMap()` como atalho para MIME types de documentos; preferir `fileCollection()->acceptedMimeTypes()` em código novo.
 
 ## 📄 Model Document
 
@@ -90,7 +97,7 @@ class Document extends Model implements HasFileUrl, HasMedia
 
     protected $fillable = ['name'];
 
-    public static function fileCollection(): MediaCollection
+    public static function fileCollection(): FileCollection
     {
         return FileCollection::Documents;
     }
@@ -102,7 +109,12 @@ class Document extends Model implements HasFileUrl, HasMedia
         $this
             ->addMediaCollection($collection->value)
             ->acceptsMimeTypes($collection->acceptedMimeTypes())
-            ->useDisk($collection->disk());
+            ->useDisk(FileCollection::Documents->disk());
+    }
+
+    public function getFileUrl(): string
+    {
+        return $this->getFirstMediaUrl(self::fileCollection()->value);
     }
 }
 ```
@@ -116,55 +128,66 @@ class Image extends Model implements HasFileUrl, HasMedia
     use InteractsWithMedia;
     use LogsActivity;
 
-    public const fileCollection()->value = FileCollection::Images->value;
-
     protected $fillable = ['name'];
+
+    public static function fileCollection(): FileCollection
+    {
+        return FileCollection::Images;
+    }
 
     public function registerMediaCollections(): void
     {
+        $collection = self::fileCollection();
+
         $this
-            ->addMediaCollection(self::fileCollection()->value)
-            ->acceptsMimeTypes(self::getMimeTypeMap())
-            ->useDisk(FileCollection::Images->disk());
+            ->addMediaCollection($collection->value)
+            ->acceptsMimeTypes($collection->acceptedMimeTypes())
+            ->useDisk($collection->disk());
+    }
+
+    public static function getMediaByName(string $name): ?Media
+    {
+        return Media::where([
+            ['file_name', $name],
+            ['collection_name', self::fileCollection()->value],
+        ])->first();
     }
 }
 ```
 
-## 🧩 Resource x Modelo
+## 🧩 Resource × modelo
 
 ### DocumentResource
 
 - Modelo: `App\Models\Document`
-- Páginas registradas: `index` e `view`
-- `infolist()` definido no Resource
+- Páginas: `index` e `view`
+- Form usa `LibraryFileUpload::mediaLibrary(..., FileCollection::Documents, ...)`
 
 ### ImageResource
 
 - Modelo: `App\Models\Image`
-- Páginas registradas: `index` e `view`
-- `infolist()` definido no Resource
+- Páginas: `index` e `view`
+- Form usa `LibraryFileUpload::mediaLibrary('image', Image::fileCollection(), 'Imagem')`
 
 ### MediaResource
 
 - Modelo: `Spatie\MediaLibrary\MediaCollections\Models\Media`
-- Páginas registradas: `index` e `view`
-- Rotas de `create` e `edit` estão comentadas por padrão
+- Páginas: `index` e `view`
+- `create` / `edit` desabilitados por padrão (somente leitura)
 
-## 💾 Discos e Visibilidade
+## 💾 Discos e visibilidade
 
-Configuração atual em `config/filesystems.php`:
+Em `config/filesystems.php`:
 
 - Disco `images`: `storage/app/public/images`, URL `/storage/images`
 - Disco `documents`: `storage/app/public/documents`, URL `/storage/documents`
-- Disco `public`: usado por logos/fundos do sistema
+- Disco `public`: logos/fundos do sistema
 
-Quando o arquivo precisar de acesso público, mantenha `visibility => public`.
+Para acesso público, rode `php artisan storage:link` e mantenha `visibility => public` quando necessário.
 
 ## 📝 Activity Log
 
-`User`, `Document` e `Image` usam `spatie/laravel-activitylog` com `logOnly()` e `logOnlyDirty()`.
-
-Exemplo:
+`User`, `Document` e `Image` usam `spatie/laravel-activitylog` com `logOnly()` + `logOnlyDirty()`.
 
 ```php
 public function getActivitylogOptions(): LogOptions
@@ -175,16 +198,17 @@ public function getActivitylogOptions(): LogOptions
 }
 ```
 
-## 🎯 Boas Práticas
+## 🎯 Boas práticas
 
-1. Use `FileCollection` para evitar strings mágicas de coleção/disco.
-2. Centralize regras de MIME type no enum/modelo.
-3. Mantenha `create/edit` desabilitado no `MediaResource` enquanto o fluxo oficial for somente leitura.
-4. Garanta que uploads públicos estejam em discos com URL configurada.
-5. Prefira reaproveitar `LibraryFileUpload` nos formulários.
+1. Centralize coleção/disco/MIME em `FileCollection` + `fileCollection()`.
+2. Prefira `LibraryFileUpload` nos forms de biblioteca.
+3. Mantenha `MediaResource` somente leitura enquanto o fluxo oficial for via Document/Image.
+4. Em testes, faça `Storage::fake(Image::fileCollection()->value)` (ou Documents).
+5. Não reintroduza `COLLECTION_NAME` — quebra o padrão atual dos models.
 
 ## 🔗 Próximos Passos
 
-- [Schemas e Formulários](03-schemas-e-formularios.md) para uploads com Media Library
-- [Settings](11-settings.md) para logos e fundos via `SystemSettings`
-- [Panel Provider](15-panel-provider.md) para navegação do grupo Arquivos
+- [Schemas e Formulários](03-schemas-e-formularios.md)
+- [Traits](10-traits.md)
+- [Settings](11-settings.md)
+- [Setup e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)

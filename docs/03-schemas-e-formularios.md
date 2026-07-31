@@ -149,13 +149,28 @@ Toggle::make('is_active')
 
 ### FileUpload (Spatie Media Library)
 
+Prefira o helper `LibraryFileUpload`, que aplica coleção, disco, MIME types e preenche `name` a partir do arquivo:
+
+```php
+use App\Filament\Support\LibraryFileUpload;
+use App\Models\Image;
+
+LibraryFileUpload::mediaLibrary('image', Image::fileCollection(), 'Imagem');
+
+// Documentos:
+LibraryFileUpload::mediaLibrary('file', FileCollection::Documents, 'Arquivo');
+```
+
+Para logos/fundos em disco `public` (Settings), use `LibraryFileUpload::publicImage(...)`.
+
+Montagem manual (quando o helper não servir):
+
 ```php
 SpatieMediaLibraryFileUpload::make('image')
     ->label('Imagem')
     ->collection(Image::fileCollection()->value)
     ->disk(Image::fileCollection()->disk())
-    ->image()
-    ->imageEditor()
+    ->acceptedFileTypes(Image::fileCollection()->acceptedMimeTypes())
     ->required();
 ```
 
@@ -284,10 +299,15 @@ Select::make('category_id')
     });
 ```
 
-## 📄 Exemplo Completo: DocumentForm
+## 📄 Exemplo completo: DocumentForm
 
 ```php
 // app/Filament/Resources/Documents/Schemas/DocumentForm.php
+use App\Enums\FileCollection;
+use App\Filament\Support\LibraryFileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Schemas\Schema;
+
 class DocumentForm
 {
     public static function configure(Schema $schema): Schema
@@ -296,21 +316,13 @@ class DocumentForm
             ->components([
                 Hidden::make('name')->default('Document Name Not Set'),
 
-                SpatieMediaLibraryFileUpload::make('file')
-                    ->label('Arquivo')
-                    ->live()
-                    ->required()
-                    ->acceptedFileTypes(Document::getMimeTypeMap())
-                    ->collection(Document::fileCollection()->value)
-                    ->afterStateUpdated(function ($state, Set $set) {
-                        if ($state instanceof TemporaryUploadedFile) {
-                            $set('name', $state->getClientOriginalName());
-                        }
-                    }),
+                LibraryFileUpload::mediaLibrary('file', FileCollection::Documents, 'Arquivo'),
             ]);
     }
 }
 ```
+
+`ImageForm` segue o mesmo padrão com `Image::fileCollection()`.
 
 ## 🎯 Boas Práticas
 
@@ -320,7 +332,7 @@ class DocumentForm
 4. **Validação**: Sempre valide campos obrigatórios
 5. **Relacionamentos**: Use `relationship()` quando possível
 6. **Type Hints**: Sempre use type hints explícitos
-7. **Helper Text**: Adicione textos de ajuda quando necessário
+7. **Uploads de biblioteca**: Prefira `LibraryFileUpload` + `fileCollection()` / `FileCollection`
 
 ## 🔗 Próximos Passos
 

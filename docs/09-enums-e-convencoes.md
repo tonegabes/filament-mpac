@@ -10,13 +10,17 @@ app/Enums/
 ├── FileCollection.php
 ├── NavGroups.php
 ├── PageLayouts.php
+├── Panels.php
 ├── UserRole.php
 └── Permissions/
-    ├── UserPermissions.php
+    ├── DocumentPermissions.php
+    ├── ImagePermissions.php
     ├── PanelPermissions.php
-    ├── RolePermissions.php
     ├── PermissionPermissions.php
-    └── SystemPermissions.php
+    ├── RolePermissions.php
+    ├── SystemPermissions.php
+    ├── UserPermissions.php
+    └── WildcardPermissions.php
 ```
 
 ## 🧭 NavGroups
@@ -63,18 +67,21 @@ Enum central para coleções de arquivos, disco e diretório:
 - `SystemLogos`
 - `SystemBackgrounds`
 
-Também define MIME types aceitos para cada coleção.
+Também define MIME types aceitos e `options()` para selects/filtros.
 
 ```php
-FileCollection::Documents->disk(); // documents
+FileCollection::Documents->disk();       // documents
 FileCollection::SystemLogos->directory(); // system/logos
+FileCollection::Images->acceptedMimeTypes();
 
 // Em models com Spatie Media Library:
-Post::mediaCollection()->value;
-Image::mediaCollection()->disk();
+Document::fileCollection()->value; // 'documents'
+Image::fileCollection()->disk();   // 'images'
 ```
 
-Se um arquivo importar também `Spatie\MediaLibrary\MediaCollections\MediaCollection`, use alias:
+O método nos models é `fileCollection()` (retorna `App\Enums\FileCollection`). Não use `mediaCollection()`.
+
+Se o arquivo também importar `Spatie\MediaLibrary\MediaCollections\MediaCollection`, use alias para evitar colisão de nomes:
 
 ```php
 use Spatie\MediaLibrary\MediaCollections\MediaCollection as SpatieMediaCollection;
@@ -84,10 +91,11 @@ use Spatie\MediaLibrary\MediaCollections\MediaCollection as SpatieMediaCollectio
 
 Roles atuais:
 
-- `Developer`
-- `Admin`
+- `Developer` → `Desenvolvedor`
+- `Admin` → `Administrador`
+- `User` → `Usuário` (default via `UserRole::default()`)
 
-Valores persistidos no banco estão em português (`Desenvolvedor`, `Administrador`, etc.).
+Valores persistidos no banco estão em português.
 
 ## 🎨 PageLayouts
 
@@ -108,6 +116,9 @@ Enums de permissões:
 - `RolePermissions`
 - `PermissionPermissions`
 - `SystemPermissions`
+- `DocumentPermissions`
+- `ImagePermissions`
+- `WildcardPermissions`
 
 Cada enum é usado por policies, seeders e checks de acesso no painel.
 
@@ -128,5 +139,6 @@ Use quando precisar expor listas para selects, filtros ou serialização de opç
 ## 🔗 Próximos Passos
 
 - [Sistema de Permissões](07-sistema-permissoes.md)
+- [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md)
 - [Settings](11-settings.md)
-- [Panel Provider](15-panel-provider.md)
+- [Setup e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)

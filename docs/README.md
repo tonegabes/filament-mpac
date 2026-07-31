@@ -59,7 +59,7 @@ Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentaç�
    - Convenções de uso
 
 10. [Traits](10-traits.md)
-    - HasActiveScope
+    - HasIsActiveScope
     - HasNotifications
     - BetterEnum
 
@@ -96,6 +96,11 @@ Bem-vindo à documentação completa do sistema Filament MPAC. Esta documentaç�
     - Exemplo completo: Resource do zero
     - Exemplo completo: Página de configurações
     - Fluxo completo de desenvolvimento
+
+17. [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
+    - Scripts Composer (`lint`, `format`, `analyze`, `test`)
+    - PHPStan / Pest / Pint
+    - Armadilhas de Media Library e HasIsActiveScope
 
 ## 🚀 Guia Rápido
 
@@ -146,8 +151,11 @@ php artisan make:mpac-model Evento --resource=eventos --force
 - **Laravel**: v13
 - **Filament**: v5
 - **Livewire**: v4
-- **Pest**: v4
+- **Pest**: v5
+- **PHPUnit**: v13
 - **Tailwind CSS**: v4
+- **Spatie Permission**: v8
+- **ldaprecord-laravel**: v4
 
 ## 🧩 Funcionalidades do Projeto Atual
 
@@ -162,6 +170,7 @@ Veja também:
 - [Páginas Customizadas](05-paginas-customizadas.md) para autenticação e SettingsPage
 - [Panel Provider](15-panel-provider.md) para configuração do painel admin
 - [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) para biblioteca de arquivos e media
+- [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md) para lint, analyze e armadilhas comuns
 
 ## 🔗 Links Úteis
 
@@ -180,4 +189,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Maio 2026
+**Última atualização**: Julho 2026
