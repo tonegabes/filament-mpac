@@ -152,8 +152,8 @@ Toggle::make('is_active')
 ```php
 SpatieMediaLibraryFileUpload::make('image')
     ->label('Imagem')
-    ->collection(FileCollection::Images->value)
-    ->disk(FileCollection::Images->disk())
+    ->collection(Image::fileCollection()->value)
+    ->disk(Image::fileCollection()->disk())
     ->image()
     ->imageEditor()
     ->required();
@@ -250,10 +250,10 @@ return $schema
             ->schema([
                 TextInput::make('name')
                     ->columnSpan(1),  // Ocupa 1 coluna
-                
+
                 TextInput::make('email')
                     ->columnSpan(1),
-                
+
                 TextInput::make('address')
                     ->columnSpanFull(),  // Ocupa todas as colunas
             ]),
@@ -301,7 +301,7 @@ class DocumentForm
                     ->live()
                     ->required()
                     ->acceptedFileTypes(Document::getMimeTypeMap())
-                    ->collection(Document::COLLECTION_NAME)
+                    ->collection(Document::fileCollection()->value)
                     ->afterStateUpdated(function ($state, Set $set) {
                         if ($state instanceof TemporaryUploadedFile) {
                             $set('name', $state->getClientOriginalName());

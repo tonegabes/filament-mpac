@@ -72,6 +72,16 @@ Também define MIME types aceitos para cada coleção.
 ```php
 FileCollection::Documents->disk(); // documents
 FileCollection::SystemLogos->directory(); // system/logos
+
+// Em models com Spatie Media Library:
+Post::mediaCollection()->value;
+Image::mediaCollection()->disk();
+```
+
+Se um arquivo importar também `Spatie\MediaLibrary\MediaCollections\MediaCollection`, use alias:
+
+```php
+use Spatie\MediaLibrary\MediaCollections\MediaCollection as SpatieMediaCollection;
 ```
 
 ## 👥 UserRole

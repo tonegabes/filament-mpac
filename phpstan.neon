@@ -1,20 +1,15 @@
 includes:
-    - vendor/larastan/larastan/extension.neon
-    - vendor/mrpunyapal/peststan/extension.neon
-    - vendor/nesbot/carbon/extension.neon
-    - vendor/phpstan/phpstan-phpunit/extension.neon
-    - vendor/phpstan/phpstan-phpunit/rules.neon
     - phar://phpstan.phar/conf/bleedingEdge.neon
     - vendor/calebdw/larastan-livewire/extension.neon
+    - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+    - vendor/pestphp/pest-plugin-phpstan/extension.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
 
 parameters:
     parallel:
         maximumNumberOfProcesses: 1
-
-    peststan:
-        testCaseClass: Tests\TestCase
-        pestConfigFiles:
-            - tests/Pest.php
 
     paths:
         - app

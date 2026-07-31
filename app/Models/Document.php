@@ -19,15 +19,14 @@ class Document extends Model implements HasFileUrl, HasMedia
 
     protected $fillable = ['name'];
 
-    public const COLLECTION_NAME = FileCollection::Documents->value;
-
     public function registerMediaCollections(): void
     {
+        $collection = self::fileCollection();
+
         $this
-            ->addMediaCollection(self::COLLECTION_NAME)
-            ->acceptsMimeTypes(self::getMimeTypeMap())
-            ->useDisk(FileCollection::Documents->disk())
-        ;
+            ->addMediaCollection($collection->value)
+            ->acceptsMimeTypes($collection->acceptedMimeTypes())
+            ->useDisk(FileCollection::Documents->disk());
     }
 
     /**
@@ -45,19 +44,23 @@ class Document extends Model implements HasFileUrl, HasMedia
 
     public function getFileUrl(): string
     {
-        return $this->getFirstMediaUrl(self::COLLECTION_NAME);
+        return $this->getFirstMediaUrl(self::fileCollection()->value);
     }
 
     public function getFilename(): string
     {
-        return $this->getFirstMedia(self::COLLECTION_NAME)->file_name ?? '';
+        return $this->getFirstMedia(self::fileCollection()->value)->file_name ?? '';
+    }
+
+    public static function fileCollection(): FileCollection
+    {
+        return FileCollection::Documents;
     }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly(['name'])
-            ->logOnlyDirty()
-        ;
+            ->logOnlyDirty();
     }
 }

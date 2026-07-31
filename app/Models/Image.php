@@ -18,50 +18,45 @@ class Image extends Model implements HasFileUrl, HasMedia
     use InteractsWithMedia;
     use LogsActivity;
 
-    public const COLLECTION_NAME = FileCollection::Images->value;
-
     protected $fillable = ['name'];
 
     public function registerMediaCollections(): void
     {
-        $this
-            ->addMediaCollection(self::COLLECTION_NAME)
-            ->acceptsMimeTypes(self::getMimeTypeMap())
-            ->useDisk(FileCollection::Images->disk())
-        ;
-    }
+        $collection = self::fileCollection();
 
-    /**
-     * @return string[]
-     */
-    public static function getMimeTypeMap(): array
-    {
-        return FileCollection::Images->acceptedMimeTypes();
+        $this
+            ->addMediaCollection($collection->value)
+            ->acceptsMimeTypes($collection->acceptedMimeTypes())
+            ->useDisk($collection->disk());
     }
 
     public function getFileUrl(): string
     {
-        return $this->getFirstMediaUrl(self::COLLECTION_NAME);
+        return $this->getFirstMediaUrl(self::fileCollection()->value);
     }
 
     public function getFilename(): string
     {
-        return $this->getFirstMedia(self::COLLECTION_NAME)->file_name ?? '';
+        return $this->getFirstMedia(self::fileCollection()->value)->file_name ?? '';
     }
 
     public static function getMediaByName(string $name): ?Media
     {
         return Media::where([
             ['file_name', $name],
-            ['collection_name', self::COLLECTION_NAME],
+            ['collection_name', self::fileCollection()->value],
         ])->first();
+    }
+
+    public static function fileCollection(): FileCollection
+    {
+        return FileCollection::Images;
     }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly($this->fillable)
-            ->logOnlyDirty()
-        ;
+            ->logOnlyDirty();
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Models\Image;
 
 it('returns expected mime types for images', function (): void {
-    $mimes = Image::getMimeTypeMap();
+    $mimes = Image::fileCollection()->acceptedMimeTypes();
 
     expect($mimes)->toContain(
         'image/jpeg',
@@ -21,5 +21,5 @@ it('returns expected mime types for images', function (): void {
 });
 
 it('has collection name constant', function (): void {
-    expect(Image::COLLECTION_NAME)->toBe('images');
+    expect(Image::fileCollection()->value)->toBe('images');
 });

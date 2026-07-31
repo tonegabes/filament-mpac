@@ -27,8 +27,8 @@ beforeEach(function (): void {
     $this->seed(PermissionSeeder::class);
     $this->seed(RoleSeeder::class);
 
-    Storage::fake(Image::COLLECTION_NAME);
-    Storage::fake(Document::COLLECTION_NAME);
+    Storage::fake(Image::fileCollection()->value);
+    Storage::fake(Document::fileCollection()->value);
 
     $user = User::factory()->create();
     $user->assignRole(UserRole::Developer->value);
@@ -43,7 +43,7 @@ function createMediaRecord(string $name, string $fileName): Media
 
     return $image
         ->addMedia(UploadedFile::fake()->image($fileName))
-        ->toMediaCollection(Image::COLLECTION_NAME);
+        ->toMediaCollection(Image::fileCollection()->value);
 }
 
 function createDocumentMediaRecord(string $name, string $fileName): Media
@@ -52,7 +52,7 @@ function createDocumentMediaRecord(string $name, string $fileName): Media
 
     return $document
         ->addMedia(UploadedFile::fake()->createWithContent($fileName, "%PDF-1.4\n% Test PDF\n"))
-        ->toMediaCollection(Document::COLLECTION_NAME);
+        ->toMediaCollection(Document::fileCollection()->value);
 }
 
 it('can render list media page and see records', function (): void {
@@ -79,7 +79,7 @@ it('can filter media library by collection and file type', function (): void {
     $document = createDocumentMediaRecord('Visible library document', 'visible-library.pdf');
 
     Livewire::test(ListMedia::class)
-        ->filterTable('collection_name', Image::COLLECTION_NAME)
+        ->filterTable('collection_name', Image::fileCollection()->value)
         ->assertCanSeeTableRecords([$image])
         ->assertCanNotSeeTableRecords([$document])
         ->removeTableFilter('collection_name')

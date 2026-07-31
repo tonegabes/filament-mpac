@@ -25,7 +25,7 @@ beforeEach(function (): void {
     $this->seed(PermissionSeeder::class);
     $this->seed(RoleSeeder::class);
 
-    Storage::fake(Document::COLLECTION_NAME);
+    Storage::fake(Document::fileCollection()->value);
 
     $user = User::factory()->create();
     $user->assignRole(UserRole::Developer->value);
@@ -40,7 +40,7 @@ function createDocumentRecord(string $name, string $fileName): Document
 
     $document
         ->addMedia(UploadedFile::fake()->createWithContent($fileName, "%PDF-1.4\n% Test PDF\n"))
-        ->toMediaCollection(Document::COLLECTION_NAME);
+        ->toMediaCollection(Document::fileCollection()->value);
 
     return $document->refresh();
 }
