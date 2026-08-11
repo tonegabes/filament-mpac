@@ -62,10 +62,17 @@ class ProductForm
 }
 ```
 
-### Exemplo Real: UserForm
+### Exemplo Real: UserForm (Local x LDAP)
+
+`UserForm` adapta username/email conforme `config('auth.mode')` (`AuthMode::Local` ou `AuthMode::Ldap`).
+
+**Intento:** no modo LDAP, o e-mail institucional é derivado do username + `config('auth.ldap.email_domain')`, alinhado ao login LDAP. No modo local, username e e-mail são campos editáveis e obrigatórios.
 
 ```php
 // app/Filament/Resources/Users/Schemas/UserForm.php
+use App\Enums\AuthMode;
+use Filament\Schemas\Components\Utilities\Set;
+
 class UserForm
 {
     public static function configure(Schema $schema): Schema
@@ -81,14 +88,8 @@ class UserForm
                             ->maxLength(255)
                             ->required(),
 
-                        TextInput::make('email')
-                            ->email()
-                            ->maxLength(255)
-                            ->required(),
-
-                        TextInput::make('username')
-                            ->maxLength(255)
-                            ->required(),
+                        self::getUsernameComponent(),
+                        self::getEmailComponent(),
 
                         ToggleButtons::make('is_active')
                             ->label('Ativo')
@@ -110,8 +111,64 @@ class UserForm
                     ]),
             ])->columns(2);
     }
+
+    private static function getUsernameComponent(): TextInput
+    {
+        $usernameComponent = TextInput::make('username')
+            ->label('Nome de Usuário');
+
+        if (config('auth.mode') === AuthMode::Ldap->value) {
+            $usernameComponent
+                ->live()
+                ->debounce(500)
+                ->afterStateUpdated(function (Set $set, $state) {
+                    $set('email', $state . config('auth.ldap.email_domain'));
+                });
+        } else {
+            $usernameComponent
+                ->maxLength(255)
+                ->required();
+        }
+
+        return $usernameComponent;
+    }
+
+    private static function getEmailComponent(): TextInput
+    {
+        $emailComponent = TextInput::make('email');
+
+        if (config('auth.mode') === AuthMode::Ldap->value) {
+            $emailComponent
+                ->hint(config('auth.ldap.email_domain'))
+                ->helperText('O email será gerado automaticamente com base no nome de usuário.')
+                ->readonly();
+        } else {
+            $emailComponent
+                ->email()
+                ->maxLength(255)
+                ->required();
+        }
+
+        return $emailComponent;
+    }
 }
 ```
+
+#### Comportamento por modo
+
+| Modo | Username | E-mail |
+| --- | --- | --- |
+| `local` | obrigatório, `maxLength(255)` | editável, `email()` + obrigatório |
+| `ldap` | `live()` + debounce 500ms; preenche e-mail | `readonly`; hint = `auth.ldap.email_domain` |
+
+#### Constraints e pitfalls
+
+- A decisão usa `config('auth.mode')` **no build do schema** (não `Get`/`live` entre modos). Trocar `AUTH_MODE` exige novo request/reload do formulário.
+- Em LDAP, a concatenação é literal: `username` + `auth.ldap.email_domain` (ex.: `joao` + `@mpdomain.br` → `joao@mpdomain.br`).
+- Em LDAP, username/e-mail **não** recebem `->required()` / `->email()` no componente — a UI assume derivação automática; valide no backend/DB se precisar de garantia extra.
+- Útil com `LDAP_AUTH_REQUIRES_LOCAL=true`: pré-cadastrar usuário local com username (e e-mail derivado) antes do primeiro login.
+
+Veja também [Setup e Troubleshooting](17-setup-dependencias-e-troubleshooting.md) e [Páginas de Autenticação](05-paginas-customizadas.md).
 
 ## 🧩 Componentes de Formulário Comuns
 

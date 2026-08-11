@@ -21,6 +21,7 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 3. [Schemas e Formulários](03-schemas-e-formularios.md)
    - Schemas separados (Form, Table, Infolist)
    - Componentes de formulário
+   - `UserForm` adaptativo (local vs LDAP)
    - Relacionamentos e validação
 
 4. [Tabelas](04-tabelas.md)
@@ -188,4 +189,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Julho 2026
+**Última atualização**: Agosto 2026

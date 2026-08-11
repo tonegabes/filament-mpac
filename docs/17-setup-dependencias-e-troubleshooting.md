@@ -66,17 +66,22 @@ LDAP_AUTH_REQUIRES_LOCAL=false
 LDAP_AUTH_EMAIL_DOMAIN=@mpdomain.br
 ```
 
+`LDAP_AUTH_EMAIL_DOMAIN` alimenta `config('auth.ldap.email_domain')` (default em `config/auth.php`: `@mpac.mp.br` se o env não estiver setado).
+
 Codepaths:
 
 - Resolução: `AuthModeHandlerResolver` → `LocalAuthModeHandler` / `LdapAuthModeHandler`
-- Página: `App\Filament\Pages\Auth\Login`
-- Serviços LDAP: `LdapAuthService`, `LdapUserService`
+- Página: `App\Filament\Pages\Auth\Login` (suffix no username; `normalizeUsername()` remove o domínio se colado)
+- Serviços LDAP: `LdapAuthService` (login = username + domínio), `LdapUserService`
+- Admin CRUD: `App\Filament\Resources\Users\Schemas\UserForm` — em LDAP, e-mail readonly gerado a partir do username
 
 Pitfalls:
 
 - Com `LDAP_AUTH_REQUIRES_LOCAL=true`, usuários LDAP sem registro local ativo falham no login.
 - Username LDAP é normalizado (lowercase, trim, remove domínio se colado no valor).
 - Registro local só existe no modo local e quando o panel provider habilita registration.
+- No form de usuário (LDAP), digitar o domínio no username gera e-mail inválido (`user@domain@domain`) — digite só o sAMAccountName/uid.
+- Testes de `UserResource` em CI geralmente rodam com `AUTH_MODE=local`; para cobrir o ramo LDAP do form, setar `Config::set('auth.mode', 'ldap')` (+ `auth.ldap.email_domain`) no teste.
 
 ## 🧭 Painéis
 
@@ -95,6 +100,8 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | ViteException / manifesto | frontend não buildado | `npm run build` ou `npm run dev` |
 | Permissões “sumiram” | cache Spatie / seed ausente | `PermissionRegistrar::forgetCachedPermissions()` + reseeding |
 | Login LDAP falha com usuário novo | `requires_local` ou falta de sync | revisar `auth.ldap.requires_local` e criação em `Login::handleLocalUserRecord()` |
+| E-mail do UserForm LDAP errado / com domínio duplicado | username inclui suffix ou `LDAP_AUTH_EMAIL_DOMAIN` inconsistente | username sem domínio; alinhar env com login e `UserForm` |
+| E-mail do UserForm editável em ambiente LDAP | `AUTH_MODE` não é `ldap` no processo PHP | checar `.env` / `config:clear`; schema lê `config('auth.mode')` no render |
 | Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |
 | Testes de role quebrando com `Operator` | rename para `UserRole::User` | atualizar asserts/factories para `User` |
 
@@ -102,6 +109,7 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 
 ```bash
 php artisan test --compact tests/Feature/Filament/LoginTest.php
+php artisan test --compact tests/Feature/Filament/UserResourceTest.php
 php artisan test --compact tests/Feature/Seeders/RoleSeederTest.php
 php artisan test --compact tests/Unit/Services/Auth/
 ```

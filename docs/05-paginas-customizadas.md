@@ -282,7 +282,9 @@ Config relevante (`.env` / `config/auth.php`):
 - `AUTH_MODE=local|ldap`
 - `auth.default_role` → role atribuída a usuários LDAP sem papel
 - `LDAP_AUTH_REQUIRES_LOCAL` → se `true`, exige usuário local ativo pré-existente
-- `LDAP_AUTH_EMAIL_DOMAIN` → sufixo exibido no input de username
+- `LDAP_AUTH_EMAIL_DOMAIN` → sufixo no login LDAP **e** no e-mail gerado em `UserForm` (admin create/edit)
+
+O mesmo domínio aparece em três pontos: login (UI + `LdapAuthService::authenticate`), normalização de username no `Login`, e derivação de e-mail no `UserForm` quando `AUTH_MODE=ldap`. Detalhes do formulário: [Schemas e Formulários](03-schemas-e-formularios.md).
 
 #### Labels e ícones
 

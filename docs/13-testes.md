@@ -132,6 +132,7 @@ php artisan test --compact
 - Recursos de arquivos (`Document`, `Image`, `Media`) hoje têm foco em listagem/visualização.
 - Não assuma factories de `Document`/`Image` se elas não existirem; use o padrão já adotado nos testes atuais.
 - Para autenticação, há testes dedicados em `LoginTest` e `RegisterTest`.
+- `UserResourceTest` cobre CRUD no modo local. Para o ramo LDAP do `UserForm` (e-mail readonly derivado do username), configure `auth.mode` / `auth.ldap.email_domain` no teste e asserte o `afterStateUpdated` — ver [Schemas e Formulários](03-schemas-e-formularios.md).
 
 ## 🔗 Próximos Passos
 
