@@ -257,6 +257,17 @@ Além do `AdminPanelProvider`, este projeto também usa:
 - `OverrideNotificationsProvider`: padroniza notificações do painel.
 - `RenderHooksProvider`: injeta conteúdo em hooks de renderização (`hooks.head-end`).
 
+### OverrideActionsProvider + AppServiceProvider
+
+Registro em `bootstrap/providers.php`:
+
+- `OverrideActionsProvider` — `CreateAction` / `EditAction` / `DeleteAction` com ícones Phosphor (`Plus`, `PencilSimpleLine`, `Trash`) e cores Indigo/Rose para Edit/Delete.
+- `AppServiceProvider::configureComponents()` — `CreateAction::configureUsing(...)->iconButton()`, para o header “Criar” ser só ícone em todas as listagens.
+
+Os dois `configureUsing` de `CreateAction` se acumulam: ícone do override + estilo `iconButton` do AppServiceProvider.
+
+Detalhes de uso e override local: [Actions Customizadas](12-actions-customizadas.md).
+
 ## 🎯 Boas Práticas
 
 1. **Descoberta Automática**: Use descoberta automática quando possível

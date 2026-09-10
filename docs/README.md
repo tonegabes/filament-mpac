@@ -70,6 +70,7 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 
 12. [Actions Customizadas](12-actions-customizadas.md)
     - Criando Actions
+    - Defaults globais (`CreateAction` iconButton, OverrideActions)
     - CopyFileUrlAction
     - Integração com Livewire
 
@@ -89,6 +90,7 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 
 15. [Panel Provider](15-panel-provider.md)
     - AdminPanelProvider
+    - OverrideActions / AppServiceProvider (CreateAction)
     - Descoberta automática
     - Grupos de navegação
 
@@ -188,4 +190,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Julho 2026
+**Última atualização**: Agosto 2026
