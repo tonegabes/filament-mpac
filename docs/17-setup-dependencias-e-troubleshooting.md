@@ -97,6 +97,8 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | Login LDAP falha com usuário novo | `requires_local` ou falta de sync | revisar `auth.ldap.requires_local` e criação em `Login::handleLocalUserRecord()` |
 | Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |
 | Testes de role quebrando com `Operator` | rename para `UserRole::User` | atualizar asserts/factories para `User` |
+| Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |
+| CreateAction sem ícone Phosphor esperado | `OverrideActionsProvider` não registrado | confirme `bootstrap/providers.php` e [Panel Provider](15-panel-provider.md) |
 
 ## 🧪 Verificação mínima após mudanças de auth/deps
 

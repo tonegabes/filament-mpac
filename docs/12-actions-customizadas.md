@@ -86,6 +86,50 @@ class CopyFileUrlAction extends Action
 }
 ```
 
+## 🌐 Defaults globais do projeto
+
+O projeto padroniza as actions nativas do Filament em dois pontos:
+
+| Onde | O que configura |
+| --- | --- |
+| `App\Providers\Filament\OverrideActionsProvider` | Ícones Phosphor de `CreateAction`, `EditAction` e `DeleteAction` (+ cores de Edit/Delete) |
+| `App\Providers\AppServiceProvider::configureComponents()` | `CreateAction` como `iconButton()` (só ícone, sem label visível) |
+
+Resultado prático: o botão **Criar** nas listagens aparece como ícone `+` circular. Label customizado vira tooltip (comportamento do estilo `iconButton` no Filament).
+
+### Uso típico nas List pages
+
+```php
+// ListUsers.php — herda ícone Plus + iconButton global
+protected function getHeaderActions(): array
+{
+    return [
+        CreateAction::make(),
+    ];
+}
+```
+
+### Override local
+
+Ícone e label customizados (ex.: `ListDocuments`):
+
+```php
+CreateAction::make()
+    ->label('Enviar arquivo')
+    ->icon(Phosphor::Upload);
+```
+
+Com o default `iconButton()`, o label costuma aparecer como tooltip. Para forçar botão com texto visível:
+
+```php
+CreateAction::make()
+    ->label('Enviar arquivo')
+    ->icon(Phosphor::Upload)
+    ->button(); // reverte o iconButton() global nesta instância
+```
+
+Para mudar o padrão global, edite `configureComponents()` / `OverrideActionsProvider` — não copie `->iconButton()` em cada Resource.
+
 ## 🎯 Usando Actions
 
 ### Em Resources
@@ -260,11 +304,12 @@ Action::make('send_email')
 ## 🎯 Boas Práticas
 
 1. **Nomes Descritivos**: Use nomes claros para actions
-2. **Ícones**: Sempre use Phosphor Icons
-3. **Confirmação**: Use `requiresConfirmation()` para ações destrutivas
-4. **Notificações**: Informe o usuário sobre o resultado
-5. **Validação**: Valide dados em actions com formulários
-6. **Type Hints**: Use type hints explícitos
+2. **Ícones**: Sempre use Phosphor Icons (defaults de Create/Edit/Delete já vêm do `OverrideActionsProvider`)
+3. **CreateAction**: assume `iconButton()` global; use `->button()` só quando o label precisa ser visível
+4. **Confirmação**: Use `requiresConfirmation()` para ações destrutivas
+5. **Notificações**: Informe o usuário sobre o resultado
+6. **Validação**: Valide dados em actions com formulários
+7. **Type Hints**: Use type hints explícitos
 
 ## 🔗 Próximos Passos
 
