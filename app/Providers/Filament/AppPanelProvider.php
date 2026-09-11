@@ -23,10 +23,12 @@ use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Spatie\LaravelSettings\Exceptions\MissingSettings;
 
 class AppPanelProvider extends PanelProvider
 {
@@ -39,8 +41,11 @@ class AppPanelProvider extends PanelProvider
             ->id('app')
             ->path('')
             ->login(Login::class)
+            ->font('Plus Jakarta Sans')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Emerald,
+                'success' => Color::Emerald,
+                'gray' => Color::Slate,
             ])
             ->viteTheme('resources/css/mpac-theme/index.css')
             ->resources([])
@@ -83,9 +88,9 @@ class AppPanelProvider extends PanelProvider
 
         try {
             $canRegister = app(SystemSettings::class)->enable_registration;
-        } catch (\Spatie\LaravelSettings\Exceptions\MissingSettings $e) {
+        } catch (MissingSettings $e) {
             return $panel;
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             return $panel;
         } catch (\Exception $e) {
             throw $e;
@@ -96,8 +101,7 @@ class AppPanelProvider extends PanelProvider
                 ->passwordReset(
                     ResetPasswordRequest::class,
                     ResetPasswordAction::class,
-                )
-            ;
+                );
         }
 
         return $panel;

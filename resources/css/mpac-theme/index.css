@@ -1,60 +1,66 @@
+@import "../../../vendor/filament/filament/resources/css/theme.css";
 @import "./components/sidebar.css" layer(components);
-@import "../app.css";
+@import "./components/layout.css" layer(components);
+@import "./components/surfaces.css" layer(components);
 
-:root {
-  --color-background-darker: #eff0f0;
-  --color-background-dark: #fafafa;
-  --color-background: #fff;
-  --color-background-light: #fff;
-  --color-contrast-low: #8a8d8f;
-  --color-contrast-medium: #505355;
-  --color-contrast-high: #1c1f21;
-  --sidebar-width: 16rem;
+@source "../../../app/Filament/**/*";
+@source "../../../resources/views/filament/**/*";
+@source "../../../resources/views/components/**/*";
+@source "../../../storage/framework/views/*.php";
+@source "../../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+
+/*
+ |--------------------------------------------------------------------------
+ | MPAC Mac-like theme tokens
+ | Cool gray sidebar + white content, soft shadows, high radius, few borders.
+ |--------------------------------------------------------------------------
+ */
+@layer base {
+  :root {
+    --mpac-sidebar-bg: #f3f4f6;
+    --mpac-sidebar-bg-soft: #f9fafb;
+    --mpac-content-bg: #ffffff;
+    --mpac-nav-muted: #6b7280;
+    --mpac-nav-strong: #111827;
+    --mpac-accent: #10b981;
+    --mpac-accent-strong: #059669;
+
+    --mpac-radius-control: 0.75rem;
+    --mpac-radius-panel: 1.25rem;
+    --mpac-radius-pill: 9999px;
+
+    --mpac-shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04),
+      0 8px 24px rgb(15 23 42 / 0.06);
+    --mpac-shadow-nav-active: 0 1px 2px rgb(15 23 42 / 0.05),
+      0 6px 16px rgb(15 23 42 / 0.08);
+    --mpac-shadow-content-edge: -8px 0 24px rgb(15 23 42 / 0.04);
+
+    --sidebar-width: 16rem;
+  }
+
+  .dark {
+    --mpac-sidebar-bg: #111827;
+    --mpac-sidebar-bg-soft: #0b1220;
+    --mpac-content-bg: #1f2937;
+    --mpac-nav-muted: #9ca3af;
+    --mpac-nav-strong: #f9fafb;
+    --mpac-shadow-soft: 0 1px 2px rgb(0 0 0 / 0.35),
+      0 8px 24px rgb(0 0 0 / 0.45);
+    --mpac-shadow-nav-active: 0 1px 2px rgb(0 0 0 / 0.4),
+      0 8px 20px rgb(0 0 0 / 0.5);
+    --mpac-shadow-content-edge: -8px 0 24px rgb(0 0 0 / 0.35);
+  }
 }
 
 @theme {
-  /* fonts */
   --font-sans:
     "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-display:
-    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-serif:
-    "IBM Plex Mono", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco;
+  --font-mono:
+    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
 
-  /* brand */
-  --color-brand: #903031;
-
-  /* borders */
-  --color-border: var(--color-contrast-low);
-
-  /* backgrounds */
-  --color-bg: var(--color-background-dark);
-  --color-bg-secondary: var(--color-contrast-medium);
-  --color-bg-inverse: var(--color-contrast-high);
-
-  /* text */
-  --color-text: var(--color-contrast-high);
-  --color-text-secondary: var(--color-contrast-low);
-  --color-text-inverse: var(--color-background-darker);
-}
-
-.dark {
-  --color-bg: var(--color-bg-dark);
-  --color-bg-secondary: var(--color-contrast-medium);
-  --color-bg-inverse: var(--color-background-darker);
-
-  --color-text: var(--color-background-darker);
-  --color-text-secondary: var(--color-contrast-low);
-  --color-text-inverse: var(--color-contrast-high);
-  --color-border: var(--color-contrast-medium);
-}
-
-@layer components {
-  .fi-body {
-    background-color: var(--color-bg);
-    color: var(--color-text);
-  }
+  --radius-lg: var(--mpac-radius-control);
+  --radius-xl: var(--mpac-radius-panel);
+  --radius-3xl: 1.5rem;
 }

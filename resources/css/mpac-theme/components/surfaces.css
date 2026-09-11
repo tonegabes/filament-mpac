@@ -1,0 +1,40 @@
+/* High-radius controls, soft elevation, minimized borders */
+
+.fi-btn {
+  @apply rounded-(--mpac-radius-pill) shadow-none;
+}
+
+.fi-btn-primary {
+  box-shadow: var(--mpac-shadow-soft);
+}
+
+.fi-input-wrp,
+.fi-select-input,
+.fi-textarea {
+  @apply rounded-(--mpac-radius-control);
+}
+
+.fi-ta-ctn,
+.fi-section,
+.fi-wi-widget,
+.fi-modal-window,
+.fi-dropdown-panel {
+  border-width: 0;
+  border-radius: var(--mpac-radius-panel);
+  box-shadow: var(--mpac-shadow-soft);
+  --tw-ring-shadow: 0 0 #0000;
+}
+
+.fi-badge {
+  @apply rounded-(--mpac-radius-pill);
+}
+
+.fi-badge.fi-color-success {
+  color: var(--mpac-accent-strong);
+}
+
+code,
+.fi-font-mono,
+.fi-code {
+  font-family: var(--font-mono);
+}

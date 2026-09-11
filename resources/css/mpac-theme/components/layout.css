@@ -1,0 +1,49 @@
+/* Two-column shell: gray canvas + white content panel with soft edge shadow */
+
+.fi-body {
+  background-color: var(--mpac-sidebar-bg);
+  color: var(--mpac-nav-strong);
+  @apply antialiased;
+}
+
+.fi-layout {
+  @apply gap-0;
+}
+
+.fi-topbar {
+  @apply border-0 bg-(--mpac-sidebar-bg) shadow-none ring-0
+    dark:bg-(--mpac-sidebar-bg);
+}
+
+.fi-main-ctn {
+  background-color: var(--mpac-content-bg);
+  box-shadow: var(--mpac-shadow-content-edge);
+  @apply min-w-0 flex-1 flex-col;
+}
+
+@media (width >= 64rem) {
+  .fi-body.fi-body-has-navigation:not(.fi-body-has-top-navigation)
+    .fi-main-ctn {
+    border-top-left-radius: var(--mpac-radius-panel);
+    margin-block: 0.5rem 0;
+    margin-inline-end: 0.5rem;
+    min-height: calc(100dvh - 0.5rem);
+    overflow: clip;
+  }
+
+  .fi-body.fi-body-has-topbar.fi-body-has-navigation:not(
+      .fi-body-has-top-navigation
+    )
+    .fi-main-ctn {
+    min-height: calc(100dvh - 4.5rem);
+  }
+}
+
+.fi-main {
+  @apply mx-auto h-full w-full px-5 py-6 md:px-8 lg:px-10;
+}
+
+.fi-simple-main {
+  @apply rounded-(--mpac-radius-panel) border-0 bg-(--mpac-content-bg) ring-0;
+  box-shadow: var(--mpac-shadow-soft);
+}
