@@ -132,6 +132,8 @@ php artisan test --compact
 - Recursos de arquivos (`Document`, `Image`, `Media`) hoje têm foco em listagem/visualização.
 - Não assuma factories de `Document`/`Image` se elas não existirem; use o padrão já adotado nos testes atuais.
 - Para autenticação, há testes dedicados em `LoginTest` e `RegisterTest`.
+- Trait `HasIsActiveScope`: assertar com `->active()` / `$model->isActive()` (não `->isActive()` no builder) — ver `tests/Unit/Traits/HasActiveScopeTest.php`.
+- Helpers de mídia: `tests/Unit/Support/FileLibraryTest.php`.
 
 ## 🔗 Próximos Passos
 

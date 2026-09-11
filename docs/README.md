@@ -21,11 +21,13 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 3. [Schemas e Formulários](03-schemas-e-formularios.md)
     - Schemas separados (Form, Table, Infolist)
     - `LibraryFileUpload` para Media Library
+    - UserForm local vs LDAP
     - Relacionamentos e validação
 
 4. [Tabelas](04-tabelas.md)
    - Configuração de tabelas
    - Colunas, filtros e busca
+   - `FileLibrary` para labels de mídia
    - Ações de tabela
 
 ### Páginas e Componentes
@@ -59,7 +61,7 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
    - Convenções de uso
 
 10. [Traits](10-traits.md)
-    - HasIsActiveScope
+    - HasIsActiveScope (`active()` / `isActive()`)
     - HasNotifications
     - BetterEnum
 
@@ -84,6 +86,7 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 14. [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md)
     - Convenções de Models
     - `FileCollection` / `fileCollection()`
+    - `HasFileUrl` e `FileLibrary`
     - Media Library e Activity Log
 
 ### Configuração e Operação
@@ -117,8 +120,10 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 
 ### Scaffold completo de recurso (MPAC)
 
+Pacote de desenvolvimento: `tonegabes/laravel-make-model-plus`.
+
 ```bash
-php artisan make:mpac-model Evento --resource=eventos
+php artisan make:model-plus Evento --resource=eventos
 ```
 
 Esse comando gera:
@@ -133,9 +138,13 @@ Esse comando gera:
 Opções:
 
 ```bash
-php artisan make:mpac-model Evento --resource=eventos --migration --factory --seed
-php artisan make:mpac-model Evento --resource=eventos --force
+php artisan make:model-plus Evento --resource=eventos --migration --factory --seed
+php artisan make:model-plus Evento --resource=eventos --panel=admin
+php artisan make:model-plus Evento --resource=eventos --no-filament
+php artisan make:model-plus Evento --resource=eventos --force
 ```
+
+> O comando antigo `make:mpac-model` **não existe** — use `make:model-plus`.
 
 ### Convenções Importantes
 
