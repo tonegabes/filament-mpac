@@ -11,51 +11,68 @@
 
 /*
  |--------------------------------------------------------------------------
- | MPAC Mac-like theme tokens
- | Cool gray sidebar + white content, soft shadows, high radius, few borders.
+ | MPAC theme — tokens from Component Tutorial Starter.htm + screenshot
  |--------------------------------------------------------------------------
  */
 @layer base {
   :root {
-    --mpac-sidebar-bg: #f3f4f6;
-    --mpac-sidebar-bg-soft: #f9fafb;
-    --mpac-content-bg: #ffffff;
-    --mpac-nav-muted: #6b7280;
-    --mpac-nav-strong: #111827;
-    --mpac-accent: #10b981;
-    --mpac-accent-strong: #059669;
+    --mpac-sidebar-bg: #e6e6ea;
+    --mpac-sidebar-bg-soft: #f9f9fa;
+    --mpac-content-bg: #f9f9fa;
+    --mpac-content-surface: #ffffff;
+    --mpac-divider: #d8d8de;
+    --mpac-hairline: #e9e9ec;
+    --mpac-nav-muted: #6b6b73;
+    --mpac-nav-strong: #070708;
+    --mpac-accent: #b2e071;
+    --mpac-accent-strong: #7ab427;
+    --mpac-accent-mid: #99d643;
+    --mpac-accent-deep: #79b428;
 
     --mpac-radius-control: 0.75rem;
-    --mpac-radius-panel: 1.25rem;
+    --mpac-radius-panel: 0.75rem;
+    --mpac-radius-nav: 0.75rem;
+    --mpac-radius-nav-halo: 13px;
     --mpac-radius-pill: 9999px;
 
-    --mpac-shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04),
-      0 8px 24px rgb(15 23 42 / 0.06);
-    --mpac-shadow-nav-active: 0 1px 2px rgb(15 23 42 / 0.05),
-      0 6px 16px rgb(15 23 42 / 0.08);
-    --mpac-shadow-content-edge: -8px 0 24px rgb(15 23 42 / 0.04);
+    --mpac-shadow-soft: 0 0 0 1px rgb(7 7 8 / 0.05),
+      0 9px 19px rgb(7 7 8 / 0.02), 0 35px 35px rgb(7 7 8 / 0.02),
+      0 79px 48px rgb(7 7 8 / 0.01), inset 0 1px 0 #ffffff;
+    --mpac-shadow-nav-active: 0 11px 4px rgb(7 7 8 / 0.01),
+      0 6px 4px rgb(7 7 8 / 0.02), 0 3px 3px rgb(7 7 8 / 0.04),
+      0 1px 1px rgb(7 7 8 / 0.05);
+    --mpac-shadow-content-edge: 0 0 0 1px rgb(7 7 8 / 0.05),
+      0 9px 19px rgb(7 7 8 / 0.02), 0 35px 35px rgb(7 7 8 / 0.02),
+      0 79px 48px rgb(7 7 8 / 0.01), inset 0 1px 0 #ffffff;
+    --mpac-shadow-success-dot: inset 0 1px 0 hsl(0 0% 100% / 0.7),
+      0 19px 7px rgb(131 188 58 / 0.01), 0 12px 7px rgb(131 188 58 / 0.09),
+      0 7px 6px rgb(131 188 58 / 0.31), 0 3px 4px rgb(131 188 58 / 0.53),
+      0 1px 2px rgb(131 188 58 / 0.61);
 
-    --sidebar-width: 16rem;
+    --sidebar-width: 15rem;
   }
 
   .dark {
-    --mpac-sidebar-bg: #111827;
-    --mpac-sidebar-bg-soft: #0b1220;
-    --mpac-content-bg: #1f2937;
-    --mpac-nav-muted: #9ca3af;
-    --mpac-nav-strong: #f9fafb;
-    --mpac-shadow-soft: 0 1px 2px rgb(0 0 0 / 0.35),
-      0 8px 24px rgb(0 0 0 / 0.45);
-    --mpac-shadow-nav-active: 0 1px 2px rgb(0 0 0 / 0.4),
-      0 8px 20px rgb(0 0 0 / 0.5);
-    --mpac-shadow-content-edge: -8px 0 24px rgb(0 0 0 / 0.35);
+    --mpac-sidebar-bg: #1c1c1f;
+    --mpac-sidebar-bg-soft: #2a2a2e;
+    --mpac-content-bg: #232328;
+    --mpac-content-surface: #2c2c31;
+    --mpac-divider: #3a3a40;
+    --mpac-hairline: #3a3a40;
+    --mpac-nav-muted: #a1a1aa;
+    --mpac-nav-strong: #f4f4f5;
+    --mpac-shadow-soft: 0 0 0 1px rgb(255 255 255 / 0.06),
+      0 9px 19px rgb(0 0 0 / 0.25), 0 35px 35px rgb(0 0 0 / 0.2);
+    --mpac-shadow-nav-active: 0 8px 16px rgb(0 0 0 / 0.35);
+    --mpac-shadow-content-edge: 0 0 0 1px rgb(255 255 255 / 0.06),
+      0 12px 32px rgb(0 0 0 / 0.35);
   }
 }
 
 @theme {
   --font-sans:
-    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-mono:
     "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;

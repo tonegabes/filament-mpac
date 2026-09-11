@@ -1,4 +1,4 @@
-/* Two-column shell: gray canvas + white content panel with soft edge shadow */
+/* Shell: #E6E6EA canvas + elevated #F9F9FA content panel */
 
 .fi-body {
   background-color: var(--mpac-sidebar-bg);
@@ -25,9 +25,9 @@
   .fi-body.fi-body-has-navigation:not(.fi-body-has-top-navigation)
     .fi-main-ctn {
     border-top-left-radius: var(--mpac-radius-panel);
-    margin-block: 0.5rem 0;
-    margin-inline-end: 0.5rem;
-    min-height: calc(100dvh - 0.5rem);
+    margin-block: 1rem 0;
+    margin-inline-end: 0;
+    min-height: calc(100dvh - 1rem);
     overflow: clip;
   }
 
@@ -35,12 +35,13 @@
       .fi-body-has-top-navigation
     )
     .fi-main-ctn {
-    min-height: calc(100dvh - 4.5rem);
+    min-height: calc(100dvh - 5rem);
   }
 }
 
 .fi-main {
   @apply mx-auto h-full w-full px-5 py-6 md:px-8 lg:px-10;
+  background-color: var(--mpac-content-surface);
 }
 
 .fi-simple-main {

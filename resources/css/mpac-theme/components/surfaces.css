@@ -1,11 +1,11 @@
-/* High-radius controls, soft elevation, minimized borders */
+/* Controls: xl radius, soft elevation, lime success from Starter */
 
 .fi-btn {
-  @apply rounded-(--mpac-radius-pill) shadow-none;
+  @apply rounded-(--mpac-radius-control) shadow-none;
 }
 
 .fi-btn-primary {
-  box-shadow: var(--mpac-shadow-soft);
+  box-shadow: var(--mpac-shadow-nav-active);
 }
 
 .fi-input-wrp,
@@ -29,7 +29,8 @@
   @apply rounded-(--mpac-radius-pill);
 }
 
-.fi-badge.fi-color-success {
+.fi-badge.fi-color-success,
+.fi-color-success {
   color: var(--mpac-accent-strong);
 }
 

@@ -1,4 +1,4 @@
-/* Cool-toned sidebar: gray wash, caps groups, outline icons, white pill active */
+/* Sidebar: #E6E6EA wash, group labels, xl active with layered Starter shadow */
 
 .fi-sidebar {
   @apply border-0 bg-(--mpac-sidebar-bg) shadow-none ring-0 backdrop-blur-none
@@ -19,69 +19,88 @@
 }
 
 .fi-sidebar-nav {
-  @apply flex grow flex-col gap-y-6 overflow-x-hidden overflow-y-auto px-3 py-6;
+  @apply flex grow flex-col gap-y-6 overflow-x-hidden overflow-y-auto px-4 py-4;
   scrollbar-gutter: stable;
 }
 
 .fi-sidebar-nav-groups {
-  @apply mx-0 flex flex-col gap-y-5;
+  @apply mx-0 flex flex-col gap-y-6;
 }
 
 .fi-sidebar-group-btn {
-  @apply flex items-center gap-x-3 px-3 py-1;
+  @apply mb-2 flex items-center gap-x-3 px-3 py-0;
 
   & .fi-icon {
-    @apply size-3.5 text-(--mpac-nav-muted);
+    @apply size-3 text-(--mpac-nav-muted);
   }
 }
 
 .fi-sidebar-group-label {
-  @apply flex-1 text-[0.6875rem] leading-5 font-semibold tracking-[0.08em]
-    text-(--mpac-nav-muted) uppercase;
+  @apply flex-1 text-[0.6875rem] leading-none font-medium tracking-[0.06em]
+    text-(--mpac-nav-muted) uppercase select-none;
 }
 
 .fi-sidebar-group-items {
-  @apply flex flex-col gap-y-1;
+  @apply flex flex-col gap-px;
 }
 
 .fi-sidebar-item-btn {
-  @apply relative flex items-center justify-center gap-x-3 rounded-(--mpac-radius-pill)
-    px-3 py-2.5 outline-hidden transition duration-150;
+  @apply relative flex h-9 items-center justify-center gap-x-2.5
+    rounded-(--mpac-radius-nav) px-3 outline-hidden transition duration-150
+    select-none;
 
   & > .fi-icon {
-    @apply size-5 text-(--mpac-nav-muted);
+    @apply size-[1.125rem] text-(--mpac-nav-muted);
   }
 }
 
 .fi-sidebar-item-label {
-  @apply flex-1 truncate text-sm font-medium text-(--mpac-nav-muted);
+  @apply flex-1 truncate text-xs font-medium text-(--mpac-nav-strong);
 }
 
 .fi-sidebar-item.fi-sidebar-item-has-url > .fi-sidebar-item-btn {
-  @apply hover:bg-white/70 focus-visible:bg-white/70
-    dark:hover:bg-white/5 dark:focus-visible:bg-white/5;
+  @apply hover:bg-(--mpac-nav-strong)/5 focus-visible:bg-(--mpac-nav-strong)/5;
 }
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
 .fi-sidebar-item.fi-sidebar-item-has-active-child-items
   > .fi-sidebar-item-btn {
-  background-color: var(--mpac-content-bg);
-  box-shadow: var(--mpac-shadow-nav-active);
+  background-color: var(--mpac-sidebar-bg-soft);
+  background-image: linear-gradient(
+    to top,
+    transparent,
+    rgb(255 255 255 / 0.5)
+  );
+  box-shadow:
+    var(--mpac-shadow-nav-active),
+    inset 0 0 0 1px rgb(255 255 255 / 0.5);
 
   & > .fi-icon {
     @apply text-(--mpac-nav-strong);
   }
 
   & > .fi-sidebar-item-label {
-    @apply font-semibold text-(--mpac-nav-strong);
+    @apply font-medium text-(--mpac-nav-strong);
   }
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn::after,
+.fi-sidebar-item.fi-sidebar-item-has-active-child-items
+  > .fi-sidebar-item-btn::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 -2px 0
+    color-mix(in oklab, var(--mpac-nav-strong) 6%, transparent);
 }
 
 .fi-sidebar-group-dropdown-trigger-btn,
 .fi-sidebar-database-notifications-btn {
-  @apply rounded-(--mpac-radius-pill);
+  @apply rounded-(--mpac-radius-nav);
 }
 
 .fi-sidebar-footer {
-  @apply mx-2 mb-3;
+  @apply mx-1 mb-2;
 }

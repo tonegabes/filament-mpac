@@ -47,16 +47,16 @@ class AdminPanelProvider extends PanelProvider
             ->id(Panels::Admin->value)
             ->path(Panels::Admin->path())
             ->login(Login::class)
-            ->sidebarWidth('16rem')
+            ->sidebarWidth('15rem')
             ->profile()
             ->brandLogo(fn () => view('components.brand-logo'))
             ->unsavedChangesAlerts()
             ->sidebarCollapsibleOnDesktop()
-            ->font('Plus Jakarta Sans')
+            ->font('Inter')
             ->colors([
-                'primary' => Color::Emerald,
-                'success' => Color::Emerald,
-                'gray' => Color::Slate,
+                'primary' => '#7AB427',
+                'success' => '#7AB427',
+                'gray' => Color::Zinc,
             ])
             ->viteTheme('resources/css/mpac-theme/index.css')
             ->resources([
