@@ -14,17 +14,18 @@ app/
 │   ├── Actions/            # Ações customizadas
 │   ├── Components/         # Componentes Filament (ex.: Navigation/PanelSwitcher)
 │   ├── Pages/              # Páginas customizadas (Auth, Settings)
-│   └── Resources/          # Resources CRUD
-│       └── {Entity}/
-│           ├── Pages/      # Páginas do Resource (List, Create, Edit, View)
-│           ├── Schemas/    # Schemas separados (Form, Table, Infolist)
-│           └── Tables/     # Configuração de tabelas
+│   ├── Resources/          # Resources CRUD
+│   │   └── {Entity}/
+│   │       ├── Pages/      # Páginas do Resource (List, Create, Edit, View)
+│   │       ├── Schemas/    # Schemas separados (Form, Table, Infolist)
+│   │       └── Tables/     # Configuração de tabelas
+│   └── Support/            # Helpers de formulário (ex.: LibraryFileUpload)
 ├── Http/                   # Controllers e Responses HTTP
 ├── Livewire/               # Componentes Livewire
 ├── Models/                 # Modelos Eloquent
 ├── Notifications/           # Notificações do sistema
 ├── Policies/               # Policies de autorização
-├── Providers/              # Service Providers
+├── Providers/              # Service Providers (AppServiceProvider + Filament/)
 │   └── Filament/           # Providers específicos do Filament
 ├── Services/                # Serviços de negócio
 ├── Settings/                # Classes de configurações (Spatie Settings)

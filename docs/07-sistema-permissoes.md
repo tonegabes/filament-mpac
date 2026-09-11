@@ -107,7 +107,12 @@ public static function canAccess(): bool
 ```php
 NavigationItem::make('Log Viewer')
     ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess));
+
+NavigationItem::make('Pulse')
+    ->visible(fn () => Auth::user()?->can(SystemPermissions::PulseAccess));
 ```
+
+O gate Laravel `viewPulse` (em `AppServiceProvider`) também exige `SystemPermissions::PulseAccess`.
 
 ## ⚠️ Pitfalls
 

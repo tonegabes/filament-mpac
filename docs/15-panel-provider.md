@@ -148,9 +148,18 @@ private function configureNavigationItems(): array
             ->url('/' . Config::string('log-viewer.route_path'))
             ->openUrlInNewTab()
             ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess)),
+
+        NavigationItem::make('Pulse')
+            ->group(NavGroups::Tools->value)
+            ->icon(Phosphor::Pulse)
+            ->url('/' . Config::string('pulse.path'))
+            ->openUrlInNewTab()
+            ->visible(fn () => Auth::user()?->can(SystemPermissions::PulseAccess)),
     ];
 }
 ```
+
+Além da permissão Spatie no item de menu, o Pulse exige o gate `viewPulse` definido em `AppServiceProvider::configurePulse()`.
 
 ## 🔐 Autenticação
 
@@ -265,6 +274,8 @@ Registro em `bootstrap/providers.php`:
 - `AppServiceProvider::configureComponents()` — `CreateAction::configureUsing(...)->iconButton()`, para o header “Criar” ser só ícone em todas as listagens.
 
 Os dois `configureUsing` de `CreateAction` se acumulam: ícone do override + estilo `iconButton` do AppServiceProvider.
+
+O mesmo `AppServiceProvider` também define strict Eloquent fora de produção, HTTPS/DB guards em produção e o gate do Pulse — detalhes em [Setup e Troubleshooting](17-setup-dependencias-e-troubleshooting.md).
 
 Detalhes de uso e override local: [Actions Customizadas](12-actions-customizadas.md).
 
