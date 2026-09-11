@@ -12,21 +12,22 @@ it('registers the mpac vite theme on admin and app panels', function (): void {
         ->and(Filament::getPanel('app')->getViteTheme())->toBe($themePath);
 });
 
-it('uses cool mac-like panel tokens for font and accent colors', function (): void {
+it('uses starter-derived panel tokens for font, width, and accent colors', function (): void {
     $admin = Filament::getPanel('admin');
     $app = Filament::getPanel('app');
 
-    expect($admin->getFontFamily())->toBe('Plus Jakarta Sans')
-        ->and($app->getFontFamily())->toBe('Plus Jakarta Sans')
-        ->and($admin->getColors()['primary'])->toBe(Color::Emerald)
-        ->and($admin->getColors()['success'])->toBe(Color::Emerald)
-        ->and($admin->getColors()['gray'])->toBe(Color::Slate)
-        ->and($app->getColors()['primary'])->toBe(Color::Emerald)
-        ->and($app->getColors()['success'])->toBe(Color::Emerald)
-        ->and($app->getColors()['gray'])->toBe(Color::Slate);
+    expect($admin->getFontFamily())->toBe('Inter')
+        ->and($app->getFontFamily())->toBe('Inter')
+        ->and($admin->getSidebarWidth())->toBe('15rem')
+        ->and($admin->getColors()['primary'])->toBe('#7AB427')
+        ->and($admin->getColors()['success'])->toBe('#7AB427')
+        ->and($admin->getColors()['gray'])->toBe(Color::Zinc)
+        ->and($app->getColors()['primary'])->toBe('#7AB427')
+        ->and($app->getColors()['success'])->toBe('#7AB427')
+        ->and($app->getColors()['gray'])->toBe(Color::Zinc);
 });
 
-it('ships the mpac theme stylesheet and component tokens', function (): void {
+it('ships starter hex tokens and layered nav/content shadows', function (): void {
     $theme = resource_path('css/mpac-theme/index.css');
     $sidebar = resource_path('css/mpac-theme/components/sidebar.css');
     $layout = resource_path('css/mpac-theme/components/layout.css');
@@ -41,12 +42,18 @@ it('ships the mpac theme stylesheet and component tokens', function (): void {
     $sidebarCss = file_get_contents($sidebar);
     $layoutCss = file_get_contents($layout);
 
-    expect($themeCss)->toContain('--mpac-sidebar-bg')
-        ->and($themeCss)->toContain('--mpac-radius-pill')
+    expect($themeCss)->toContain('--mpac-sidebar-bg: #e6e6ea')
+        ->and($themeCss)->toContain('--mpac-sidebar-bg-soft: #f9f9fa')
+        ->and($themeCss)->toContain('--mpac-accent: #b2e071')
+        ->and($themeCss)->toContain('--mpac-accent-strong: #7ab427')
+        ->and($themeCss)->toContain('--mpac-radius-nav: 0.75rem')
         ->and($themeCss)->toContain('--mpac-shadow-nav-active')
+        ->and($themeCss)->toContain('0 11px 4px rgb(7 7 8 / 0.01)')
+        ->and($themeCss)->toContain('--mpac-shadow-content-edge')
         ->and($themeCss)->toContain('filament/filament/resources/css/theme.css')
         ->and($sidebarCss)->toContain('fi-sidebar-item.fi-active')
         ->and($sidebarCss)->toContain('--mpac-shadow-nav-active')
+        ->and($sidebarCss)->toContain('rounded-(--mpac-radius-nav)')
         ->and($layoutCss)->toContain('border-top-left-radius')
         ->and($layoutCss)->toContain('--mpac-shadow-content-edge');
 });
