@@ -27,8 +27,9 @@ app/
 ├── Policies/               # Policies de autorização
 ├── Providers/              # Service Providers (AppServiceProvider + Filament/)
 │   └── Filament/           # Providers específicos do Filament
-├── Services/                # Serviços de negócio
+├── Services/                # Serviços de negócio (Auth LDAP/local)
 ├── Settings/                # Classes de configurações (Spatie Settings)
+├── Support/                 # Helpers de domínio (ex.: FileLibrary)
 └── Traits/                  # Traits reutilizáveis
 ```
 
