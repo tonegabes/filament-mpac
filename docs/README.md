@@ -19,9 +19,9 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
    - Configuração básica
 
 3. [Schemas e Formulários](03-schemas-e-formularios.md)
-   - Schemas separados (Form, Table, Infolist)
-   - Componentes de formulário
-   - Relacionamentos e validação
+    - Schemas separados (Form, Table, Infolist)
+    - `LibraryFileUpload` para Media Library
+    - Relacionamentos e validação
 
 4. [Tabelas](04-tabelas.md)
    - Configuração de tabelas
@@ -83,7 +83,7 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 
 14. [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md)
     - Convenções de Models
-    - Relacionamentos Eloquent
+    - `FileCollection` / `fileCollection()`
     - Media Library e Activity Log
 
 ### Configuração e Operação
@@ -100,8 +100,8 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
     - Fluxo completo de desenvolvimento
 
 17. [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
-    - Setup local
-    - Upgrade de dependências
+    - Setup local e scripts (`format` / `lint` via mpac-essentials)
+    - AppServiceProvider (strict models, HTTPS, Pulse, CreateAction)
     - Auth local/LDAP e pitfalls
 
 ## 🚀 Guia Rápido
@@ -190,4 +190,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Agosto 2026
+**Última atualização**: Setembro 2026
