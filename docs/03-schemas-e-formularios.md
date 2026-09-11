@@ -149,15 +149,18 @@ Toggle::make('is_active')
 
 ### FileUpload (Spatie Media Library)
 
+Para uploads ligados a `Document` / `Image`, use o helper do projeto — ele aplica coleção, disco, MIME types e preenche `name` automaticamente:
+
 ```php
-SpatieMediaLibraryFileUpload::make('image')
-    ->label('Imagem')
-    ->collection(Image::fileCollection()->value)
-    ->disk(Image::fileCollection()->disk())
-    ->image()
-    ->imageEditor()
-    ->required();
+use App\Enums\FileCollection;
+use App\Filament\Support\LibraryFileUpload;
+
+// DocumentForm / ImageForm
+LibraryFileUpload::mediaLibrary('file', FileCollection::Documents, 'Arquivo');
+LibraryFileUpload::mediaLibrary('image', Image::fileCollection(), 'Imagem');
 ```
+
+Só monte `SpatieMediaLibraryFileUpload` manualmente quando precisar de comportamento fora desse padrão. Logos/fundos do sistema usam `LibraryFileUpload::publicImage(...)` (ver [Settings](11-settings.md)).
 
 ### CheckboxCards (Relacionamento Many-to-Many)
 
@@ -265,13 +268,15 @@ return $schema
 ### afterStateUpdated
 
 ```php
-SpatieMediaLibraryFileUpload::make('file')
-    ->afterStateUpdated(function ($state, Set $set) {
-        if ($state instanceof TemporaryUploadedFile) {
-            $set('name', $state->getClientOriginalName());
-        }
+// Já incluso em LibraryFileUpload::mediaLibrary() — exemplo do comportamento:
+TextInput::make('title')
+    ->live(onBlur: true)
+    ->afterStateUpdated(function (?string $state, Set $set): void {
+        $set('slug', Str::slug($state ?? ''));
     });
 ```
+
+Para uploads, o helper já faz `$set('name', $state->getClientOriginalName())` quando o arquivo chega.
 
 ### live() para Atualização em Tempo Real
 
@@ -288,6 +293,11 @@ Select::make('category_id')
 
 ```php
 // app/Filament/Resources/Documents/Schemas/DocumentForm.php
+use App\Enums\FileCollection;
+use App\Filament\Support\LibraryFileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Schemas\Schema;
+
 class DocumentForm
 {
     public static function configure(Schema $schema): Schema
@@ -296,17 +306,7 @@ class DocumentForm
             ->components([
                 Hidden::make('name')->default('Document Name Not Set'),
 
-                SpatieMediaLibraryFileUpload::make('file')
-                    ->label('Arquivo')
-                    ->live()
-                    ->required()
-                    ->acceptedFileTypes(Document::getMimeTypeMap())
-                    ->collection(Document::fileCollection()->value)
-                    ->afterStateUpdated(function ($state, Set $set) {
-                        if ($state instanceof TemporaryUploadedFile) {
-                            $set('name', $state->getClientOriginalName());
-                        }
-                    }),
+                LibraryFileUpload::mediaLibrary('file', FileCollection::Documents, 'Arquivo'),
             ]);
     }
 }
@@ -316,11 +316,12 @@ class DocumentForm
 
 1. **Separe Schemas**: Sempre crie classes separadas para Form, Table e Infolist
 2. **Use Sections**: Agrupe campos relacionados em Sections
-3. **Labels em português**: Use labels descritivos
-4. **Validação**: Sempre valide campos obrigatórios
-5. **Relacionamentos**: Use `relationship()` quando possível
-6. **Type Hints**: Sempre use type hints explícitos
-7. **Helper Text**: Adicione textos de ajuda quando necessário
+3. **Uploads de mídia**: Prefira `LibraryFileUpload::mediaLibrary()` / `publicImage()` em vez de montar Spatie manualmente
+4. **Labels em português**: Use labels descritivos
+5. **Validação**: Sempre valide campos obrigatórios
+6. **Relacionamentos**: Use `relationship()` quando possível
+7. **Type Hints**: Sempre use type hints explícitos
+8. **Helper Text**: Adicione textos de ajuda quando necessário
 
 ## 🔗 Próximos Passos
 

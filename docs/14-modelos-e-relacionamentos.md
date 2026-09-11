@@ -90,9 +90,39 @@ class Document extends Model implements HasFileUrl, HasMedia
 
     protected $fillable = ['name'];
 
-    public static function fileCollection(): MediaCollection
+    public static function fileCollection(): FileCollection
     {
         return FileCollection::Documents;
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $collection = self::fileCollection();
+
+        $this
+            ->addMediaCollection($collection->value)
+            ->acceptsMimeTypes($collection->acceptedMimeTypes())
+            ->useDisk(FileCollection::Documents->disk());
+    }
+}
+```
+
+`Document::getMimeTypeMap()` ainda existe e delega para `FileCollection::Documents->acceptedMimeTypes()`, mas os forms usam `LibraryFileUpload` (que já lê o enum).
+
+## 🖼️ Model Image
+
+```php
+// app/Models/Image.php
+class Image extends Model implements HasFileUrl, HasMedia
+{
+    use InteractsWithMedia;
+    use LogsActivity;
+
+    protected $fillable = ['name'];
+
+    public static function fileCollection(): FileCollection
+    {
+        return FileCollection::Images;
     }
 
     public function registerMediaCollections(): void
@@ -107,28 +137,7 @@ class Document extends Model implements HasFileUrl, HasMedia
 }
 ```
 
-## 🖼️ Model Image
-
-```php
-// app/Models/Image.php
-class Image extends Model implements HasFileUrl, HasMedia
-{
-    use InteractsWithMedia;
-    use LogsActivity;
-
-    public const fileCollection()->value = FileCollection::Images->value;
-
-    protected $fillable = ['name'];
-
-    public function registerMediaCollections(): void
-    {
-        $this
-            ->addMediaCollection(self::fileCollection()->value)
-            ->acceptsMimeTypes(self::getMimeTypeMap())
-            ->useDisk(FileCollection::Images->disk());
-    }
-}
-```
+Não use constante `COLLECTION_NAME` — a fonte da verdade é `fileCollection()`.
 
 ## 🧩 Resource x Modelo
 
@@ -164,16 +173,18 @@ Quando o arquivo precisar de acesso público, mantenha `visibility => public`.
 
 `User`, `Document` e `Image` usam `spatie/laravel-activitylog` com `logOnly()` e `logOnlyDirty()`.
 
-Exemplo:
+Exemplo (`Document` registra só `name`):
 
 ```php
 public function getActivitylogOptions(): LogOptions
 {
     return LogOptions::defaults()
-        ->logOnly($this->fillable)
+        ->logOnly(['name'])
         ->logOnlyDirty();
 }
 ```
+
+Em `User` / `Image`, o padrão atual é `logOnly($this->fillable)`.
 
 ## 🎯 Boas Práticas
 
