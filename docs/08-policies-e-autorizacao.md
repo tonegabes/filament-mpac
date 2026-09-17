@@ -4,13 +4,18 @@ Este documento mostra como a autorização está aplicada hoje no projeto e como
 
 ## 📚 Policies existentes
 
-Atualmente existem policies para:
+Policies de app models (convenção `Model` → `Policy`):
 
 - `User` (`UserPolicy`)
 - `Role` (`RolePolicy`)
 - `Permission` (`PermissionPolicy`)
 
-No estado atual, não existem policies dedicadas para `Document`, `Image` ou `Media`.
+Policies de models de vendor (registro manual em `AuthServiceProvider`):
+
+- `Spatie\Activitylog\Models\Activity` → `ActivityPolicy` (somente `viewAny` / `view`)
+- `Spatie\MediaLibrary\MediaCollections\Models\Media` → `MediaPolicy`
+
+No estado atual, não existem policies dedicadas para `Document` ou `Image`.
 
 ## 🔐 Padrão utilizado
 
@@ -29,11 +34,13 @@ public function update(User $user, User $model): bool
 }
 ```
 
+`ActivityPolicy` é somente leitura: `create` / `update` / `delete` / `restore` / `forceDelete` retornam `false`.
+
 ## 🔎 Descoberta de policy
 
 O Laravel resolve policies por convenção (`Model` -> `Policy`) automaticamente.
 
-Registro manual em `AuthServiceProvider` só é necessário em casos fora da convenção.
+Registro manual em `AuthServiceProvider` é obrigatório para models de pacotes (Activity, Media).
 
 ## 🧩 Integração com Filament
 
@@ -65,6 +72,7 @@ Arquivos de referência:
 - `tests/Feature/Policies/UserPolicyTest.php`
 - `tests/Feature/Policies/RolePolicyTest.php`
 - `tests/Feature/Policies/PermissionPolicyTest.php`
+- `tests/Feature/Policies/ActivityPolicyTest.php`
 
 Exemplo:
 
@@ -93,4 +101,5 @@ No cenário atual, os Resources de arquivos estão majoritariamente em modo leit
 ## 🔗 Próximos Passos
 
 - [Sistema de Permissões](07-sistema-permissoes.md)
+- [Logs de Atividade](18-logs-de-atividade.md)
 - [Testes](13-testes.md)

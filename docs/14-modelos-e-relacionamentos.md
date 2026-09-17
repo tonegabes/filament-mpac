@@ -15,16 +15,16 @@ O projeto atualmente trabalha com:
 
 ## 👤 User
 
-`User` implementa `FilamentUser`, usa `HasRoles`, `HasIsActiveScope` e `LogsActivity`.
+`User` implementa `FilamentUser`, usa `HasRoles`, `HasIsActiveScope` e `HasActivity` (Spatie Activitylog v5).
 
 ```php
 // app/Models/User.php
 class User extends Authenticatable implements FilamentUser
 {
+    use HasActivity;
     use HasFactory;
     use HasIsActiveScope;
     use HasRoles;
-    use LogsActivity;
     use Notifiable;
 
     protected $fillable = [
@@ -45,8 +45,18 @@ class User extends Authenticatable implements FilamentUser
 
         return $this->can($permission);
     }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'username', 'email', 'is_active'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges();
+    }
 }
 ```
+
+`HasActivity` (não só `LogsActivity`) porque o usuário também é **causer** das ações no painel.
 
 ## 📁 Biblioteca de Arquivos
 
@@ -171,9 +181,15 @@ Quando o arquivo precisar de acesso público, mantenha `visibility => public`.
 
 ## 📝 Activity Log
 
-`User`, `Document` e `Image` usam `spatie/laravel-activitylog` com `logOnly()` e `logOnlyDirty()`.
+`User`, `Document`, `Image`, `Role` e `Permission` registram mudanças via Spatie Activitylog v5.
 
-Exemplo (`Document` registra só `name`):
+| Model | Trait | Escopo típico |
+| --- | --- | --- |
+| `User` | `HasActivity` | `name`, `username`, `email`, `is_active` |
+| `Document` / `Image` | `LogsActivity` | `name` (Image via `fillable`) |
+| `Role` / `Permission` | `LogsActivity` | `name`, `guard_name` |
+
+Exemplo (`Document`):
 
 ```php
 public function getActivitylogOptions(): LogOptions
@@ -184,7 +200,7 @@ public function getActivitylogOptions(): LogOptions
 }
 ```
 
-Em `User` / `Image`, o padrão atual é `logOnly($this->fillable)`.
+No painel: `ActivityResource`, `ViewActivitiesAction` e `ActivitiesRelationManager`. Guia completo: [Logs de Atividade](18-logs-de-atividade.md).
 
 ## 🎯 Boas Práticas
 
@@ -193,9 +209,11 @@ Em `User` / `Image`, o padrão atual é `logOnly($this->fillable)`.
 3. Mantenha `create/edit` desabilitado no `MediaResource` enquanto o fluxo oficial for somente leitura.
 4. Garanta que uploads públicos estejam em discos com URL configurada.
 5. Prefira reaproveitar `LibraryFileUpload` nos formulários.
+6. Em novos models auditáveis, use `LogsActivity` + `logOnlyDirty()`; use `HasActivity` só quando o model também for causer.
 
 ## 🔗 Próximos Passos
 
 - [Schemas e Formulários](03-schemas-e-formularios.md) para uploads com Media Library
 - [Settings](11-settings.md) para logos e fundos via `SystemSettings`
 - [Panel Provider](15-panel-provider.md) para navegação do grupo Arquivos
+- [Logs de Atividade](18-logs-de-atividade.md) para UI, permissões e pitfalls

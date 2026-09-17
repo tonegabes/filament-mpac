@@ -10,7 +10,8 @@ Actions são ações que podem ser executadas em Resources, Tables, Pages, etc. 
 
 ```
 app/Filament/Actions/
-└── CopyFileUrlAction.php
+├── CopyFileUrlAction.php
+└── ViewActivitiesAction.php
 ```
 
 ## 📝 Criando uma Action Customizada
@@ -85,6 +86,55 @@ class CopyFileUrlAction extends Action
     }
 }
 ```
+
+### Exemplo Real: ViewActivitiesAction
+
+Action de auditoria (slide-over) usada nas tabelas de Users, Documents, Images, Roles e Permissions:
+
+```php
+// app/Filament/Actions/ViewActivitiesAction.php
+class ViewActivitiesAction extends Action
+{
+    public static function getDefaultName(): ?string
+    {
+        return 'activities';
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this
+            ->label('Histórico')
+            ->icon(Phosphor::ClockCounterClockwise)
+            ->slideOver()
+            ->visible(function (?Model $record): bool {
+                $user = Auth::user();
+
+                if (! $user instanceof User || $record === null) {
+                    return false;
+                }
+
+                if (! $user->can('viewAny', Activity::class)) {
+                    return false;
+                }
+
+                return method_exists($record, 'activitiesAsSubject');
+            });
+        // schema: RepeatableEntry com as últimas 30 atividades
+    }
+}
+```
+
+Uso em table:
+
+```php
+->recordActions([
+    ViewActivitiesAction::make(),
+])
+```
+
+Guia completo: [Logs de Atividade](18-logs-de-atividade.md).
 
 ## 🌐 Defaults globais do projeto
 
@@ -315,3 +365,4 @@ Action::make('send_email')
 
 - [Tabelas](04-tabelas.md) - Use actions em tabelas
 - [Páginas Customizadas](05-paginas-customizadas.md) - Use actions em páginas
+- [Logs de Atividade](18-logs-de-atividade.md) - ViewActivitiesAction e Relation Manager
