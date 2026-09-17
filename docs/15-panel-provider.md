@@ -161,6 +161,8 @@ private function configureNavigationItems(): array
 
 Além da permissão Spatie no item de menu, o Pulse exige o gate `viewPulse` definido em `AppServiceProvider::configurePulse()`.
 
+O grupo **Ferramentas** (`NavGroups::Tools`) também inclui o resource auto-descoberto `ActivityResource` (“Logs de atividade”) — ver [Logs de Atividade](18-logs-de-atividade.md).
+
 ## 🔐 Autenticação
 
 ### Login Customizado

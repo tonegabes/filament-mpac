@@ -15,14 +15,16 @@ app/Enums/Permissions/
 ├── PanelPermissions.php
 ├── DocumentPermissions.php
 ├── ImagePermissions.php
+├── ActivityPermissions.php
 └── WildcardPermissions.php
 ```
 
 ## 🔐 SystemPermissions
 
-- `system`
+- `system.*`
 - `system.log-viewer.access`
 - `system.settings.manage`
+- `system.pulse.access`
 
 ## 🧭 PanelPermissions
 
@@ -41,6 +43,12 @@ Módulos com enum CRUD completo:
 - `permissions.*`
 - `documents.*`
 - `images.*`
+
+Módulo somente leitura (auditoria):
+
+- `activities.*` → `activities.view.any`, `activities.view` (`ActivityPermissions`)
+
+Detalhes de UI e policy: [Logs de Atividade](18-logs-de-atividade.md).
 
 ## 🌱 Seeders oficiais
 
@@ -61,7 +69,7 @@ Distribuição atual:
 | Role | Permissões |
 | --- | --- |
 | `Developer` | `*` (todas) |
-| `Admin` | painel admin + users + documents + images |
+| `Admin` | painel admin + users + documents + images + activities |
 | `User` | `panels.view.app` |
 
 Role padrão para novos usuários (registro local / LDAP sem role): `config('auth.default_role')` → `UserRole::default()` = `User`.
@@ -133,4 +141,5 @@ O gate Laravel `viewPulse` (em `AppServiceProvider`) também exige `SystemPermis
 
 - [Policies e Autorização](08-policies-e-autorizacao.md)
 - [Enums e Convenções](09-enums-e-convencoes.md)
+- [Logs de Atividade](18-logs-de-atividade.md)
 - [Testes](13-testes.md)
