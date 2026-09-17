@@ -25,6 +25,7 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/framework/lsp-*.php
 /tmp
 /vendor
 CLAUDE.md

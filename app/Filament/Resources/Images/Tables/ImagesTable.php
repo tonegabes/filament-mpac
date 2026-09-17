@@ -6,6 +6,7 @@ namespace App\Filament\Resources\Images\Tables;
 
 use Alsaloul\ImageGallery\Tables\Columns\ImageGalleryColumn;
 use App\Filament\Actions\CopyFileUrlAction;
+use App\Filament\Actions\ViewActivitiesAction;
 use App\Models\Image;
 use App\Support\FileLibrary;
 use App\Traits\HasNotifications;
@@ -51,6 +52,7 @@ class ImagesTable
             ])
             ->recordActions([
                 CopyFileUrlAction::make()->label('Link da Imagem'),
+                ViewActivitiesAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

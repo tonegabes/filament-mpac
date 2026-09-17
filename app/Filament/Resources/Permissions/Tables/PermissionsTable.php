@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Permissions\Tables;
 
+use App\Filament\Actions\ViewActivitiesAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -39,6 +40,7 @@ class PermissionsTable
                 //
             ])
             ->recordActions([
+                ViewActivitiesAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([

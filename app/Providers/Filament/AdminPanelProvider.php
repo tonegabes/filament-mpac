@@ -10,6 +10,7 @@ use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Components\Navigation\PanelSwitcher;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Settings\ManageSystem;
+use App\Filament\Resources\Activities\ActivityResource;
 use App\Filament\Resources\Documents\DocumentResource;
 use App\Filament\Resources\Images\ImageResource;
 use App\Filament\Resources\Media\MediaResource;
@@ -66,6 +67,7 @@ class AdminPanelProvider extends PanelProvider
                 UserResource::class,
                 RoleResource::class,
                 PermissionResource::class,
+                ActivityResource::class,
             ])
             ->pages([
                 ManageSystem::class,

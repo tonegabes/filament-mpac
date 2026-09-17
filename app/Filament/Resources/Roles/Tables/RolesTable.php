@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Roles\Tables;
 
+use App\Filament\Actions\ViewActivitiesAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -42,6 +43,7 @@ class RolesTable
                 //
             ])
             ->recordActions([
+                ViewActivitiesAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

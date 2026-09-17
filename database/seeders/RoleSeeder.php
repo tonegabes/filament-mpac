@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\Permissions\ActivityPermissions;
 use App\Enums\Permissions\DocumentPermissions;
 use App\Enums\Permissions\ImagePermissions;
 use App\Enums\Permissions\PanelPermissions;
@@ -27,6 +28,7 @@ final class RoleSeeder extends Seeder
             UserPermissions::All,
             DocumentPermissions::All,
             ImagePermissions::All,
+            ActivityPermissions::All,
         ]);
 
         $roleUser->syncPermissions([

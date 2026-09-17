@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Permissions;
 
 use App\Enums\NavGroups;
+use App\Filament\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\Permissions\Pages\CreatePermission;
 use App\Filament\Resources\Permissions\Pages\EditPermission;
 use App\Filament\Resources\Permissions\Pages\ListPermissions;
@@ -47,7 +48,7 @@ class PermissionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ActivitiesRelationManager::class,
         ];
     }
 

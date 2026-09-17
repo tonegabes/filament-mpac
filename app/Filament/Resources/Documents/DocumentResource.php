@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Documents;
 
 use App\Enums\NavGroups;
+use App\Filament\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\Documents\Pages\ListDocuments;
 use App\Filament\Resources\Documents\Pages\ViewDocument;
 use App\Filament\Resources\Documents\Schemas\DocumentForm;
@@ -45,6 +46,13 @@ class DocumentResource extends Resource
     public static function table(Table $table): Table
     {
         return DocumentsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ActivitiesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
