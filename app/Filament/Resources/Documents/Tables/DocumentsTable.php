@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Documents\Tables;
 
 use App\Filament\Actions\CopyFileUrlAction;
+use App\Filament\Actions\ViewActivitiesAction;
 use App\Models\Document;
 use App\Support\FileLibrary;
 use Filament\Actions\BulkActionGroup;
@@ -62,6 +63,7 @@ class DocumentsTable
             ])
             ->recordActions([
                 CopyFileUrlAction::make()->label('Link do Arquivo'),
+                ViewActivitiesAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

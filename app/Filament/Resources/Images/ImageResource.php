@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Images;
 
 use App\Enums\NavGroups;
+use App\Filament\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\Images\Pages\ListImages;
 use App\Filament\Resources\Images\Pages\ViewImage;
 use App\Filament\Resources\Images\Schemas\ImageForm;
@@ -47,6 +48,13 @@ class ImageResource extends Resource
     public static function table(Table $table): Table
     {
         return ImagesTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ActivitiesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

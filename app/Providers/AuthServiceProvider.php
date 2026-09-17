@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Enums\Permissions\SystemPermissions;
 use App\Models\User;
+use App\Policies\ActivityPolicy;
 use App\Policies\MediaPolicy;
 use App\Services\Auth\AuthModeHandlerResolver;
 use App\Services\Auth\LdapAuthModeHandler;
@@ -16,6 +17,7 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class AuthServiceProvider extends ServiceProvider
@@ -26,6 +28,7 @@ final class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
+        Activity::class => ActivityPolicy::class,
         Media::class => MediaPolicy::class,
     ];
 

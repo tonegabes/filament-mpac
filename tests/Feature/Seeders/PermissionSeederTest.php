@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Permissions\ActivityPermissions;
 use App\Enums\Permissions\DocumentPermissions;
 use App\Enums\Permissions\ImagePermissions;
 use App\Enums\Permissions\PanelPermissions;
@@ -32,6 +33,7 @@ it('creates all permissions from enums', function (): void {
         array_map(fn ($c) => $c->value, PermissionPermissions::cases()),
         array_map(fn ($c) => $c->value, DocumentPermissions::cases()),
         array_map(fn ($c) => $c->value, ImagePermissions::cases()),
+        array_map(fn ($c) => $c->value, ActivityPermissions::cases()),
     );
 
     foreach ($expected as $name) {
