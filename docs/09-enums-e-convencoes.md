@@ -20,6 +20,7 @@ app/Enums/
     ├── SystemPermissions.php
     ├── DocumentPermissions.php
     ├── ImagePermissions.php
+    ├── ActivityPermissions.php
     └── WildcardPermissions.php
 ```
 
@@ -130,9 +131,13 @@ Enums de permissões:
 - `UserPermissions`
 - `RolePermissions`
 - `PermissionPermissions`
-- `SystemPermissions`
+- `SystemPermissions` (`system.settings.manage`, `system.pulse.access`)
+- `DocumentPermissions` / `ImagePermissions`
+- `ActivityPermissions` (`activities.view.any`, `activities.view`) — ver [Logs de Atividade](18-logs-de-atividade.md)
 
 Cada enum é usado por policies, seeders e checks de acesso no painel.
+
+`SystemPermissions::LogViewerAccess` foi removido junto com o pacote Log Viewer.
 
 ## 🔧 BetterEnum
 
