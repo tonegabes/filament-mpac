@@ -6,7 +6,6 @@ use App\Enums\Permissions\SystemPermissions;
 
 it('has expected cases and string values', function (): void {
     expect(SystemPermissions::All->value)->toBe('system.*')
-        ->and(SystemPermissions::LogViewerAccess->value)->toBe('system.log-viewer.access')
         ->and(SystemPermissions::SystemSettingsManage->value)->toBe('system.settings.manage');
 });
 

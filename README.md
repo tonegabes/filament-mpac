@@ -150,7 +150,7 @@ After running the seeders, you can login with these accounts:
 
 | Role          | Email                 | Password    | Panel Access                   |
 | ------------- | --------------------- | ----------- | ------------------------------ |
-| Developer     | `developer@email.com` | `developer` | All panels + Telescope + Pulse |
+| Developer     | `developer@email.com` | `developer` | All panels + Pulse |
 | Administrator | `admin@email.com`     | `admin`     | Admin panel                    |
 | Operator      | `operator@email.com`  | `operator`  | Limited admin access           |
 
@@ -159,7 +159,6 @@ After running the seeders, you can login with these accounts:
 -   **Admin Panel**: <http://localhost:8000/admin>
 -   **App Panel**: <http://localhost:8000/app> (to be implemented)
 -   **Pulse Monitoring**: <http://localhost:8000/pulse>
--   **Telescope Debug**: <http://localhost:8000/telescope> (local only)
 
 ## 💻 Development Workflow
 
@@ -352,16 +351,6 @@ Real-time application monitoring dashboard showing:
 -   **Exceptions** - Error tracking and frequency
 -   **User Sessions** - Active user monitoring
 
-#### Laravel Telescope (`/telescope`)
-
-Development debugging tool (local environment only):
-
--   **Request Inspection** - HTTP request/response debugging
--   **Database Query Analysis** - Query performance optimization
--   **Mail Monitoring** - Email delivery tracking
--   **Cache Analysis** - Cache hit/miss monitoring
--   **Event Tracking** - Application event debugging
-
 ### Health Monitoring
 
 The application includes health check endpoints:
@@ -490,7 +479,6 @@ php artisan test --coverage          # Run with coverage report
 
 # Monitoring
 # Visit /pulse for application monitoring
-# Visit /telescope for debugging (local only)
 ```
 
 ## 🔧 Customization & Extension
@@ -596,7 +584,6 @@ DOCKER_REGISTRY=registry.your-domain.com/your-project
 
 # Monitoring
 PULSE_ENABLED=true
-TELESCOPE_ENABLED=false  # Only enable in development
 ```
 
 ### Adding API Endpoints
@@ -690,7 +677,7 @@ This starter kit provides:
 -   ✅ **Authentication System** - Multi-auth with LDAP support
 -   ✅ **Admin Panel** - Complete Filament admin interface
 -   ✅ **User Management** - RBAC with roles and permissions
--   ✅ **Monitoring** - Pulse and Telescope integration
+-   ✅ **Monitoring** - Pulse integration
 -   ✅ **File Management** - Media library and document generation
 -   ✅ **Background Jobs** - Queue system with monitoring
 -   ✅ **Health Checks** - Application health monitoring

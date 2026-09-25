@@ -40,9 +40,10 @@ it('can render list activities page and see records', function (): void {
 
     expect($activities)->not->toBeEmpty();
 
-    Livewire::test(ListActivities::class)
-        ->assertOk()
-        ->assertCanSeeTableRecords($activities);
+    $component = Livewire::test(ListActivities::class);
+
+    $component->assertOk();
+    $component->assertCanSeeTableRecords($activities);
 });
 
 it('can render the activity view page', function (): void {

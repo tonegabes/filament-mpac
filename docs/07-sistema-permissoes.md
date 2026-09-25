@@ -21,7 +21,6 @@ app/Enums/Permissions/
 ## 🔐 SystemPermissions
 
 - `system`
-- `system.log-viewer.access`
 - `system.settings.manage`
 
 ## 🧭 PanelPermissions
@@ -105,9 +104,6 @@ public static function canAccess(): bool
 ### Em itens de navegação
 
 ```php
-NavigationItem::make('Log Viewer')
-    ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess));
-
 NavigationItem::make('Pulse')
     ->visible(fn () => Auth::user()?->can(SystemPermissions::PulseAccess));
 ```

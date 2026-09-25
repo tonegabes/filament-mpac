@@ -7,7 +7,6 @@ namespace App\Enums\Permissions;
 enum SystemPermissions: string
 {
     case All = 'system.*';
-    case LogViewerAccess = 'system.log-viewer.access';
     case SystemSettingsManage = 'system.settings.manage';
     case PulseAccess = 'system.pulse.access';
 }

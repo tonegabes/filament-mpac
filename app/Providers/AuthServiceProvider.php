@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Enums\Permissions\SystemPermissions;
+use App\Http\Responses\LoginResponse;
 use App\Models\User;
 use App\Policies\ActivityPolicy;
 use App\Policies\MediaPolicy;
@@ -14,9 +14,7 @@ use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
 use App\Services\Auth\LocalAuthModeHandler;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Opcodes\LogViewer\Facades\LogViewer;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -45,7 +43,7 @@ final class AuthServiceProvider extends ServiceProvider
 
         $this->app->singleton(
             abstract: \Filament\Auth\Http\Responses\Contracts\LoginResponse::class,
-            concrete: \App\Http\Responses\LoginResponse::class,
+            concrete: LoginResponse::class,
         );
     }
 
@@ -58,18 +56,6 @@ final class AuthServiceProvider extends ServiceProvider
 
         $this->configureGates();
 
-        if (! app()->isProduction()) {
-            LogViewer::auth(function (Request $request) {
-
-                $user = $request->user();
-
-                if ($user) {
-                    return $user->can(SystemPermissions::LogViewerAccess);
-                }
-
-                return false;
-            });
-        }
     }
 
     /**

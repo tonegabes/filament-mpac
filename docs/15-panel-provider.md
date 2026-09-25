@@ -142,13 +142,6 @@ public static function getNavigationGroup(): string
 private function configureNavigationItems(): array
 {
     return [
-        NavigationItem::make('Log Viewer')
-            ->group(NavGroups::Tools->value)
-            ->icon(Phosphor::Scroll)
-            ->url('/' . Config::string('log-viewer.route_path'))
-            ->openUrlInNewTab()
-            ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess)),
-
         NavigationItem::make('Pulse')
             ->group(NavGroups::Tools->value)
             ->icon(Phosphor::Pulse)

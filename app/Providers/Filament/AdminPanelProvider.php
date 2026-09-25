@@ -127,21 +127,12 @@ class AdminPanelProvider extends PanelProvider
     private function configureNavigationItems(): array
     {
         return [
-            NavigationItem::make('Log Viewer')
-                ->group(NavGroups::Tools->value)
-                ->icon(Phosphor::Scroll)
-                ->url('/' . Config::string('log-viewer.route_path'))
-                ->openUrlInNewTab()
-                ->visible(fn () => Auth::user()?->can(SystemPermissions::LogViewerAccess))
-            ,
-
             NavigationItem::make('Pulse')
                 ->group(NavGroups::Tools->value)
                 ->icon(Phosphor::Pulse)
                 ->url('/' . Config::string('pulse.path'))
                 ->openUrlInNewTab()
-                ->visible(fn () => Auth::user()?->can(SystemPermissions::PulseAccess))
-            ,
+                ->visible(fn () => Auth::user()?->can(SystemPermissions::PulseAccess)),
         ];
     }
 }
