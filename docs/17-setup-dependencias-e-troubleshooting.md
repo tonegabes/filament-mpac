@@ -26,6 +26,22 @@ Comandos úteis do `composer.json`:
 
 A config do Pint vem de `vendor/tonegabes/mpac-essentials/pint.json` (pacote `tonegabes/mpac-essentials`).
 
+## 🕐 Timezone da aplicação
+
+Em `config/app.php`, o timezone está fixo (não via `.env`):
+
+```php
+'timezone' => 'America/Rio_Branco',
+```
+
+Implicações:
+
+- `Carbon` / `now()` / casts `datetime` e formatação Filament (`dateTime(...)`) usam **Acre (UTC−05)**.
+- Datas em logs de atividade, listagens e infolists seguem esse fuso.
+- Não há `APP_TIMEZONE` no `.env.example`; alterar o fuso exige mudar `config/app.php` (e invalidar config cache em produção: `php artisan config:clear`).
+
+Locale padrão continua em `APP_LOCALE` / `APP_FAKER_LOCALE` (`.env.example` usa `en` / `en_US`). Timezone e locale são independentes.
+
 ## 🧱 AppServiceProvider (comportamento global)
 
 `App\Providers\AppServiceProvider` concentra defaults de runtime:
@@ -117,6 +133,12 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |
 | CreateAction sem ícone Phosphor esperado | `OverrideActionsProvider` não registrado | confirme `bootstrap/providers.php` e [Panel Provider](15-panel-provider.md) |
 | Lazy loading / attribute exception em local | `Model::shouldBeStrict(true)` fora de produção | corrija a query/atributo; em produção o strict mode está desligado |
+| Horários “atrasados/adiantados” vs UTC | app em `America/Rio_Branco` | esperado; ajuste `config/app.php` só se o produto exigir outro fuso |
+| Menu “Logs de atividade” / Histórico invisível | falta seed de `ActivityPermissions` ou role sem `activities.*` | reseeding (`RoleSeeder`); Admin/Developer têm acesso — ver [Logs de Atividade](18-logs-de-atividade.md) |
+| Relation Manager de Histórico quebra | model sem `activitiesAsSubject` | use `LogsActivity` / `HasActivity` (API v5, não `activities()` do v4) |
+| Diffs vazios na view de Activity | API v4 (`changes()`) ou atributo não logado | use `attribute_changes` + `logOnly()` / `logOnlyDirty()` |
+| Procura Log Viewer / Telescope | pacotes removidos | use Pulse (permissão) + `storage/logs` / pail; activity log no painel |
+| Resource novo não aparece no menu | não está em `->resources([...])` | registre em `AdminPanelProvider` — ver [Panel Provider](15-panel-provider.md) |
 
 ## 🧪 Verificação mínima após mudanças de auth/deps
 
@@ -126,9 +148,18 @@ php artisan test --compact tests/Feature/Seeders/RoleSeederTest.php
 php artisan test --compact tests/Unit/Services/Auth/
 ```
 
+Após mudanças em activity log:
+
+```bash
+php artisan test --compact tests/Feature/Filament/ActivityResourceTest.php
+php artisan test --compact tests/Feature/Policies/ActivityPolicyTest.php
+php artisan test --compact tests/Unit/Support/ActivityLogTest.php
+```
+
 ## 🔗 Próximos Passos
 
 - [Páginas Customizadas](05-paginas-customizadas.md) — login/registro
 - [Sistema de Permissões](07-sistema-permissoes.md)
 - [Testes](13-testes.md)
 - [Panel Provider](15-panel-provider.md)
+- [Logs de Atividade](18-logs-de-atividade.md)
