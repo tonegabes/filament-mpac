@@ -71,7 +71,7 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 12. [Actions Customizadas](12-actions-customizadas.md)
     - Criando Actions
     - Defaults globais (`CreateAction` iconButton, OverrideActions)
-    - CopyFileUrlAction
+    - CopyFileUrlAction / ViewActivitiesAction
     - Integração com Livewire
 
 ### Testes e Modelos
@@ -84,14 +84,14 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 14. [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md)
     - Convenções de Models
     - `FileCollection` / `fileCollection()`
-    - Media Library e Activity Log
+    - Media Library e Activity Log (resumo)
 
 ### Configuração e Operação
 
 15. [Panel Provider](15-panel-provider.md)
-    - AdminPanelProvider
+    - AdminPanelProvider / AppPanelProvider
+    - Registro explícito de resources
     - OverrideActions / AppServiceProvider (CreateAction)
-    - Descoberta automática
     - Grupos de navegação
 
 16. [Exemplos Completos](16-exemplos-completos.md)
@@ -101,8 +101,14 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 
 17. [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
     - Setup local e scripts (`format` / `lint` via mpac-essentials)
+    - Timezone (`America/Rio_Branco`)
     - AppServiceProvider (strict models, HTTPS, Pulse, CreateAction)
     - Auth local/LDAP e pitfalls
+
+18. [Logs de Atividade](18-logs-de-atividade.md)
+    - Spatie Activitylog v5 (`LogsActivity` / `HasActivity`)
+    - `ActivityResource`, `ViewActivitiesAction`, Relation Manager
+    - Permissões, policy e `App\Support\ActivityLog`
 
 ## 🚀 Guia Rápido
 
@@ -118,24 +124,14 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 ### Scaffold completo de recurso (MPAC)
 
 ```bash
-php artisan make:mpac-model Evento --resource=eventos
+php artisan make:model-plus Evento --resource=eventos
 ```
 
-Esse comando gera:
+Pacote: `tonegabes/laravel-make-model-plus`. Esse comando gera model, enum de permissões, policy, testes e Filament Resource (com `View` quando aplicável).
 
-- Model
-- Enum de permissões
-- Policy
-- Teste unitário do enum de permissões
-- Teste de feature da policy
-- Filament Resource com página `View`
+Opções úteis: `--panel`, `--no-filament`, `--migration`, `--factory`, `--seed`, `--force`.
 
-Opções:
-
-```bash
-php artisan make:mpac-model Evento --resource=eventos --migration --factory --seed
-php artisan make:mpac-model Evento --resource=eventos --force
-```
+Lembre de registrar o Resource em `AdminPanelProvider` (`->resources([...])`) se o scaffold não fizer isso automaticamente.
 
 ### Convenções Importantes
 
@@ -165,13 +161,17 @@ php artisan make:mpac-model Evento --resource=eventos --force
 - Recursos de arquivos: **Document**, **Image** e **Media**
 - Configurações do sistema com **Spatie Settings**
 - Permissões e roles com **Spatie Permission** (`UserRole`: Developer, Admin, User)
-- Logs de atividade com **Spatie Activitylog**
+- Logs de atividade com **Spatie Activitylog** v5 (resource, action e relation manager)
+- Timezone da aplicação: **America/Rio_Branco** (`config/app.php`)
+- Observabilidade: **Pulse** (Log Viewer / Telescope removidos)
 
 Veja também:
 
 - [Páginas Customizadas](05-paginas-customizadas.md) para autenticação e SettingsPage
 - [Panel Provider](15-panel-provider.md) para configuração do painel admin
 - [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) para biblioteca de arquivos e media
+- [Logs de Atividade](18-logs-de-atividade.md) para auditoria no painel
+- [Setup e Troubleshooting](17-setup-dependencias-e-troubleshooting.md) para timezone, lint e pitfalls
 
 ## 🔗 Links Úteis
 
