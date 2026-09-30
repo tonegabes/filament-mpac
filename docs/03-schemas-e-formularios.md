@@ -64,54 +64,27 @@ class ProductForm
 
 ### Exemplo Real: UserForm
 
+`UserForm` adapta username/email conforme `config('auth.mode')` (`AuthMode::Local` vs `AuthMode::Ldap`):
+
 ```php
-// app/Filament/Resources/Users/Schemas/UserForm.php
-class UserForm
-{
-    public static function configure(Schema $schema): Schema
-    {
-        return $schema
-            ->components([
-                Section::make('Dados Pessoais')
-                    ->columns(2)
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('name')
-                            ->label('Nome')
-                            ->maxLength(255)
-                            ->required(),
-
-                        TextInput::make('email')
-                            ->email()
-                            ->maxLength(255)
-                            ->required(),
-
-                        TextInput::make('username')
-                            ->maxLength(255)
-                            ->required(),
-
-                        ToggleButtons::make('is_active')
-                            ->label('Ativo')
-                            ->boolean()
-                            ->inline()
-                            ->required(),
-                    ]),
-
-                Section::make('Perfis')
-                    ->columnSpanFull()
-                    ->description('Selecione os perfis associados a esse usuário.')
-                    ->schema([
-                        CheckboxCards::make('roles')
-                            ->hiddenLabel()
-                            ->bulkToggleable()
-                            ->columns(3)
-                            ->relationship('roles', 'name')
-                            ->required(),
-                    ]),
-            ])->columns(2);
-    }
-}
+// app/Filament/Resources/Users/Schemas/UserForm.php (resumo)
+Section::make('Dados Pessoais')
+    ->schema([
+        TextInput::make('name')->required(),
+        self::getUsernameComponent(),
+        self::getEmailComponent(),
+        ToggleButtons::make('is_active')->boolean()->inline()->required(),
+    ]),
 ```
+
+| Modo | Username | Email |
+| --- | --- | --- |
+| `local` | obrigatório, `maxLength(255)` | `email()` obrigatório |
+| `ldap` | `live()` + `debounce(500)` → preenche email | `readonly` + hint/helper do domínio |
+
+Em LDAP, o email é montado como `username + config('auth.ldap.email_domain')` (env `LDAP_AUTH_EMAIL_DOMAIN`; default de config `@mpac.mp.br`). Não edite o email manualmente nesse modo — altere o username.
+
+Roles continuam em `CheckboxCards::make('roles')->relationship('roles', 'name')`.
 
 ## 🧩 Componentes de Formulário Comuns
 
@@ -322,6 +295,7 @@ class DocumentForm
 6. **Relacionamentos**: Use `relationship()` quando possível
 7. **Type Hints**: Sempre use type hints explícitos
 8. **Helper Text**: Adicione textos de ajuda quando necessário
+9. **Auth mode**: Em formulários sensíveis a LDAP (ex.: `UserForm`), ramifique com `config('auth.mode')` / `AuthMode` em vez de duplicar Resources
 
 ## 🔗 Próximos Passos
 

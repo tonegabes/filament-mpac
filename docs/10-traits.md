@@ -19,13 +19,15 @@ O trait `HasIsActiveScope` encapsula operações sobre o campo booleano `is_acti
 
 | API | Tipo | Uso |
 | --- | --- | --- |
-| `isActive()` | query scope (`#[Scope]`) | `Model::query()->isActive()->get()` |
+| `active()` | query scope (`#[Scope]`) | `Model::query()->active()->get()` |
+| `activeCount()` | query scope (`#[Scope]`) | `Model::query()->activeCount()` → `int` |
+| `isActive()` | método de instância | `true` se `$model->is_active` |
+| `isInactive()` | método de instância | inverso de `isActive()` |
 | `activate()` | método de instância | marca `is_active = true` |
 | `deactivate()` | método de instância | marca `is_active = false` |
 | `toggleActive()` | método de instância | inverte o valor atual |
-| `countActive(Builder $query)` | helper | conta registros com `is_active = true` |
 
-No MySQL, o scope `isActive()` tenta usar o índice `idx_is_active` quando disponível.
+No MySQL, o scope `active()` tenta usar o índice `idx_is_active` quando disponível.
 
 ### Uso em Models
 
@@ -41,14 +43,18 @@ class User extends Authenticatable
 ### Exemplos
 
 ```php
-$activeUsers = User::query()->isActive()->get();
+$activeUsers = User::query()->active()->get();
+$count = User::query()->activeCount();
 
 $user->activate();
 $user->deactivate();
 $user->toggleActive();
 
-// Preferir o atributo booleano para checagens de instância:
-if ($user->is_active) {
+if ($user->isActive()) {
+    // ...
+}
+
+if ($user->isInactive()) {
     // ...
 }
 ```
@@ -56,8 +62,11 @@ if ($user->is_active) {
 ### Restrições
 
 - O model precisa ter a coluna `is_active` (cast `boolean` recomendado).
-- O scope é `protected` com atributo `#[Scope]`; chame via query builder (`->isActive()`), não como método público de instância.
-- Não existe mais o trait antigo `HasActiveScope`.
+- Scopes `active` / `activeCount` são `protected` com `#[Scope]`; chame via query builder (`->active()`), **não** como método público de instância.
+- `isActive()` / `isInactive()` são checagens de instância — **não** são query scopes. Não use `Model::query()->isActive()`.
+- Não existe mais o trait antigo `HasActiveScope` nem `countActive()`.
+
+Testes de referência: `tests/Unit/Traits/HasActiveScopeTest.php`.
 
 ## 🔔 HasNotifications
 

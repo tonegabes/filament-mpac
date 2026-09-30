@@ -362,6 +362,25 @@ class ProductsTable
 }
 ```
 
+## 📁 Labels de mídia com FileLibrary
+
+Nas tabelas de arquivos, reutilize `App\Support\FileLibrary` em vez de formatar MIME/tamanho na mão:
+
+```php
+use App\Support\FileLibrary;
+
+TextColumn::make('size')
+    ->formatStateUsing(fn (?int $state): string => FileLibrary::formatSize($state)),
+
+TextColumn::make('mime_type')
+    ->formatStateUsing(fn (?string $state): string => FileLibrary::typeLabel($state)),
+
+TextColumn::make('collection_name')
+    ->formatStateUsing(fn (?string $state): string => FileLibrary::collectionLabel($state)),
+```
+
+Ver também [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md).
+
 ## 🎯 Boas Práticas
 
 1. **Separe Table Schema**: Crie classe separada para configuração da tabela

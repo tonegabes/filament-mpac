@@ -139,6 +139,35 @@ class Image extends Model implements HasFileUrl, HasMedia
 
 Não use constante `COLLECTION_NAME` — a fonte da verdade é `fileCollection()`.
 
+## 🔗 HasFileUrl e FileLibrary
+
+### Contrato `HasFileUrl`
+
+Models que expõem URL pública do arquivo implementam `App\Contracts\HasFileUrl`:
+
+```php
+interface HasFileUrl
+{
+    public function getFileUrl(): string;
+}
+```
+
+`Document` e `Image` implementam via `getFirstMediaUrl(self::fileCollection()->value)`. A action `CopyFileUrlAction` tipa o record como `HasFileUrl` — novos models com “copiar URL” precisam do contrato.
+
+### Helper `FileLibrary`
+
+`App\Support\FileLibrary` centraliza labels/formatação usados em tabelas e infolists de mídia:
+
+| Método | Uso |
+| --- | --- |
+| `collectionLabel(?string)` | label amigável via `FileCollection::tryFrom` (fallback: nome cru / `Arquivos`) |
+| `typeLabel(?string)` | PDF, Imagem, Planilha, etc. a partir do MIME |
+| `formatSize(?int)` | tamanho legível (`Number::fileSize`) |
+| `url(Media)` | `getUrl()` do Spatie Media |
+| `isImage(?string)` | MIME começa com `image/` |
+
+Consumidores atuais: `DocumentsTable`, `ImagesTable`, `MediaTable`, `MediaInfolist`. Prefira o helper a duplicar `match` de MIME nas colunas.
+
 ## 🧩 Resource x Modelo
 
 ### DocumentResource
@@ -193,6 +222,8 @@ Em `User` / `Image`, o padrão atual é `logOnly($this->fillable)`.
 3. Mantenha `create/edit` desabilitado no `MediaResource` enquanto o fluxo oficial for somente leitura.
 4. Garanta que uploads públicos estejam em discos com URL configurada.
 5. Prefira reaproveitar `LibraryFileUpload` nos formulários.
+6. Use `FileLibrary` para labels/tamanho/URL em tabelas de mídia.
+7. Implemente `HasFileUrl` antes de reutilizar `CopyFileUrlAction`.
 
 ## 🔗 Próximos Passos
 

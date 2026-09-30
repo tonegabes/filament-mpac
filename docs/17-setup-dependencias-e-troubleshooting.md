@@ -86,12 +86,15 @@ Codepaths:
 - Resolução: `AuthModeHandlerResolver` → `LocalAuthModeHandler` / `LdapAuthModeHandler`
 - Página: `App\Filament\Pages\Auth\Login`
 - Serviços LDAP: `LdapAuthService`, `LdapUserService`
+- Formulário de usuário: `UserForm` (username `live` + email readonly quando `AUTH_MODE=ldap`)
 
 Pitfalls:
 
 - Com `LDAP_AUTH_REQUIRES_LOCAL=true`, usuários LDAP sem registro local ativo falham no login.
 - Username LDAP é normalizado (lowercase, trim, remove domínio se colado no valor).
 - Registro local só existe no modo local e quando o panel provider habilita registration.
+- Em `UserForm` (LDAP), o email é derivado do username + `auth.ldap.email_domain` — não espere campo email editável.
+- Default de config (`@mpac.mp.br`) pode diferir do exemplo em `.env.example` (`@mpdomain.br`); alinhe o `.env` do ambiente.
 
 ## 🧭 Painéis
 
@@ -111,8 +114,11 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | `php-cs-fixer` / root `.php-cs-fixer.php` quebra | arquivo ainda exige `mp-coding-standards` (removido) | use `composer format` / `format:dirty` com `mpac-essentials`; não dependa do CS Fixer da raiz |
 | Permissões “sumiram” | cache Spatie / seed ausente | `PermissionRegistrar::forgetCachedPermissions()` + reseeding |
 | Login LDAP falha com usuário novo | `requires_local` ou falta de sync | revisar `auth.ldap.requires_local` e criação em `Login::handleLocalUserRecord()` |
+| Email readonly / preenchido sozinho no UserForm | `AUTH_MODE=ldap` | esperado; altere o username — ver [Schemas](03-schemas-e-formularios.md) |
+| `make:mpac-model` não encontrado | comando renomeado no pacote | use `php artisan make:model-plus` (`laravel-make-model-plus`) |
 | Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |
 | Testes de role quebrando com `Operator` | rename para `UserRole::User` | atualizar asserts/factories para `User` |
+| Query `->isActive()` quebra / não filtra | API do trait mudou | use `->active()` no builder; `isActive()` é método de instância — ver [Traits](10-traits.md) |
 | Pulse abre mas retorna 403 | falta gate/permissão | `SystemPermissions::PulseAccess` + gate `viewPulse` em `AppServiceProvider` |
 | Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |
 | CreateAction sem ícone Phosphor esperado | `OverrideActionsProvider` não registrado | confirme `bootstrap/providers.php` e [Panel Provider](15-panel-provider.md) |
