@@ -4,13 +4,15 @@ Este documento mostra como a autorização está aplicada hoje no projeto e como
 
 ## 📚 Policies existentes
 
-Atualmente existem policies para:
-
-- `User` (`UserPolicy`)
-- `Role` (`RolePolicy`)
-- `Permission` (`PermissionPolicy`)
-
-No estado atual, não existem policies dedicadas para `Document`, `Image` ou `Media`.
+| Model | Policy | Notas |
+| --- | --- | --- |
+| `User` | `UserPolicy` | enum `UserPermissions` |
+| `Role` | `RolePolicy` | enum `RolePermissions` |
+| `Permission` | `PermissionPolicy` | enum `PermissionPermissions` |
+| `Document` | `DocumentPolicy` | enum `DocumentPermissions` |
+| `Image` | `ImagePolicy` | enum `ImagePermissions` |
+| `Spatie\Activitylog\Models\Activity` | `ActivityPolicy` | somente `viewAny` / `view`; mutações `false` |
+| `Spatie\MediaLibrary\…\Media` | `MediaPolicy` | model vendor; ver implementação atual |
 
 ## 🔐 Padrão utilizado
 
@@ -20,7 +22,7 @@ As policies usam enums de permissões para cada ação:
 // app/Policies/UserPolicy.php
 public function viewAny(User $user): bool
 {
-    return $user->can(UserPermissions::All);
+    return $user->can(UserPermissions::ViewAny);
 }
 
 public function update(User $user, User $model): bool
@@ -29,11 +31,29 @@ public function update(User $user, User $model): bool
 }
 ```
 
+`ActivityPolicy` é intencionalmente read-only:
+
+```php
+public function create(User $user): bool
+{
+    return false;
+}
+```
+
 ## 🔎 Descoberta de policy
 
-O Laravel resolve policies por convenção (`Model` -> `Policy`) automaticamente.
+O Laravel resolve policies por convenção (`App\Models\X` → `App\Policies\XPolicy`) automaticamente.
 
-Registro manual em `AuthServiceProvider` só é necessário em casos fora da convenção.
+Models **vendor** precisam de registro explícito em `AuthServiceProvider`:
+
+```php
+protected $policies = [
+    Activity::class => ActivityPolicy::class,
+    Media::class => MediaPolicy::class,
+];
+```
+
+Sem esse mapa, o Filament não aplica a policy correta ao Resource.
 
 ## 🧩 Integração com Filament
 
@@ -46,6 +66,12 @@ public static function canViewAny(): bool
 {
     return auth()->user()?->can('viewAny', User::class) ?? false;
 }
+```
+
+Para Activity (vendor):
+
+```php
+$user->can('viewAny', Activity::class);
 ```
 
 ## 🛡️ Gate global
@@ -65,6 +91,7 @@ Arquivos de referência:
 - `tests/Feature/Policies/UserPolicyTest.php`
 - `tests/Feature/Policies/RolePolicyTest.php`
 - `tests/Feature/Policies/PermissionPolicyTest.php`
+- `tests/Feature/Policies/ActivityPolicyTest.php`
 
 Exemplo:
 
@@ -80,7 +107,7 @@ it('denies user without permission to create users', function (): void {
 
 Crie policy quando um novo módulo precisar de regras de autorização explícitas (ex.: novo Resource com create/edit/delete).
 
-No cenário atual, os Resources de arquivos estão majoritariamente em modo leitura, por isso ainda não há policy dedicada para eles.
+Para models de pacotes (Spatie Activitylog, Media Library), registre a policy em `$policies` do `AuthServiceProvider`.
 
 ## 🎯 Boas Práticas
 
@@ -89,8 +116,10 @@ No cenário atual, os Resources de arquivos estão majoritariamente em modo leit
 3. Evite lógica complexa no Resource se ela pertence ao domínio de acesso.
 4. Cubra cada policy com testes de feature.
 5. Sempre validar impacto do `Gate::before` em cenários de segurança.
+6. Audit trail: não libere create/update/delete em `ActivityPolicy`.
 
 ## 🔗 Próximos Passos
 
 - [Sistema de Permissões](07-sistema-permissoes.md)
+- [Logs de Atividade](18-logs-de-atividade.md)
 - [Testes](13-testes.md)

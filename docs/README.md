@@ -103,6 +103,12 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
     - Setup local e scripts (`format` / `lint` via mpac-essentials)
     - AppServiceProvider (strict models, HTTPS, Pulse, CreateAction)
     - Auth local/LDAP e pitfalls
+    - Observabilidade: Pulse + logs em `storage/logs` (sem Log Viewer/Telescope)
+
+18. [Logs de Atividade](18-logs-de-atividade.md)
+    - Spatie Activitylog + `ActivityResource`
+    - `ViewActivitiesAction` / RelationManager
+    - Permissões somente leitura
 
 ## 🚀 Guia Rápido
 
@@ -118,23 +124,24 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 ### Scaffold completo de recurso (MPAC)
 
 ```bash
-php artisan make:mpac-model Evento --resource=eventos
+php artisan make:model-plus Evento --resource=eventos
 ```
 
-Esse comando gera:
+Comando do pacote `tonegabes/laravel-make-model-plus` (não use o antigo `make:mpac-model`). Gera:
 
 - Model
 - Enum de permissões
 - Policy
 - Teste unitário do enum de permissões
 - Teste de feature da policy
-- Filament Resource com página `View`
+- Filament Resource com página `View` (omitível com `--no-filament`)
 
 Opções:
 
 ```bash
-php artisan make:mpac-model Evento --resource=eventos --migration --factory --seed
-php artisan make:mpac-model Evento --resource=eventos --force
+php artisan make:model-plus Evento --resource=eventos --migration --factory --seed
+php artisan make:model-plus Evento --resource=eventos --panel=admin --force
+php artisan make:model-plus Evento --resource=eventos --no-filament
 ```
 
 ### Convenções Importantes
@@ -165,13 +172,16 @@ php artisan make:mpac-model Evento --resource=eventos --force
 - Recursos de arquivos: **Document**, **Image** e **Media**
 - Configurações do sistema com **Spatie Settings**
 - Permissões e roles com **Spatie Permission** (`UserRole`: Developer, Admin, User)
-- Logs de atividade com **Spatie Activitylog**
+- Logs de atividade com **Spatie Activitylog** (UI em Ferramentas)
+- Monitoramento com **Laravel Pulse** (`/pulse`)
+- Logs de aplicação em `storage/logs` (Log Viewer e Telescope foram removidos)
 
 Veja também:
 
 - [Páginas Customizadas](05-paginas-customizadas.md) para autenticação e SettingsPage
 - [Panel Provider](15-panel-provider.md) para configuração do painel admin
 - [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) para biblioteca de arquivos e media
+- [Logs de Atividade](18-logs-de-atividade.md) para audit trail no Filament
 
 ## 🔗 Links Úteis
 

@@ -15,16 +15,16 @@ O projeto atualmente trabalha com:
 
 ## 👤 User
 
-`User` implementa `FilamentUser`, usa `HasRoles`, `HasIsActiveScope` e `LogsActivity`.
+`User` implementa `FilamentUser`, usa `HasRoles`, `HasIsActiveScope` e `HasActivity` (Spatie Activitylog v5 — não `LogsActivity` puro).
 
 ```php
 // app/Models/User.php
 class User extends Authenticatable implements FilamentUser
 {
+    use HasActivity;
     use HasFactory;
     use HasIsActiveScope;
     use HasRoles;
-    use LogsActivity;
     use Notifiable;
 
     protected $fillable = [
@@ -44,6 +44,14 @@ class User extends Authenticatable implements FilamentUser
         }
 
         return $this->can($permission);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'username', 'email', 'is_active'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges();
     }
 }
 ```
@@ -171,9 +179,16 @@ Quando o arquivo precisar de acesso público, mantenha `visibility => public`.
 
 ## 📝 Activity Log
 
-`User`, `Document` e `Image` usam `spatie/laravel-activitylog` com `logOnly()` e `logOnlyDirty()`.
+`User` (`HasActivity`), `Document`, `Image`, `Role` e `Permission` (`LogsActivity`) usam `spatie/laravel-activitylog`.
 
-Exemplo (`Document` registra só `name`):
+| Model | Atributos logados (padrão atual) |
+| --- | --- |
+| `User` | `name`, `username`, `email`, `is_active` (+ `dontLogEmptyChanges`) |
+| `Document` | `name` |
+| `Image` | `$this->fillable` |
+| `Role` | `name`, `guard_name` |
+
+Exemplo (`Document`):
 
 ```php
 public function getActivitylogOptions(): LogOptions
@@ -184,7 +199,7 @@ public function getActivitylogOptions(): LogOptions
 }
 ```
 
-Em `User` / `Image`, o padrão atual é `logOnly($this->fillable)`.
+Para UI Filament, permissões e pitfalls: [Logs de Atividade](18-logs-de-atividade.md).
 
 ## 🎯 Boas Práticas
 
@@ -193,9 +208,11 @@ Em `User` / `Image`, o padrão atual é `logOnly($this->fillable)`.
 3. Mantenha `create/edit` desabilitado no `MediaResource` enquanto o fluxo oficial for somente leitura.
 4. Garanta que uploads públicos estejam em discos com URL configurada.
 5. Prefira reaproveitar `LibraryFileUpload` nos formulários.
+6. Para histórico na UI, exponha `activitiesAsSubject` (já vem com os traits Spatie).
 
 ## 🔗 Próximos Passos
 
 - [Schemas e Formulários](03-schemas-e-formularios.md) para uploads com Media Library
 - [Settings](11-settings.md) para logos e fundos via `SystemSettings`
 - [Panel Provider](15-panel-provider.md) para navegação do grupo Arquivos
+- [Logs de Atividade](18-logs-de-atividade.md) para audit trail

@@ -53,8 +53,16 @@ Stack relevante após o bump de dependências:
 | `directorytree/ldaprecord-laravel` | `^4.0.4` |
 | `spatie/laravel-permission` | `^8.3` |
 | `janczakb/filament-flex-fields` | `^2.7` |
+| `spatie/laravel-activitylog` | `^5` (UI: [Logs de Atividade](18-logs-de-atividade.md)) |
 
 Fonte da verdade: `composer.json` / `composer.lock`.
+
+### Removidos do stack
+
+- **opcodesio/log-viewer** (e permissão `system.log-viewer.access`)
+- **Laravel Telescope** (se ainda aparecer em docs antigas / README marketing, ignore)
+
+Para logs de aplicação use `storage/logs/laravel.log` ou `php artisan pail`. Para audit trail de domínio use o `ActivityResource`.
 
 ## 🔄 Workflow de update de dependências
 
@@ -114,9 +122,14 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |
 | Testes de role quebrando com `Operator` | rename para `UserRole::User` | atualizar asserts/factories para `User` |
 | Pulse abre mas retorna 403 | falta gate/permissão | `SystemPermissions::PulseAccess` + gate `viewPulse` em `AppServiceProvider` |
+| Menu sem Log Viewer / rota 404 | pacote removido | esperado; use `storage/logs` + [ActivityResource](18-logs-de-atividade.md) |
+| Activity Resource 403 | falta `activities.view.*` ou policy | seed `ActivityPermissions` + map em `AuthServiceProvider` |
+| Histórico vazio no slide-over | model sem `LogsActivity`/`HasActivity` ou relação errada | use `activitiesAsSubject()` — ver [18](18-logs-de-atividade.md) |
 | Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |
 | CreateAction sem ícone Phosphor esperado | `OverrideActionsProvider` não registrado | confirme `bootstrap/providers.php` e [Panel Provider](15-panel-provider.md) |
 | Lazy loading / attribute exception em local | `Model::shouldBeStrict(true)` fora de produção | corrija a query/atributo; em produção o strict mode está desligado |
+| `Model::query()->isActive()` não filtra | `isActive()` é método de instância | use `->active()` — ver [Traits](10-traits.md) |
+| `php artisan make:mpac-model` não existe | comando renomeado | use `php artisan make:model-plus` |
 
 ## 🧪 Verificação mínima após mudanças de auth/deps
 
@@ -132,3 +145,4 @@ php artisan test --compact tests/Unit/Services/Auth/
 - [Sistema de Permissões](07-sistema-permissoes.md)
 - [Testes](13-testes.md)
 - [Panel Provider](15-panel-provider.md)
+- [Logs de Atividade](18-logs-de-atividade.md)

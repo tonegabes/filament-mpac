@@ -21,85 +21,38 @@ app/Providers/Filament/
 
 ### AdminPanelProvider
 
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Providers\Filament;
-
-use Filament\Panel;
-use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-
-class AdminPanelProvider extends PanelProvider
-{
-    public function panel(Panel $panel): Panel
-    {
-        $panel = $this->configureRegistration($panel);
-
-        return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
-            ->login(Login::class)
-            ->sidebarWidth('16rem')
-            ->profile()
-            ->brandLogo(fn () => view('components.brand-logo'))
-            ->unsavedChangesAlerts()
-            ->sidebarCollapsibleOnDesktop()
-            ->colors([
-                'primary' => Color::Emerald,
-            ])
-            ->viteTheme('resources/css/mpac-theme/index.css')
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            ->pages([])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
-            ->navigationGroups($this->configureNavigationGroups())
-            ->navigationItems($this->configureNavigationItems());
-    }
-}
-```
-
-## 🔍 Descoberta Automática
-
-### Resources
+O painel admin registra resources e pages **explicitamente** (não usa `discoverResources` / `discoverPages` no estado atual):
 
 ```php
-->discoverResources(
-    in: app_path('Filament/Resources'),
-    for: 'App\Filament\Resources'
-)
+return $panel
+    ->default()
+    ->id('admin')
+    ->path('admin')
+    ->login(Login::class)
+    // ...
+    ->resources([
+        DocumentResource::class,
+        ImageResource::class,
+        MediaResource::class,
+        UserResource::class,
+        RoleResource::class,
+        PermissionResource::class,
+        ActivityResource::class,
+    ])
+    ->pages([
+        ManageSystem::class,
+    ])
+    ->navigationGroups($this->configureNavigationGroups())
+    ->navigationItems($this->configureNavigationItems());
 ```
 
-Todos os Resources em `app/Filament/Resources/` são descobertos automaticamente.
+`ActivityResource` aparece no grupo `NavGroups::Tools` (“Logs de atividade”). Detalhes: [Logs de Atividade](18-logs-de-atividade.md).
 
-### Pages
+## 🔍 Registro de Resources / Pages
 
-```php
-->discoverPages(
-    in: app_path('Filament/Pages'),
-    for: 'App\Filament\Pages'
-)
-```
+Ao criar um Resource novo, adicione a classe na lista `->resources([...])` do `AdminPanelProvider` (ou reative descoberta automática se o time decidir padronizar assim).
 
-Todas as Pages em `app/Filament/Pages/` são descobertas automaticamente.
-
-### Widgets
-
-```php
-->discoverWidgets(
-    in: app_path('Filament/Widgets'),
-    for: 'App\Filament\Widgets'
-)
-```
-
-Todos os Widgets em `app/Filament/Widgets/` são descobertos automaticamente.
+O mesmo vale para páginas customizadas em `->pages([...])`.
 
 ## 🧭 Grupos de Navegação
 
@@ -153,6 +106,8 @@ private function configureNavigationItems(): array
 ```
 
 Além da permissão Spatie no item de menu, o Pulse exige o gate `viewPulse` definido em `AppServiceProvider::configurePulse()`.
+
+Não há mais item de Log Viewer / Telescope no menu (pacotes removidos). Auditoria de domínio: `ActivityResource`. Logs de runtime: `storage/logs`.
 
 ## 🔐 Autenticação
 
@@ -274,7 +229,7 @@ Detalhes de uso e override local: [Actions Customizadas](12-actions-customizadas
 
 ## 🎯 Boas Práticas
 
-1. **Descoberta Automática**: Use descoberta automática quando possível
+1. **Registro explícito**: Inclua novos Resources/Pages na lista do provider (ou padronize descoberta se o time migrar).
 2. **Grupos**: Organize navegação com grupos
 3. **Permissões**: Verifique permissões em itens de navegação
 4. **Configuração**: Separe configurações complexas em métodos privados
@@ -286,3 +241,4 @@ Detalhes de uso e override local: [Actions Customizadas](12-actions-customizadas
 - [Enums e Convenções](09-enums-e-convencoes.md) - Veja NavGroups
 - [Sistema de Permissões](07-sistema-permissoes.md) - Configure permissões no panel
 - [Páginas Customizadas](05-paginas-customizadas.md) - Crie páginas para o panel
+- [Logs de Atividade](18-logs-de-atividade.md) - ActivityResource no grupo Tools

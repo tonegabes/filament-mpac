@@ -8,9 +8,10 @@ Actions são ações que podem ser executadas em Resources, Tables, Pages, etc. 
 
 ## 🏗️ Estrutura
 
-```
+```text
 app/Filament/Actions/
-└── CopyFileUrlAction.php
+├── CopyFileUrlAction.php
+└── ViewActivitiesAction.php
 ```
 
 ## 📝 Criando uma Action Customizada
@@ -85,6 +86,23 @@ class CopyFileUrlAction extends Action
     }
 }
 ```
+
+## 🕒 ViewActivitiesAction (histórico)
+
+Slide-over de auditoria para records que usam Spatie Activitylog (`activitiesAsSubject`):
+
+```php
+use App\Filament\Actions\ViewActivitiesAction;
+
+->recordActions([
+    ViewActivitiesAction::make(),
+])
+```
+
+- Default name: `activities`
+- Visível só com `viewAny` em `Activity` + method `activitiesAsSubject` no record
+- Até 30 eventos; modal sem submit (somente leitura)
+- Detalhes: [Logs de Atividade](18-logs-de-atividade.md)
 
 ## 🌐 Defaults globais do projeto
 
@@ -315,3 +333,4 @@ Action::make('send_email')
 
 - [Tabelas](04-tabelas.md) - Use actions em tabelas
 - [Páginas Customizadas](05-paginas-customizadas.md) - Use actions em páginas
+- [Logs de Atividade](18-logs-de-atividade.md) - ViewActivitiesAction e RelationManager
