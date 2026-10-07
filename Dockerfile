@@ -11,58 +11,87 @@ LABEL org.opencontainers.image.version="$CI_COMMIT_TAG"
 USER root
 
 ENV LOG_CHANNEL=stderr \
-    SSL_MODE=on \
     PHP_OPCACHE_ENABLE=1 \
-    PHP_OPCACHE_JIT=on \
+    SSL_MODE=on \
     COMPOSER_ALLOW_SUPERUSER=false
 
-RUN apk add --no-cache \
-    bash curl ca-certificates \
-    libpng-dev libzip-dev libxml2-dev \
-    poppler-utils \
-    zip unzip
+#
+# install-php-extensions already pulls the runtime libraries each extension
+# needs and removes its build dependencies, so no apk packages are required.
+#
+RUN install-php-extensions \
+    intl \
+    exif \
+    ldap \
+    bcmath \
+    gd
 
-RUN install-php-extensions intl exif ldap bcmath gd
+# Utilizado para gerar PDF de relatórios
+RUN apk add --no-cache \
+    poppler-utils
 
 USER www-data
 
 WORKDIR /var/www/html
+
+# ------------------------------------------------------------
+# PHP dependencies
+# ------------------------------------------------------------
 
 FROM base AS build
 
-USER root
-COPY --chown=www-data:www-data composer.* ./
-USER www-data
+COPY --chown=www-data:www-data composer.json composer.lock ./
 
 RUN composer install \
-    --no-dev --no-interaction --prefer-dist \
-    --optimize-autoloader --no-scripts
+    --no-dev \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-scripts
 
 COPY --chown=www-data:www-data . .
 
-#
-# Ensure we don't ship (or load) locally-generated discovery caches that may
-# reference dev-only packages (e.g. laravel/boost) which are not installed in
-# this image (composer install --no-dev).
-#
+# Don't ship local/dev-generated Laravel discovery caches.
 RUN rm -rf bootstrap/cache/* storage/framework/views/*
 
-RUN composer dump-autoload --optimize --classmap-authoritative --no-scripts && \
-    php artisan package:discover --ansi
+RUN composer dump-autoload \
+    --optimize \
+    --classmap-authoritative \
+    --no-scripts \
+    && php artisan package:discover --ansi
 
-FROM node:20-alpine AS assets
+# ------------------------------------------------------------
+# Frontend
+# ------------------------------------------------------------
+
+FROM node:24-alpine AS assets
+
+ENV HUSKY=0
 
 WORKDIR /var/www/html
 
-COPY --from=build /var/www/html /var/www/html
+COPY package.json package-lock.json ./
 
 RUN npm ci
 
-RUN rm -rf public/build && npm cache clear --force
+COPY --from=build /var/www/html /var/www/html
 
 RUN npm run build
 
+# ------------------------------------------------------------
+# Production
+# ------------------------------------------------------------
+
 FROM base
+
+#
+# Config, route, view and event caches depend on runtime values (APP_KEY,
+# APP_URL, ...), so they are generated on container start by the image's
+# Laravel automations instead of at build time. Migrations stay a deploy step.
+#
+ENV AUTORUN_ENABLED=true \
+    AUTORUN_LARAVEL_MIGRATION=false \
+    AUTORUN_LARAVEL_STORAGE_LINK=false
 
 COPY --from=build --chown=www-data:www-data /var/www/html /var/www/html
 COPY --from=assets /var/www/html/public/build /var/www/html/public/build
@@ -71,18 +100,21 @@ COPY --chown=root:root docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.
 
 USER root
 
-RUN mkdir -p storage/framework/{cache,sessions,views} \
+RUN mkdir -p \
+    storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/app/public \
+    storage/app/private/livewire-tmp \
     bootstrap/cache \
-    storage/app/{public,private/livewire-tmp} && \
-    chown -R www-data:www-data storage bootstrap/cache
-
-RUN CACHE_STORE=array php artisan optimize:clear && \
-    php artisan storage:link && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php artisan event:cache
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && php artisan storage:link
 
 USER www-data
 
-HEALTHCHECK CMD wget --no-verbose --tries=1 --spider \
-  http://localhost:8080/up || exit 1
+HEALTHCHECK \
+    --interval=10s \
+    --timeout=3s \
+    --start-period=30s \
+    --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/up || exit 1

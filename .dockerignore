@@ -19,8 +19,16 @@ pint.json
 phpunit.xml
 tests
 node_modules
+public/hot
+public/build
+public/storage
+database/*.sqlite*
+.composer-cache
+.cursor
 npm-debug.log
 yarn-error.log
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
 storage/app/*
 storage/framework/cache/*
 storage/framework/sessions/*

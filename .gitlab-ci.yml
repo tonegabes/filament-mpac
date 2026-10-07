@@ -114,7 +114,7 @@ build_mr_image:
   tags:
     - production
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
   before_script:
     - |
       echo "${CI_REGISTRY_PASSWORD}" | docker login "${MPAC_REGISTRY_URL}" \
@@ -127,6 +127,8 @@ build_mr_image:
     - >
       docker buildx build
       --pull
+      --provenance=false
+      --sbom=false
       --cache-from type=registry,ref=${APP_IMAGE}:mr-${CI_MERGE_REQUEST_IID}
       --cache-to type=inline
       --build-arg BUILDKIT_INLINE_CACHE=1
@@ -134,6 +136,50 @@ build_mr_image:
       --tag "${APP_IMAGE}:mr-${CI_MERGE_REQUEST_IID}"
       --push
       .
+    - |
+      set -eu
+
+      container_name="mr-${CI_PIPELINE_ID}"
+      image="${APP_IMAGE}:${CI_COMMIT_SHORT_SHA}"
+
+      cleanup() {
+        docker rm --force "${container_name}" >/dev/null 2>&1 || true
+      }
+
+      trap cleanup EXIT
+
+      docker pull "${image}"
+      docker run --detach \
+        --name "${container_name}" \
+        --env APP_ENV=testing \
+        --env APP_DEBUG=false \
+        --env APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= \
+        --env DB_CONNECTION=sqlite \
+        --env CACHE_STORE=array \
+        --env SESSION_DRIVER=array \
+        --env QUEUE_CONNECTION=sync \
+        "${image}"
+
+      for attempt in $(seq 1 30); do
+        health_status="$(docker inspect --format '{{.State.Health.Status}}' "${container_name}")"
+
+        if [ "${health_status}" = "healthy" ]; then
+          echo "MR image health check passed."
+          exit 0
+        fi
+
+        if [ "${health_status}" = "unhealthy" ]; then
+          echo "MR image health check failed."
+          docker logs "${container_name}"
+          exit 1
+        fi
+
+        sleep 2
+      done
+
+      echo "MR image health check timed out."
+      docker logs "${container_name}"
+      exit 1
 
 # --------------------------------------------------------
 # RELEASE / TAG BUILD
@@ -159,6 +205,8 @@ release_image:
     - >
       docker buildx build
       --pull
+      --provenance=false
+      --sbom=false
       --cache-from type=registry,ref=${APP_IMAGE}:stable
       --cache-to type=inline
       --build-arg BUILDKIT_INLINE_CACHE=1
