@@ -126,8 +126,20 @@ php artisan test --compact tests/Feature/Seeders/RoleSeederTest.php
 php artisan test --compact tests/Unit/Services/Auth/
 ```
 
+## 🚢 Deploy / Docker
+
+Ambiente de produção e CI estão documentados em [Deploy, Docker e CI](18-deploy-docker-e-ci.md) (`Dockerfile`, `Caddyfile`, `.gitlab-ci.yml`).
+
+Resumo rápido:
+
+- Imagem: FrankenPHP 8.4 Alpine (`serversideup/php`)
+- Health: `GET /up` (porta 8080)
+- MR image build só com target `develop`
+- Migrations não rodam no boot do container
+
 ## 🔗 Próximos Passos
 
+- [Deploy, Docker e CI](18-deploy-docker-e-ci.md)
 - [Páginas Customizadas](05-paginas-customizadas.md) — login/registro
 - [Sistema de Permissões](07-sistema-permissoes.md)
 - [Testes](13-testes.md)

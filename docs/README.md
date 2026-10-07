@@ -104,6 +104,11 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
     - AppServiceProvider (strict models, HTTPS, Pulse, CreateAction)
     - Auth local/LDAP e pitfalls
 
+18. [Deploy, Docker e CI](18-deploy-docker-e-ci.md)
+    - Imagem FrankenPHP (Dockerfile multi-stage)
+    - Caddy, health check `/up`, autorun
+    - Pipeline GitLab (qualidade, MR → `develop`, release por tag)
+
 ## 🚀 Guia Rápido
 
 ### Para começar a desenvolver:
@@ -118,23 +123,17 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 ### Scaffold completo de recurso (MPAC)
 
 ```bash
-php artisan make:mpac-model Evento --resource=eventos
+php artisan make:model-plus Evento --resource=eventos
 ```
 
-Esse comando gera:
+Pacote: `tonegabes/laravel-make-model-plus` (não use o antigo `make:mpac-model`).
 
-- Model
-- Enum de permissões
-- Policy
-- Teste unitário do enum de permissões
-- Teste de feature da policy
-- Filament Resource com página `View`
-
-Opções:
+Opções úteis:
 
 ```bash
-php artisan make:mpac-model Evento --resource=eventos --migration --factory --seed
-php artisan make:mpac-model Evento --resource=eventos --force
+php artisan make:model-plus Evento --resource=eventos --migration --factory --seed
+php artisan make:model-plus Evento --resource=eventos --panel=admin --force
+php artisan make:model-plus Evento --no-filament
 ```
 
 ### Convenções Importantes
@@ -172,6 +171,7 @@ Veja também:
 - [Páginas Customizadas](05-paginas-customizadas.md) para autenticação e SettingsPage
 - [Panel Provider](15-panel-provider.md) para configuração do painel admin
 - [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) para biblioteca de arquivos e media
+- [Deploy, Docker e CI](18-deploy-docker-e-ci.md) para imagem e pipeline GitLab
 
 ## 🔗 Links Úteis
 
@@ -190,4 +190,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Setembro 2026
+**Última atualização**: Outubro 2026
