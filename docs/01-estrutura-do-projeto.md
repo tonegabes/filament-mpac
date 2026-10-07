@@ -179,7 +179,22 @@ public static function configure(Schema $schema): Schema
 }
 ```
 
+## 🐳 Deploy (raiz do repositório)
+
+Arquivos de imagem e CI (fora de `app/`):
+
+| Arquivo | Papel |
+| --- | --- |
+| `Dockerfile` | Build multi-stage (PHP + Node assets) |
+| `Caddyfile` | Proxy/static do FrankenPHP na porta 8080 |
+| `docker/php/opcache.ini` | Opcache de produção |
+| `.dockerignore` | Contexto enxuto do build |
+| `.gitlab-ci.yml` | Qualidade + build de imagem (MR/`develop`, tags) |
+
+Detalhes: [Deploy, Docker e CI](18-deploy-docker-e-ci.md).
+
 ## 🔗 Próximos Passos
 
 - [Criando Recursos Filament](02-criando-recursos-filament.md) - Aprenda a criar um Resource completo
 - [Schemas e Formulários](03-schemas-e-formularios.md) - Entenda como estruturar formulários
+- [Deploy, Docker e CI](18-deploy-docker-e-ci.md) - Imagem e pipeline
