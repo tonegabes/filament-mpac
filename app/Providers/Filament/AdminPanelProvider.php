@@ -44,7 +44,6 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
             ->id(Panels::Admin->value)
             ->path(Panels::Admin->path())
             ->login(Login::class)
