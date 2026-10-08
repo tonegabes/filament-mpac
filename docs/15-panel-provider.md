@@ -21,85 +21,43 @@ app/Providers/Filament/
 
 ### AdminPanelProvider
 
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Providers\Filament;
-
-use Filament\Panel;
-use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-
-class AdminPanelProvider extends PanelProvider
-{
-    public function panel(Panel $panel): Panel
-    {
-        $panel = $this->configureRegistration($panel);
-
-        return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
-            ->login(Login::class)
-            ->sidebarWidth('16rem')
-            ->profile()
-            ->brandLogo(fn () => view('components.brand-logo'))
-            ->unsavedChangesAlerts()
-            ->sidebarCollapsibleOnDesktop()
-            ->colors([
-                'primary' => Color::Emerald,
-            ])
-            ->viteTheme('resources/css/mpac-theme/index.css')
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            ->pages([])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
-            ->navigationGroups($this->configureNavigationGroups())
-            ->navigationItems($this->configureNavigationItems());
-    }
-}
-```
-
-## 🔍 Descoberta Automática
-
-### Resources
+Resources e pages são registrados **explicitamente** (não use `discoverResources` / `discoverPages` neste painel):
 
 ```php
-->discoverResources(
-    in: app_path('Filament/Resources'),
-    for: 'App\Filament\Resources'
-)
+// app/Providers/Filament/AdminPanelProvider.php (trecho)
+return $panel
+    ->default()
+    ->id(Panels::Admin->value)
+    ->path(Panels::Admin->path())
+    ->login(Login::class)
+    ->resources([
+        DocumentResource::class,
+        ImageResource::class,
+        MediaResource::class,
+        UserResource::class,
+        RoleResource::class,
+        PermissionResource::class,
+        ActivityResource::class,
+    ])
+    ->pages([
+        ManageSystem::class,
+    ])
+    ->widgets([
+        AccountWidget::class,
+        FilamentInfoWidget::class,
+    ])
+    ->userMenuItems(PanelSwitcher::userMenuItems())
+    ->navigationGroups($this->configureNavigationGroups())
+    ->navigationItems($this->configureNavigationItems());
 ```
 
-Todos os Resources em `app/Filament/Resources/` são descobertos automaticamente.
+Todo Resource novo precisa ser adicionado à lista `->resources([...])`.
 
-### Pages
+## 🔍 Registro explícito vs descoberta
 
-```php
-->discoverPages(
-    in: app_path('Filament/Pages'),
-    for: 'App\Filament\Pages'
-)
-```
+Neste projeto o painel **admin** lista Resources/Pages à mão. A descoberta automática (`discoverResources` / `discoverPages`) **não** está em uso no `AdminPanelProvider` atual.
 
-Todas as Pages em `app/Filament/Pages/` são descobertas automaticamente.
-
-### Widgets
-
-```php
-->discoverWidgets(
-    in: app_path('Filament/Widgets'),
-    for: 'App\Filament\Widgets'
-)
-```
-
-Todos os Widgets em `app/Filament/Widgets/` são descobertos automaticamente.
+Widgets padrão (`AccountWidget`, `FilamentInfoWidget`) também são registrados explicitamente.
 
 ## 🧭 Grupos de Navegação
 
@@ -154,9 +112,13 @@ private function configureNavigationItems(): array
 
 Além da permissão Spatie no item de menu, o Pulse exige o gate `viewPulse` definido em `AppServiceProvider::configurePulse()`.
 
+O grupo **Ferramentas** (`NavGroups::Tools`) também inclui `ActivityResource` (“Logs de atividade”), registrado em `->resources([...])` — ver [Logs de Atividade](19-logs-de-atividade.md).
+
 ## 🔐 Autenticação
 
 ### Login Customizado
+
+No painel admin:
 
 ```php
 ->login(Login::class)
@@ -164,7 +126,10 @@ Além da permissão Spatie no item de menu, o Pulse exige o gate `viewPulse` def
 
 ### Registro Condicional (Local x LDAP)
 
+Registro e password-reset vivem em `AppPanelProvider::configureRegistration()` (não no Admin):
+
 ```php
+// app/Providers/Filament/AppPanelProvider.php
 private function configureRegistration(Panel $panel): Panel
 {
     $authModeHandler = app(AuthModeHandlerResolver::class)->resolveFromConfig();
@@ -187,7 +152,7 @@ private function configureRegistration(Panel $panel): Panel
 }
 ```
 
-No projeto atual, o controle de registro depende de dois fatores:
+Controle de registro depende de dois fatores:
 
 1. O modo de autenticação (`auth.mode`): apenas modo local permite auto-registro.
 2. A flag `enable_registration` em `SystemSettings`.
@@ -274,7 +239,7 @@ Detalhes de uso e override local: [Actions Customizadas](12-actions-customizadas
 
 ## 🎯 Boas Práticas
 
-1. **Descoberta Automática**: Use descoberta automática quando possível
+1. **Registro explícito**: adicione Resources novos em `->resources([...])` do `AdminPanelProvider`
 2. **Grupos**: Organize navegação com grupos
 3. **Permissões**: Verifique permissões em itens de navegação
 4. **Configuração**: Separe configurações complexas em métodos privados
@@ -285,4 +250,5 @@ Detalhes de uso e override local: [Actions Customizadas](12-actions-customizadas
 
 - [Enums e Convenções](09-enums-e-convencoes.md) - Veja NavGroups
 - [Sistema de Permissões](07-sistema-permissoes.md) - Configure permissões no panel
+- [Logs de Atividade](19-logs-de-atividade.md) - Resource em Ferramentas
 - [Páginas Customizadas](05-paginas-customizadas.md) - Crie páginas para o panel
