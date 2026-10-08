@@ -52,7 +52,7 @@ Uso principal:
 
 - `config/auth.php` (`auth.mode`)
 - `AuthModeHandlerResolver`
-- `AdminPanelProvider::configureRegistration()`
+- `AppPanelProvider::configureRegistration()` (registro/reset só no painel `app`)
 
 ```php
 $authMode = AuthMode::fromConfig(Config::string('auth.mode'));
@@ -107,10 +107,10 @@ Não existe mais `Operator` / `Enums\Roles`.
 
 Enum dos painéis Filament (`app` e `admin`):
 
-- `Panels::App` → path `/`, permissão `panels.view.app`
+- `Panels::App` → path `/`, permissão `panels.view.app` — único painel `->default()`
 - `Panels::Admin` → path `/admin`, permissão `panels.view.admin`
 
-Usado por `PanelPermissions::fromPanel()` e `PanelSwitcher`.
+Usado por `PanelPermissions::fromPanel()` e `PanelSwitcher`. Ver [Panel Provider](15-panel-provider.md).
 
 ## 🎨 PageLayouts
 

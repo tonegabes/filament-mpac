@@ -328,16 +328,18 @@ class ResetPasswordAction extends ResetPassword
 }
 ```
 
-E registrar no Panel Provider:
+E registrar no Panel Provider do **app** (não no admin):
 
 ```php
-// app/Providers/Filament/AdminPanelProvider.php
+// app/Providers/Filament/AppPanelProvider.php — configureRegistration()
 $panel
     ->login(Login::class)
-    // Registro e reset são aplicados somente se
-    // allowsLocalRegistration() e enable_registration forem true
+    // registration() + passwordReset() só se
+    // allowsLocalRegistration() e SystemSettings::enable_registration
 ;
 ```
+
+Ver detalhes e tratamento de `MissingSettings` / `QueryException` em [Panel Provider](15-panel-provider.md).
 
 ## 🎨 Customizando Views
 

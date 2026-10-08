@@ -89,10 +89,10 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 ### Configuração e Operação
 
 15. [Panel Provider](15-panel-provider.md)
-    - AdminPanelProvider
+    - AdminPanelProvider e AppPanelProvider
+    - Único painel default (`app`)
+    - Registro explícito de Resources (sem discover)
     - OverrideActions / AppServiceProvider (CreateAction)
-    - Descoberta automática
-    - Grupos de navegação
 
 16. [Exemplos Completos](16-exemplos-completos.md)
     - Exemplo completo: Resource do zero
@@ -169,7 +169,7 @@ php artisan make:model-plus Evento --no-filament
 Veja também:
 
 - [Páginas Customizadas](05-paginas-customizadas.md) para autenticação e SettingsPage
-- [Panel Provider](15-panel-provider.md) para configuração do painel admin
+- [Panel Provider](15-panel-provider.md) para painéis `app`/`admin` e registro de Resources
 - [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) para biblioteca de arquivos e media
 - [Deploy, Docker e CI](18-deploy-docker-e-ci.md) para imagem e pipeline GitLab
 
