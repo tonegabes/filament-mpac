@@ -20,6 +20,7 @@ app/Enums/
     ├── SystemPermissions.php
     ├── DocumentPermissions.php
     ├── ImagePermissions.php
+    ├── ActivityPermissions.php
     └── WildcardPermissions.php
 ```
 
@@ -74,8 +75,8 @@ FileCollection::Documents->disk(); // documents
 FileCollection::SystemLogos->directory(); // system/logos
 
 // Em models com Spatie Media Library:
-Post::mediaCollection()->value;
-Image::mediaCollection()->disk();
+Document::fileCollection()->value;
+Image::fileCollection()->disk();
 ```
 
 Se um arquivo importar também `Spatie\MediaLibrary\MediaCollections\MediaCollection`, use alias:
@@ -131,6 +132,9 @@ Enums de permissões:
 - `RolePermissions`
 - `PermissionPermissions`
 - `SystemPermissions`
+- `DocumentPermissions`
+- `ImagePermissions`
+- `ActivityPermissions` (`activities.view.any` / `activities.view` — somente leitura)
 
 Cada enum é usado por policies, seeders e checks de acesso no painel.
 

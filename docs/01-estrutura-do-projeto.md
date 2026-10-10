@@ -11,9 +11,10 @@ app/
 ├── Contracts/              # Interfaces e contratos
 ├── Enums/                  # Enumeradores (NavGroups, Permissions, etc.)
 ├── Filament/               # Recursos Filament
-│   ├── Actions/            # Ações customizadas
+│   ├── Actions/            # Ações customizadas (CopyFileUrl, ViewActivities)
 │   ├── Components/         # Componentes Filament (ex.: Navigation/PanelSwitcher)
 │   ├── Pages/              # Páginas customizadas (Auth, Settings)
+│   ├── RelationManagers/   # Relation managers compartilhados (ex.: Activities)
 │   ├── Resources/          # Resources CRUD
 │   │   └── {Entity}/
 │   │       ├── Pages/      # Páginas do Resource (List, Create, Edit, View)
@@ -29,6 +30,7 @@ app/
 │   └── Filament/           # Providers específicos do Filament
 ├── Services/                # Serviços de negócio
 ├── Settings/                # Classes de configurações (Spatie Settings)
+├── Support/                 # Helpers de domínio (ActivityLog, FileLibrary)
 └── Traits/                  # Traits reutilizáveis
 ```
 
