@@ -6,7 +6,6 @@ namespace App\Providers;
 
 use App\Enums\Permissions\SystemPermissions;
 use App\Models\User;
-use Filament\Actions\CreateAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +38,6 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->configurePulse();
-        $this->configureComponents();
     }
 
     /**
@@ -69,16 +67,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('viewPulse', function (User $user): bool {
             return $user->can(SystemPermissions::PulseAccess);
-        });
-    }
-
-    /**
-     * Configura os componentes Blade.
-     */
-    private function configureComponents(): void
-    {
-        CreateAction::configureUsing(function (CreateAction $action) {
-            $action->iconButton();
         });
     }
 }

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Enums\PageLayouts;
 use App\Enums\Permissions\SystemPermissions;
 use App\Settings\SystemSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,21 +57,6 @@ it('getAppLogoDark returns asset fallback when null', function (): void {
     $settings->app_logo_dark = null;
 
     expect($settings->getAppLogoDark())->toBe(asset('images/logo-dark.png'));
-});
-
-it('getAppLayout returns auth_page_layout when set', function (): void {
-    $settings = new SystemSettings;
-    $settings->auth_page_layout = PageLayouts::Split;
-
-    expect($settings->getAppLayout())->toBe(PageLayouts::Split->value);
-});
-
-it('getAppLayout returns default auth layout value when null', function (): void {
-    $settings = new SystemSettings;
-    $settings->auth_page_layout = null;
-
-    expect($settings->getAppLayout())->toBe(SystemSettings::DEFAULT_AUTH_PAGE_LAYOUT->value)
-        ->and($settings->getAuthPageLayout())->toBe(SystemSettings::DEFAULT_AUTH_PAGE_LAYOUT->value);
 });
 
 it('getAuthPageBackground returns asset fallback when null', function (): void {

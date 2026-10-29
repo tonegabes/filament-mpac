@@ -19,6 +19,5 @@ return new class extends SettingsMigration
 
         $this->migrator->add('system.auth_page_layout', null);
         $this->migrator->add('system.auth_page_background', null);
-        $this->migrator->add('system.footer_text', 'Ministério Público do Estado do Acre');
     }
 };

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\Permissions\ActivityPermissions;
 use App\Enums\Permissions\DocumentPermissions;
 use App\Enums\Permissions\ImagePermissions;
+use App\Enums\Permissions\MediaPermissions;
 use App\Enums\Permissions\PanelPermissions;
 use App\Enums\Permissions\PermissionPermissions;
 use App\Enums\Permissions\RolePermissions;
@@ -44,6 +45,7 @@ it('assigns all permissions to Developer role', function (): void {
         PermissionPermissions::cases(),
         DocumentPermissions::cases(),
         ImagePermissions::cases(),
+        MediaPermissions::cases(),
         ActivityPermissions::cases(),
     );
     foreach ($allPermissions as $perm) {
@@ -59,5 +61,6 @@ it('assigns panel access and main resource permissions to Admin role', function 
     expect($admin->hasPermissionTo(UserPermissions::All->value))->toBeTrue();
     expect($admin->hasPermissionTo(DocumentPermissions::All->value))->toBeTrue();
     expect($admin->hasPermissionTo(ImagePermissions::All->value))->toBeTrue();
+    expect($admin->hasPermissionTo(MediaPermissions::All->value))->toBeTrue();
     expect($admin->hasPermissionTo(ActivityPermissions::All->value))->toBeTrue();
 });

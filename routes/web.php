@@ -9,8 +9,3 @@ Route::get(
     '/entrar',
     fn () => redirect()->to((string)Filament::getLoginUrl())
 )->name('login');
-
-Route::get(
-    '/logout',
-    fn () => redirect()->to((string)Filament::getLogoutUrl())
-)->name('logout');

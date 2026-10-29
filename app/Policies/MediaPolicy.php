@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\Permissions\MediaPermissions;
 use App\Models\User;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -14,7 +15,7 @@ class MediaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MediaPermissions::ViewAny);
     }
 
     /**
@@ -22,7 +23,7 @@ class MediaPolicy
      */
     public function view(User $user, Media $media): bool
     {
-        return true;
+        return $user->can(MediaPermissions::View);
     }
 
     /**
@@ -30,7 +31,7 @@ class MediaPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MediaPermissions::Create);
     }
 
     /**
@@ -38,7 +39,7 @@ class MediaPolicy
      */
     public function update(User $user, Media $media): bool
     {
-        return true;
+        return $user->can(MediaPermissions::Update);
     }
 
     /**
@@ -46,7 +47,7 @@ class MediaPolicy
      */
     public function delete(User $user, Media $media): bool
     {
-        return true;
+        return $user->can(MediaPermissions::Delete);
     }
 
     /**
@@ -54,7 +55,7 @@ class MediaPolicy
      */
     public function restore(User $user, Media $media): bool
     {
-        return true;
+        return $user->can(MediaPermissions::Restore);
     }
 
     /**
@@ -62,7 +63,7 @@ class MediaPolicy
      */
     public function forceDelete(User $user, Media $media): bool
     {
-        return true;
+        return $user->can(MediaPermissions::ForceDelete);
     }
 
     /**
@@ -70,7 +71,7 @@ class MediaPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return true;
+        return $user->can(MediaPermissions::Delete);
     }
 
     /**
@@ -78,7 +79,7 @@ class MediaPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return true;
+        return $user->can(MediaPermissions::Restore);
     }
 
     /**
@@ -86,7 +87,7 @@ class MediaPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return true;
+        return $user->can(MediaPermissions::ForceDelete);
     }
 
     /**
@@ -94,7 +95,7 @@ class MediaPolicy
      */
     public function replicate(User $user): bool
     {
-        return true;
+        return $user->can(MediaPermissions::Replicate);
     }
 
     /**
@@ -102,6 +103,6 @@ class MediaPolicy
      */
     public function reorder(User $user): bool
     {
-        return true;
+        return $user->can(MediaPermissions::Reorder);
     }
 }

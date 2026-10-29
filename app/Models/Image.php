@@ -11,7 +11,6 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Image extends Model implements HasFileUrl, HasMedia
 {
@@ -33,19 +32,6 @@ class Image extends Model implements HasFileUrl, HasMedia
     public function getFileUrl(): string
     {
         return $this->getFirstMediaUrl(self::fileCollection()->value);
-    }
-
-    public function getFilename(): string
-    {
-        return $this->getFirstMedia(self::fileCollection()->value)->file_name ?? '';
-    }
-
-    public static function getMediaByName(string $name): ?Media
-    {
-        return Media::where([
-            ['file_name', $name],
-            ['collection_name', self::fileCollection()->value],
-        ])->first();
     }
 
     public static function fileCollection(): FileCollection

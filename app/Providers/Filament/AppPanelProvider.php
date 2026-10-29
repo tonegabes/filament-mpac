@@ -89,8 +89,6 @@ class AppPanelProvider extends PanelProvider
             return $panel;
         } catch (QueryException $e) {
             return $panel;
-        } catch (\Exception $e) {
-            throw $e;
         }
 
         if ($canRegister) {

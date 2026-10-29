@@ -29,14 +29,6 @@ class Document extends Model implements HasFileUrl, HasMedia
             ->useDisk(FileCollection::Documents->disk());
     }
 
-    /**
-     * @return string[]
-     */
-    public static function getMimeTypeMap(): array
-    {
-        return FileCollection::Documents->acceptedMimeTypes();
-    }
-
     public function getUrl(): string
     {
         return $this->getFileUrl();
@@ -45,11 +37,6 @@ class Document extends Model implements HasFileUrl, HasMedia
     public function getFileUrl(): string
     {
         return $this->getFirstMediaUrl(self::fileCollection()->value);
-    }
-
-    public function getFilename(): string
-    {
-        return $this->getFirstMedia(self::fileCollection()->value)->file_name ?? '';
     }
 
     public static function fileCollection(): FileCollection

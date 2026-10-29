@@ -16,19 +16,21 @@ class OverrideActionsProvider extends ServiceProvider
     public function boot(): void
     {
         CreateAction::configureUsing(function (CreateAction $action) {
-            $action->icon(Phosphor::Plus->getLabel());
+            $action
+                ->icon(Phosphor::Plus)
+                ->iconButton();
         });
 
         EditAction::configureUsing(function (EditAction $action) {
             $action
-                ->icon(Phosphor::PencilSimpleLine->getLabel())
+                ->icon(Phosphor::PencilSimpleLine)
                 ->color(Color::Indigo)
             ;
         });
 
         DeleteAction::configureUsing(function (DeleteAction $action) {
             $action
-                ->icon(Phosphor::Trash->getLabel())
+                ->icon(Phosphor::Trash)
                 ->color(Color::Rose)
             ;
         });

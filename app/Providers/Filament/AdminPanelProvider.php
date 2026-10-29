@@ -72,10 +72,6 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
             ->userMenuItems(PanelSwitcher::userMenuItems())
             ->navigationGroups($this->configureNavigationGroups())
             ->navigationItems($this->configureNavigationItems())

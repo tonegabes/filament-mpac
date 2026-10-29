@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Enums\UserRole;
 use App\Http\Responses\LoginResponse;
 use App\Models\User;
 use App\Policies\ActivityPolicy;
@@ -55,7 +56,6 @@ final class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         $this->configureGates();
-
     }
 
     /**
@@ -63,6 +63,6 @@ final class AuthServiceProvider extends ServiceProvider
      */
     private function configureGates(): void
     {
-        Gate::before(fn (User $user) => $user->hasRole('TheOneAboveAll') ? true : null);
+        //
     }
 }

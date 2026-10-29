@@ -53,12 +53,3 @@ it('toggleActive flips state', function (): void {
     $user->toggleActive();
     expect($user->refresh()->isActive())->toBeTrue();
 });
-
-it('scopeActiveCount returns count of active records', function (): void {
-    User::factory()->count(3)->create(['is_active' => true]);
-    User::factory()->count(2)->create(['is_active' => false]);
-
-    $count = User::query()->activeCount();
-
-    expect($count)->toBe(3);
-});

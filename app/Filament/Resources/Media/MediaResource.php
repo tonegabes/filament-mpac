@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Media;
 
 use App\Enums\NavGroups;
-use App\Filament\Resources\Media\Pages\CreateMedia;
-use App\Filament\Resources\Media\Pages\EditMedia;
 use App\Filament\Resources\Media\Pages\ListMedia;
 use App\Filament\Resources\Media\Pages\ViewMedia;
 use App\Filament\Resources\Media\Schemas\MediaForm;
@@ -63,8 +61,6 @@ class MediaResource extends Resource
         return [
             'index' => ListMedia::route('/'),
             'view' => ViewMedia::route('/{record}'),
-            // 'create' => CreateMedia::route('/create'),
-            // 'edit'   => EditMedia::route('/{record}/edit'),
         ];
     }
 }

@@ -71,15 +71,4 @@ trait HasIsActiveScope
     {
         return $this->update(['is_active' => ! $this->is_active]);
     }
-
-    /**
-     * Count the number of active models.
-     *
-     * @param  Builder<covariant Model>  $query
-     */
-    #[Scope]
-    protected function activeCount(Builder $query): int
-    {
-        return $query->where('is_active', true)->count();
-    }
 }

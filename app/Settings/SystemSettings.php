@@ -93,14 +93,6 @@ class SystemSettings extends Settings
     }
 
     /**
-     * Get the default page layout.
-     */
-    public function getAppLayout(): string
-    {
-        return $this->getAuthPageLayout();
-    }
-
-    /**
      * Get the auth page layout view.
      */
     public function getAuthPageLayout(): string
