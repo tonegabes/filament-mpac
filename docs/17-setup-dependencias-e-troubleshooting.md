@@ -91,16 +91,16 @@ Pitfalls:
 
 - Com `LDAP_AUTH_REQUIRES_LOCAL=true`, usuários LDAP sem registro local ativo falham no login.
 - Username LDAP é normalizado (lowercase, trim, remove domínio se colado no valor).
-- Registro local só existe no modo local e quando o panel provider habilita registration.
+- Registro local só existe no modo local e quando `AppPanelProvider::configureRegistration()` habilita registration (não o admin).
 
 ## 🧭 Painéis
 
 Dois painéis (`App\Enums\Panels`):
 
-- `app` → `/` (permissão `panels.view.app`)
-- `admin` → `/admin` (permissão `panels.view.admin`)
+- `app` → `/` (permissão `panels.view.app`) — **único** `->default()`
+- `admin` → `/admin` (permissão `panels.view.admin`) — resources explícitos em `AdminPanelProvider`
 
-Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
+Troca no menu do usuário: `PanelSwitcher::userMenuItems()`. Detalhes: [Panel Provider](15-panel-provider.md).
 
 ## 🐛 Troubleshooting comum
 
@@ -112,6 +112,8 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | Permissões “sumiram” | cache Spatie / seed ausente | `PermissionRegistrar::forgetCachedPermissions()` + reseeding |
 | Login LDAP falha com usuário novo | `requires_local` ou falta de sync | revisar `auth.ldap.requires_local` e criação em `Login::handleLocalUserRecord()` |
 | Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |
+| Ambiguidade / erro de painel default | mais de um `->default()` | só `AppPanelProvider`; teste `DefaultPanelTest` |
+| Resource novo não aparece no admin | não listado em `->resources([...])` | registrar em `AdminPanelProvider` |
 | Testes de role quebrando com `Operator` | rename para `UserRole::User` | atualizar asserts/factories para `User` |
 | Pulse abre mas retorna 403 | falta gate/permissão | `SystemPermissions::PulseAccess` + gate `viewPulse` em `AppServiceProvider` |
 | Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |
