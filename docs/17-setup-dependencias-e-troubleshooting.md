@@ -52,9 +52,20 @@ Stack relevante após o bump de dependências:
 | PHPUnit | `^13.0` |
 | `directorytree/ldaprecord-laravel` | `^4.0.4` |
 | `spatie/laravel-permission` | `^8.3` |
+| `spatie/laravel-activitylog` | `^5.0` |
 | `janczakb/filament-flex-fields` | `^2.7` |
 
 Fonte da verdade: `composer.json` / `composer.lock`.
+
+## 🕒 Timezone
+
+`config/app.php` define timezone **fixado** (não via `.env`):
+
+```php
+'timezone' => 'America/Rio_Branco',
+```
+
+Não existe `APP_TIMEZONE`. Locale continua via `APP_LOCALE` / `APP_FALLBACK_LOCALE`. Datas no painel (activity log, tabelas) usam esse timezone da aplicação.
 
 ## 🔄 Workflow de update de dependências
 
@@ -117,6 +128,11 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |
 | CreateAction sem ícone Phosphor esperado | `OverrideActionsProvider` não registrado | confirme `bootstrap/providers.php` e [Panel Provider](15-panel-provider.md) |
 | Lazy loading / attribute exception em local | `Model::shouldBeStrict(true)` fora de produção | corrija a query/atributo; em produção o strict mode está desligado |
+| Menu “Logs de atividade” / Histórico invisível | falta seed de `ActivityPermissions` ou role sem `activities.*` | reseeding (`RoleSeeder`); Admin/Developer têm acesso — ver [Logs de Atividade](19-logs-de-atividade.md) |
+| Relation Manager de Histórico quebra | model sem `activitiesAsSubject` | use `LogsActivity` / `HasActivity` (API v5, não `activities()` do v4) |
+| Diffs vazios na view de Activity | API v4 (`changes()`) ou atributo não logado | use `attribute_changes` + `logOnly()` / `logOnlyDirty()` |
+| Resource novo não aparece no menu | lista explícita em `AdminPanelProvider` | adicione a classe em `->resources([...])` |
+| Horários “errados” no painel | timezone fixo `America/Rio_Branco` | ajuste `config/app.php` (não há `APP_TIMEZONE`) |
 
 ## 🧪 Verificação mínima após mudanças de auth/deps
 
@@ -124,6 +140,14 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 php artisan test --compact tests/Feature/Filament/LoginTest.php
 php artisan test --compact tests/Feature/Seeders/RoleSeederTest.php
 php artisan test --compact tests/Unit/Services/Auth/
+```
+
+Após mudanças em activity log:
+
+```bash
+php artisan test --compact tests/Feature/Filament/ActivityResourceTest.php
+php artisan test --compact tests/Feature/Policies/ActivityPolicyTest.php
+php artisan test --compact tests/Unit/Support/ActivityLogTest.php
 ```
 
 ## 🚢 Deploy / Docker
@@ -140,6 +164,7 @@ Resumo rápido:
 ## 🔗 Próximos Passos
 
 - [Deploy, Docker e CI](18-deploy-docker-e-ci.md)
+- [Logs de Atividade](19-logs-de-atividade.md)
 - [Páginas Customizadas](05-paginas-customizadas.md) — login/registro
 - [Sistema de Permissões](07-sistema-permissoes.md)
 - [Testes](13-testes.md)

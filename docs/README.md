@@ -84,14 +84,14 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 14. [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md)
     - Convenções de Models
     - `FileCollection` / `fileCollection()`
-    - Media Library e Activity Log
+    - Media Library e Activity Log (resumo)
 
 ### Configuração e Operação
 
 15. [Panel Provider](15-panel-provider.md)
     - AdminPanelProvider
     - OverrideActions / AppServiceProvider (CreateAction)
-    - Descoberta automática
+    - Registro explícito de Resources/Pages
     - Grupos de navegação
 
 16. [Exemplos Completos](16-exemplos-completos.md)
@@ -102,12 +102,17 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 17. [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
     - Setup local e scripts (`format` / `lint` via mpac-essentials)
     - AppServiceProvider (strict models, HTTPS, Pulse, CreateAction)
-    - Auth local/LDAP e pitfalls
+    - Auth local/LDAP, timezone e pitfalls
 
 18. [Deploy, Docker e CI](18-deploy-docker-e-ci.md)
     - Imagem FrankenPHP (Dockerfile multi-stage)
     - Caddy, health check `/up`, autorun
     - Pipeline GitLab (qualidade, MR → `develop`, release por tag)
+
+19. [Logs de Atividade](19-logs-de-atividade.md)
+    - Spatie Activitylog v5 (`LogsActivity` / `HasActivity`)
+    - `ActivityResource`, `ViewActivitiesAction`, Relation Manager
+    - Permissões, policy e `App\Support\ActivityLog`
 
 ## 🚀 Guia Rápido
 
@@ -164,13 +169,14 @@ php artisan make:model-plus Evento --no-filament
 - Recursos de arquivos: **Document**, **Image** e **Media**
 - Configurações do sistema com **Spatie Settings**
 - Permissões e roles com **Spatie Permission** (`UserRole`: Developer, Admin, User)
-- Logs de atividade com **Spatie Activitylog**
+- Logs de atividade com **Spatie Activitylog** v5 (resource, action e relation manager)
 
 Veja também:
 
 - [Páginas Customizadas](05-paginas-customizadas.md) para autenticação e SettingsPage
 - [Panel Provider](15-panel-provider.md) para configuração do painel admin
 - [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) para biblioteca de arquivos e media
+- [Logs de Atividade](19-logs-de-atividade.md) para auditoria no painel
 - [Deploy, Docker e CI](18-deploy-docker-e-ci.md) para imagem e pipeline GitLab
 
 ## 🔗 Links Úteis
