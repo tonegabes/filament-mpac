@@ -27,7 +27,11 @@ tests/
 │   ├── Policies/
 │   │   ├── UserPolicyTest.php
 │   │   ├── RolePolicyTest.php
-│   │   └── PermissionPolicyTest.php
+│   │   ├── PermissionPolicyTest.php
+│   │   ├── DocumentPolicyTest.php
+│   │   ├── ImagePolicyTest.php
+│   │   ├── MediaPolicyTest.php
+│   │   └── ActivityPolicyTest.php
 │   └── Seeders/
 │       ├── PermissionSeederTest.php
 │       ├── RoleSeederTest.php
@@ -39,7 +43,9 @@ tests/
     ├── Settings/
     ├── Traits/
     ├── Support/
-    └── Filament/Actions/
+    └── Filament/
+        ├── Actions/
+        └── DefaultPanelTest.php   # exatamente um painel ->default()
 ```
 
 ## 🧪 Padrão para testes Filament

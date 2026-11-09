@@ -136,6 +136,18 @@ curl -fsS http://localhost:8080/up
 
 Ajuste volumes/env de DB real conforme o ambiente de staging; o exemplo acima espelha o smoke do job de MR.
 
+### `docker-compose.yml` (build/publicação)
+
+O compose usa `image: ${APP_IMAGE:?error}:${APP_VERSION:?error}` e builda a partir do `Dockerfile` local. Preencha no `.env` (ver `.env.example`):
+
+```env
+# Usado apenas no build/publicação Docker (docker-compose.yml). Ajuste no projeto derivado.
+APP_IMAGE=registry.mpac.mp.br/sistemas/seu-projeto
+APP_VERSION=0.1.0
+```
+
+No CI, `APP_IMAGE` é `${MPAC_REGISTRY_URL}/${CI_PROJECT_PATH}` — não depende dessas vars do `.env` de desenvolvimento.
+
 ## ⚠️ Pitfalls
 
 | Sintoma | Causa | Ação |
@@ -147,6 +159,7 @@ Ajuste volumes/env de DB real conforme o ambiente de staging; o exemplo acima es
 | Discovery cache com pacotes `--dev` | caches locais no contexto | build limpa `bootstrap/cache/*`; `.dockerignore` ignora caches |
 | Expectativa de migrate no boot | `AUTORUN_LARAVEL_MIGRATION=false` | rode migrate no passo de deploy |
 | Build lento / contexto grande | arquivos locais desnecessários | revisar `.dockerignore` (`public/build`, `vendor`, tests, sqlite) |
+| `docker compose` aborta por variável | `APP_IMAGE`/`APP_VERSION` ausentes | definir no `.env` (placeholders em `.env.example`) |
 
 ## 🔗 Relacionados
 
