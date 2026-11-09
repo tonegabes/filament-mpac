@@ -2,4 +2,7 @@
 
 declare(strict_types=1);
 
-return require __DIR__ . '/vendor/tonegabes/mp-coding-standards/.php-cs-fixer.php';
+/**
+ * Configuração alinhada ao Pint (`pint.json`). Prefira `composer format` / `composer lint`.
+ */
+return require __DIR__ . '/vendor/tonegabes/mpac-essentials/.php-cs-fixer.php';

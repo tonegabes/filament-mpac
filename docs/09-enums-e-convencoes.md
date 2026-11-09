@@ -136,7 +136,7 @@ Cada enum é usado por policies, seeders e checks de acesso no painel.
 
 ## 🔧 BetterEnum
 
-O projeto possui trait `App\Traits\BetterEnum` para utilitários em enums (`names()`, `values()`, `options()`, `asArray()`, `random()`).
+Use a trait `ToneGabes\MpacEssentials\Traits\BetterEnum` (pacote `tonegabes/mpac-essentials`) para utilitários em enums (`names()`, `values()`, `options()` como **valor => nome**, `asArray()` como **nome => valor**, `random()`).
 
 Use quando precisar expor listas para selects, filtros ou serialização de opções.
 

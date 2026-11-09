@@ -50,8 +50,8 @@ it('provides BetterEnum values', function (): void {
 
 it('provides BetterEnum options', function (): void {
     $options = PageLayouts::options();
-    expect($options)->toHaveKeys(['Split', 'Centered', 'FullPage'])
-        ->and($options['Split'])->toBe('layouts.auth.split');
+    expect($options)->toHaveKeys(['layouts.auth.split', 'layouts.auth.centered', 'layouts.auth.fullpage'])
+        ->and($options['layouts.auth.split'])->toBe('Split');
 });
 
 it('provides BetterEnum asArray', function (): void {

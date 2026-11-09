@@ -164,7 +164,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 # Laravel Pint Code Formatter
 
-- If you have modified any PHP files, you must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
+- If you have modified any PHP files, you must run `vendor/bin/pint --dirty --format agent` (or `composer format:dirty`) before finalizing changes. The project uses the root `pint.json` (MPAC PSR-12 preset), not Pint's default Laravel preset.
 - Do not run `vendor/bin/pint --test --format agent`, simply run `vendor/bin/pint --format agent` to fix any formatting issues.
 
 === pest/core rules ===

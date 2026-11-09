@@ -24,7 +24,7 @@ Comandos úteis do `composer.json`:
 | `composer fresh:db` | `migrate:fresh --seed` |
 | `composer dev` | serve + queue + pail + vite |
 
-A config do Pint vem de `vendor/tonegabes/mpac-essentials/pint.json` (pacote `tonegabes/mpac-essentials`).
+A config do Pint é o `pint.json` na raiz do projeto (espelha o preset MPAC de `tonegabes/mpac-essentials`). `vendor/bin/pint` sem `--config` já usa esse arquivo.
 
 ## 🧱 AppServiceProvider (comportamento global)
 
@@ -44,7 +44,7 @@ Stack relevante após o bump de dependências:
 
 | Pacote | Constraint |
 | --- | --- |
-| PHP | `^8.3` (ambiente típico 8.4) |
+| PHP | `^8.4` |
 | Laravel | `^13` |
 | Filament | `~5.0` |
 | Livewire | v4 (via Filament) |
@@ -108,7 +108,8 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | --- | --- | --- |
 | CSS/JS Filament “quebrado” após update | assets públicos desatualizados | `composer dump-autoload` / `php artisan filament:upgrade` e commit dos arquivos em `public/` |
 | ViteException / manifesto | frontend não buildado | `npm run build` ou `npm run dev` |
-| `php-cs-fixer` / root `.php-cs-fixer.php` quebra | arquivo ainda exige `mp-coding-standards` (removido) | use `composer format` / `format:dirty` com `mpac-essentials`; não dependa do CS Fixer da raiz |
+| Estilo diferente entre `pint` na CLI e o CI | Pint sem config usa preset Laravel | use sempre `pint.json` na raiz ou `composer format`; evite `pint` sem config em outro diretório |
+| PHP-CS-Fixer opcional | `.php-cs-fixer.php` delega para `mpac-essentials` | prefira Pint (`composer format`); CS Fixer só se a ferramenta exigir |
 | Permissões “sumiram” | cache Spatie / seed ausente | `PermissionRegistrar::forgetCachedPermissions()` + reseeding |
 | Login LDAP falha com usuário novo | `requires_local` ou falta de sync | revisar `auth.ldap.requires_local` e criação em `Login::handleLocalUserRecord()` |
 | Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |

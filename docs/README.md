@@ -61,7 +61,7 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 10. [Traits](10-traits.md)
     - HasIsActiveScope
     - HasNotifications
-    - BetterEnum
+    - BetterEnum (`tonegabes/mpac-essentials`)
 
 11. [Settings](11-settings.md)
     - Spatie Laravel Settings
@@ -147,7 +147,7 @@ php artisan make:model-plus Evento --no-filament
 
 ## 📖 Versões Utilizadas
 
-- **PHP**: `^8.3` (ambiente atual em 8.4)
+- **PHP**: `^8.4`
 - **Laravel**: v13
 - **Filament**: v5
 - **Livewire**: v4

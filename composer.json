@@ -12,7 +12,7 @@
   ],
   "license": "MIT",
   "require": {
-    "php": "^8.3",
+    "php": "^8.4",
     "al-saloul/filament-image-gallery": "^3.0",
     "codeat3/blade-phosphor-icons": "^2.3",
     "directorytree/ldaprecord-laravel": "^4.0.4",
@@ -65,16 +65,16 @@
   },
   "scripts": {
     "lint": [
-      "pint --test --no-interaction --ansi --config=vendor/tonegabes/mpac-essentials/pint.json"
+      "pint --test --no-interaction --ansi"
     ],
     "format": [
-      "pint --no-interaction --ansi --config=vendor/tonegabes/mpac-essentials/pint.json"
+      "pint --no-interaction --ansi"
     ],
     "lint:dirty": [
-      "pint --test --dirty --no-interaction --ansi --config=vendor/tonegabes/mpac-essentials/pint.json"
+      "pint --test --dirty --no-interaction --ansi"
     ],
     "format:dirty": [
-      "pint --dirty --no-interaction --ansi --config=vendor/tonegabes/mpac-essentials/pint.json"
+      "pint --dirty --no-interaction --ansi"
     ],
     "analyze": [
       "phpstan analyze --memory-limit=4G --no-progress --no-interaction --ansi"

@@ -20,11 +20,11 @@ it('returns values from cases', function (): void {
     ]);
 });
 
-it('returns options as name => value', function (): void {
+it('returns options as value => name', function (): void {
     $options = PageLayouts::options();
     expect($options)->toHaveCount(3)
-        ->and(array_keys($options))->toBe(PageLayouts::names())
-        ->and(array_values($options))->toBe(PageLayouts::values());
+        ->and(array_keys($options))->toBe(PageLayouts::values())
+        ->and(array_values($options))->toBe(PageLayouts::names());
 });
 
 it('returns asArray with value keyed by name', function (): void {

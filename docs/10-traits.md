@@ -7,8 +7,7 @@ Este documento explica os Traits disponíveis no projeto e como usá-los.
 ```text
 app/Traits/
 ├── HasIsActiveScope.php
-├── HasNotifications.php
-└── BetterEnum.php
+└── HasNotifications.php
 ```
 
 ## ✅ HasIsActiveScope
@@ -80,22 +79,11 @@ class SomeLivewireComponent
 
 ## 🎯 BetterEnum
 
-Utilitários para enums backed:
+Utilitários para enums backed vêm do pacote **`tonegabes/mpac-essentials`**:
 
 ```php
-trait BetterEnum
-{
-    public static function names(): array;    // nomes dos cases
-    public static function values(): array;   // valores persistidos
-    public static function options(): array;  // name => value
-    public static function asArray(): array;  // name => value
-    public static function random(): self;
-}
-```
+use ToneGabes\MpacEssentials\Traits\BetterEnum;
 
-Exemplo:
-
-```php
 enum Status: string
 {
     use BetterEnum;
@@ -105,7 +93,7 @@ enum Status: string
 }
 
 Status::values();   // ['active', 'inactive']
-Status::options();  // ['Active' => 'active', 'Inactive' => 'inactive']
+Status::options();  // ['active' => 'Active', 'inactive' => 'Inactive']
 ```
 
 ## 🔧 Criando um Trait Customizado
