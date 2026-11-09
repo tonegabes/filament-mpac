@@ -136,6 +136,16 @@ curl -fsS http://localhost:8080/up
 
 Ajuste volumes/env de DB real conforme o ambiente de staging; o exemplo acima espelha o smoke do job de MR.
 
+### MySQL com SSL (produção / staging)
+
+Quando `DB_CONNECTION` for `mysql` ou `mariadb` e o servidor exigir CA:
+
+```env
+MYSQL_ATTR_SSL_CA=/caminho/dentro/do/container/para/ca.pem
+```
+
+`config/database.php` usa `Pdo\Mysql::ATTR_SSL_CA` (não `PDO::MYSQL_ATTR_SSL_CA`). Monte o certificado no container (secret/volume) e aponte a env para o path montado. Detalhes e teste de regressão: [Setup e Troubleshooting](17-setup-dependencias-e-troubleshooting.md).
+
 ## ⚠️ Pitfalls
 
 | Sintoma | Causa | Ação |
@@ -147,6 +157,7 @@ Ajuste volumes/env de DB real conforme o ambiente de staging; o exemplo acima es
 | Discovery cache com pacotes `--dev` | caches locais no contexto | build limpa `bootstrap/cache/*`; `.dockerignore` ignora caches |
 | Expectativa de migrate no boot | `AUTORUN_LARAVEL_MIGRATION=false` | rode migrate no passo de deploy |
 | Build lento / contexto grande | arquivos locais desnecessários | revisar `.dockerignore` (`public/build`, `vendor`, tests, sqlite) |
+| Deprecation SSL CA no PHP 8.5+ | constante PDO legada no config | manter `Pdo\Mysql::ATTR_SSL_CA`; ver doc 17 |
 
 ## 🔗 Relacionados
 
