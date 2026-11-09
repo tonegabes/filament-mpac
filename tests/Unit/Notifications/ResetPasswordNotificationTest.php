@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Config;
 
 beforeEach(function (): void {
@@ -17,6 +18,7 @@ it('builds mail message with expected subject and body', function (): void {
     $notification->url = 'https://example.com/reset?token=token123';
 
     $message = $notification->toMail($user);
+    assert($message instanceof MailMessage);
 
     expect($message->subject)->toBe('Redefinição de senha')
         ->and($message->introLines)->toContain('Você está recebendo este e-mail porque recebemos um pedido de redefinição de senha para sua conta.')
@@ -30,6 +32,7 @@ it('includes expire minutes in mail message', function (): void {
     $notification->url = 'https://example.com/reset';
 
     $message = $notification->toMail($user);
+    assert($message instanceof MailMessage);
     $outroLines = array_filter($message->outroLines, is_string(...));
 
     expect(implode(' ', $outroLines))->toContain('120');

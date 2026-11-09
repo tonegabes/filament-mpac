@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Enums\UserRole;
 use App\Http\Responses\LoginResponse;
-use App\Models\User;
 use App\Policies\ActivityPolicy;
 use App\Policies\MediaPolicy;
 use App\Services\Auth\AuthModeHandlerResolver;
@@ -15,7 +13,6 @@ use App\Services\Auth\LdapAuthService;
 use App\Services\Auth\LdapUserService;
 use App\Services\Auth\LocalAuthModeHandler;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 

@@ -34,7 +34,7 @@
     "calebdw/larastan-livewire": "^2.5",
     "fakerphp/faker": "^1.24.1",
     "friendsofphp/php-cs-fixer": "^3.88.2",
-    "larastan/larastan": "^3.7.2",
+    "larastan/larastan": "3.14",
     "laravel/boost": "^2.0",
     "laravel/pail": "^1.2.3",
     "laravel/pint": "^1.30",

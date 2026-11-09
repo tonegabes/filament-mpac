@@ -81,8 +81,6 @@ class AppPanelProvider extends PanelProvider
             return $panel;
         }
 
-        $canRegister = false;
-
         try {
             $canRegister = app(SystemSettings::class)->enable_registration;
         } catch (MissingSettings $e) {

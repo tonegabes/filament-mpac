@@ -141,10 +141,6 @@ class SystemSettings extends Settings
         $files = $disk->files($directory);
 
         foreach ($files as $file) {
-            if (! is_string($file)) {
-                continue;
-            }
-
             if (isset($keep[$file])) {
                 continue;
             }
