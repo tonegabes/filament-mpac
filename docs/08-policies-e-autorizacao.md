@@ -4,13 +4,17 @@ Este documento mostra como a autorização está aplicada hoje no projeto e como
 
 ## 📚 Policies existentes
 
-Atualmente existem policies para:
+| Model / subject | Policy | Registro |
+| --- | --- | --- |
+| `User` | `UserPolicy` | convenção Laravel |
+| `Role` | `RolePolicy` | convenção |
+| `Permission` | `PermissionPolicy` | convenção |
+| `Document` | `DocumentPolicy` | convenção |
+| `Image` | `ImagePolicy` | convenção |
+| `Media` (Spatie) | `MediaPolicy` | **manual** em `AuthServiceProvider::$policies` |
+| `Activity` (Spatie Activitylog) | `ActivityPolicy` | **manual** em `AuthServiceProvider::$policies` |
 
-- `User` (`UserPolicy`)
-- `Role` (`RolePolicy`)
-- `Permission` (`PermissionPolicy`)
-
-No estado atual, não existem policies dedicadas para `Document`, `Image` ou `Media`.
+Models de pacote (`Media`, `Activity`) não seguem a convenção `App\Models` → precisam do mapa em `AuthServiceProvider`.
 
 ## 🔐 Padrão utilizado
 
@@ -20,7 +24,7 @@ As policies usam enums de permissões para cada ação:
 // app/Policies/UserPolicy.php
 public function viewAny(User $user): bool
 {
-    return $user->can(UserPermissions::All);
+    return $user->can(UserPermissions::ViewAny);
 }
 
 public function update(User $user, User $model): bool
@@ -29,11 +33,20 @@ public function update(User $user, User $model): bool
 }
 ```
 
+`ActivityPolicy` é view-only (`viewAny` / `view` via `ActivityPermissions`).
+
 ## 🔎 Descoberta de policy
 
-O Laravel resolve policies por convenção (`Model` -> `Policy`) automaticamente.
+O Laravel resolve policies por convenção (`App\Models\X` → `App\Policies\XPolicy`) automaticamente.
 
-Registro manual em `AuthServiceProvider` só é necessário em casos fora da convenção.
+Registro manual em `AuthServiceProvider` só é necessário para subjects fora de `App\Models` (hoje: `Activity` e `Media`).
+
+```php
+protected $policies = [
+    Activity::class => ActivityPolicy::class,
+    Media::class => MediaPolicy::class,
+];
+```
 
 ## 🧩 Integração com Filament
 
@@ -48,23 +61,19 @@ public static function canViewAny(): bool
 }
 ```
 
-## 🛡️ Gate global
+## 🛡️ Gates
 
-Existe um `Gate::before` para role privilegiada:
+`AuthServiceProvider::configureGates()` está vazio no código atual — **não** há `Gate::before` de super-role.
 
-```php
-Gate::before(fn (User $user) => $user->hasRole('TheOneAboveAll') ? true : null);
-```
-
-Esse bypass acontece antes das policies.
+O gate `viewPulse` vive em `AppServiceProvider::configurePulse()` e exige `SystemPermissions::PulseAccess`.
 
 ## 🧪 Testes de policy
 
-Arquivos de referência:
+Arquivos de referência em `tests/Feature/Policies/`:
 
-- `tests/Feature/Policies/UserPolicyTest.php`
-- `tests/Feature/Policies/RolePolicyTest.php`
-- `tests/Feature/Policies/PermissionPolicyTest.php`
+- `UserPolicyTest.php`, `RolePolicyTest.php`, `PermissionPolicyTest.php`
+- `DocumentPolicyTest.php`, `ImagePolicyTest.php`, `MediaPolicyTest.php`
+- `ActivityPolicyTest.php`
 
 Exemplo:
 
@@ -78,9 +87,10 @@ it('denies user without permission to create users', function (): void {
 
 ## 🚧 Quando criar novas policies
 
-Crie policy quando um novo módulo precisar de regras de autorização explícitas (ex.: novo Resource com create/edit/delete).
-
-No cenário atual, os Resources de arquivos estão majoritariamente em modo leitura, por isso ainda não há policy dedicada para eles.
+1. Crie a policy (`php artisan make:policy … --model=…`).
+2. Use o enum de permissões correspondente.
+3. Se o subject for de pacote (não `App\Models`), registre em `AuthServiceProvider::$policies`.
+4. Cubra com teste em `tests/Feature/Policies`.
 
 ## 🎯 Boas Práticas
 
@@ -88,7 +98,7 @@ No cenário atual, os Resources de arquivos estão majoritariamente em modo leit
 2. Use enums para permissão em vez de strings soltas.
 3. Evite lógica complexa no Resource se ela pertence ao domínio de acesso.
 4. Cubra cada policy com testes de feature.
-5. Sempre validar impacto do `Gate::before` em cenários de segurança.
+5. Não reintroduza bypass global sem revisão de segurança explícita.
 
 ## 🔗 Próximos Passos
 

@@ -18,13 +18,14 @@ O trait `HasIsActiveScope` encapsula operações sobre o campo booleano `is_acti
 
 | API | Tipo | Uso |
 | --- | --- | --- |
-| `isActive()` | query scope (`#[Scope]`) | `Model::query()->isActive()->get()` |
+| `active()` | query scope (`#[Scope]`) | `Model::query()->active()->get()` |
+| `isActive()` | método de instância | retorna `(bool) $this->is_active` |
+| `isInactive()` | método de instância | negação de `isActive()` |
 | `activate()` | método de instância | marca `is_active = true` |
 | `deactivate()` | método de instância | marca `is_active = false` |
 | `toggleActive()` | método de instância | inverte o valor atual |
-| `countActive(Builder $query)` | helper | conta registros com `is_active = true` |
 
-No MySQL, o scope `isActive()` tenta usar o índice `idx_is_active` quando disponível.
+No MySQL, o scope `active()` tenta usar o índice `idx_is_active` quando disponível.
 
 ### Uso em Models
 
@@ -40,23 +41,29 @@ class User extends Authenticatable
 ### Exemplos
 
 ```php
-$activeUsers = User::query()->isActive()->get();
+$activeUsers = User::query()->active()->get();
+
+if ($user->isActive()) {
+    // ...
+}
+
+if ($user->isInactive()) {
+    // ...
+}
 
 $user->activate();
 $user->deactivate();
 $user->toggleActive();
-
-// Preferir o atributo booleano para checagens de instância:
-if ($user->is_active) {
-    // ...
-}
 ```
 
 ### Restrições
 
 - O model precisa ter a coluna `is_active` (cast `boolean` recomendado).
-- O scope é `protected` com atributo `#[Scope]`; chame via query builder (`->isActive()`), não como método público de instância.
-- Não existe mais o trait antigo `HasActiveScope`.
+- O scope é `protected` com atributo `#[Scope]`; chame via query builder (`->active()`).
+- Não use `isActive()` como se fosse scope de query — na instância ele retorna `bool`.
+- Não existe mais o trait antigo `HasActiveScope`, nem helpers `countActive()` / `activeCount()`.
+
+Cobertura: `tests/Unit/Traits/HasActiveScopeTest.php`.
 
 ## 🔔 HasNotifications
 
@@ -79,7 +86,7 @@ class SomeLivewireComponent
 
 ## 🎯 BetterEnum
 
-Utilitários para enums backed vêm do pacote **`tonegabes/mpac-essentials`**:
+Utilitários para enums backed vêm do pacote **`tonegabes/mpac-essentials`** (não há mais `App\Traits\BetterEnum`):
 
 ```php
 use ToneGabes\MpacEssentials\Traits\BetterEnum;

@@ -52,7 +52,7 @@ Uso principal:
 
 - `config/auth.php` (`auth.mode`)
 - `AuthModeHandlerResolver`
-- `AdminPanelProvider::configureRegistration()`
+- `AppPanelProvider::configureRegistration()` (registro/reset só no painel `app`)
 
 ```php
 $authMode = AuthMode::fromConfig(Config::string('auth.mode'));
@@ -74,9 +74,11 @@ FileCollection::Documents->disk(); // documents
 FileCollection::SystemLogos->directory(); // system/logos
 
 // Em models com Spatie Media Library:
-Post::mediaCollection()->value;
-Image::mediaCollection()->disk();
+Document::fileCollection()->value;
+Image::fileCollection()->disk();
 ```
+
+Não use constante `COLLECTION_NAME` — a fonte da verdade é `fileCollection()`. Detalhes em [Modelos](14-modelos-e-relacionamentos.md).
 
 Se um arquivo importar também `Spatie\MediaLibrary\MediaCollections\MediaCollection`, use alias:
 
@@ -107,10 +109,10 @@ Não existe mais `Operator` / `Enums\Roles`.
 
 Enum dos painéis Filament (`app` e `admin`):
 
-- `Panels::App` → path `/`, permissão `panels.view.app`
+- `Panels::App` → path `/`, permissão `panels.view.app` — único painel `->default()`
 - `Panels::Admin` → path `/admin`, permissão `panels.view.admin`
 
-Usado por `PanelPermissions::fromPanel()` e `PanelSwitcher`.
+Usado por `PanelPermissions::fromPanel()` e `PanelSwitcher`. Ver [Panel Provider](15-panel-provider.md).
 
 ## 🎨 PageLayouts
 
@@ -124,13 +126,13 @@ Usado em `SystemSettings` e na página `ManageSystem`.
 
 ## 🛡️ Permission Enums
 
-Enums de permissões:
+Enums em `app/Enums/Permissions/`:
 
-- `PanelPermissions`
-- `UserPermissions`
-- `RolePermissions`
-- `PermissionPermissions`
-- `SystemPermissions`
+- `PanelPermissions`, `UserPermissions`, `RolePermissions`, `PermissionPermissions`
+- `SystemPermissions` (inclui `system.pulse.access`)
+- `DocumentPermissions`, `ImagePermissions`, `MediaPermissions`
+- `ActivityPermissions` (view-only: `activities.view.any` / `activities.view`)
+- `WildcardPermissions`
 
 Cada enum é usado por policies, seeders e checks de acesso no painel.
 

@@ -24,7 +24,19 @@ Comandos úteis do `composer.json`:
 | `composer fresh:db` | `migrate:fresh --seed` |
 | `composer dev` | serve + queue + pail + vite |
 
-A config do Pint é o `pint.json` na raiz do projeto (espelha o preset MPAC de `tonegabes/mpac-essentials`). `vendor/bin/pint` sem `--config` já usa esse arquivo.
+A config do Pint é o `pint.json` na raiz do projeto (espelha o preset MPAC de `tonegabes/mpac-essentials`). `vendor/bin/pint` sem `--config` já usa esse arquivo. O `.php-cs-fixer.php` da raiz delega para `vendor/tonegabes/mpac-essentials/.php-cs-fixer.php` — prefira Pint nos scripts Composer.
+
+## 🌐 Locale, timezone e vars Docker locais
+
+Valores padrão relevantes em `.env.example` / `config/app.php`:
+
+| Chave | Fonte | Valor / comportamento |
+| --- | --- | --- |
+| `APP_LOCALE` / `APP_FALLBACK_LOCALE` / `APP_FAKER_LOCALE` | `.env` | `pt_BR` (exemplo) |
+| `timezone` | `config/app.php` (hardcoded) | `America/Rio_Branco` — **não** há `APP_TIMEZONE` |
+| `APP_IMAGE` / `APP_VERSION` | `.env` | usados só por `docker-compose.yml` no build/publicação local; ajuste no projeto derivado |
+
+Timezone de runtime não vem do `.env`. Para mudar fuso, edite `config/app.php` (ou introduza env de forma consciente e documente).
 
 ## 🧱 AppServiceProvider (comportamento global)
 
@@ -91,16 +103,16 @@ Pitfalls:
 
 - Com `LDAP_AUTH_REQUIRES_LOCAL=true`, usuários LDAP sem registro local ativo falham no login.
 - Username LDAP é normalizado (lowercase, trim, remove domínio se colado no valor).
-- Registro local só existe no modo local e quando o panel provider habilita registration.
+- Registro local só existe no modo local e quando `AppPanelProvider::configureRegistration()` habilita registration (não o admin).
 
 ## 🧭 Painéis
 
 Dois painéis (`App\Enums\Panels`):
 
-- `app` → `/` (permissão `panels.view.app`)
-- `admin` → `/admin` (permissão `panels.view.admin`)
+- `app` → `/` (permissão `panels.view.app`) — **único** `->default()`
+- `admin` → `/admin` (permissão `panels.view.admin`) — resources explícitos em `AdminPanelProvider`
 
-Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
+Troca no menu do usuário: `PanelSwitcher::userMenuItems()`. Detalhes: [Panel Provider](15-panel-provider.md).
 
 ## 🐛 Troubleshooting comum
 
@@ -110,9 +122,13 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | ViteException / manifesto | frontend não buildado | `npm run build` ou `npm run dev` |
 | Estilo diferente entre `pint` na CLI e o CI | Pint sem config usa preset Laravel | use sempre `pint.json` na raiz ou `composer format`; evite `pint` sem config em outro diretório |
 | PHP-CS-Fixer opcional | `.php-cs-fixer.php` delega para `mpac-essentials` | prefira Pint (`composer format`); CS Fixer só se a ferramenta exigir |
+| Datas/horários “errados” | timezone fixo em `config/app.php` | `America/Rio_Branco`; não procure `APP_TIMEZONE` no `.env` |
+| `docker compose` falha sem imagem | `APP_IMAGE`/`APP_VERSION` obrigatórios | preencha no `.env` (ver `.env.example`) |
 | Permissões “sumiram” | cache Spatie / seed ausente | `PermissionRegistrar::forgetCachedPermissions()` + reseeding |
 | Login LDAP falha com usuário novo | `requires_local` ou falta de sync | revisar `auth.ldap.requires_local` e criação em `Login::handleLocalUserRecord()` |
 | Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |
+| Ambiguidade / erro de painel default | mais de um `->default()` | só `AppPanelProvider`; teste `DefaultPanelTest` |
+| Resource novo não aparece no admin | não listado em `->resources([...])` | registrar em `AdminPanelProvider` |
 | Testes de role quebrando com `Operator` | rename para `UserRole::User` | atualizar asserts/factories para `User` |
 | Pulse abre mas retorna 403 | falta gate/permissão | `SystemPermissions::PulseAccess` + gate `viewPulse` em `AppServiceProvider` |
 | Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |

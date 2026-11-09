@@ -15,13 +15,16 @@ app/Enums/Permissions/
 ├── PanelPermissions.php
 ├── DocumentPermissions.php
 ├── ImagePermissions.php
+├── MediaPermissions.php
+├── ActivityPermissions.php
 └── WildcardPermissions.php
 ```
 
 ## 🔐 SystemPermissions
 
-- `system`
+- `system.*`
 - `system.settings.manage`
+- `system.pulse.access` (`PulseAccess` — menu Pulse + gate `viewPulse`)
 
 ## 🧭 PanelPermissions
 
@@ -40,6 +43,11 @@ Módulos com enum CRUD completo:
 - `permissions.*`
 - `documents.*`
 - `images.*`
+- `media.*`
+
+Módulo view-only:
+
+- `activities.*` / `activities.view.any` / `activities.view` (`ActivityPermissions`)
 
 ## 🌱 Seeders oficiais
 
@@ -80,15 +88,11 @@ public function canAccessPanel(?Panel $panel): bool
 }
 ```
 
-## 🛡️ Gate global de superusuário
+## 🛡️ Gates
 
-No `AuthServiceProvider`, existe bypass por role:
+`AuthServiceProvider::configureGates()` está vazio — não há bypass global de role.
 
-```php
-Gate::before(fn (User $user) => $user->hasRole('TheOneAboveAll') ? true : null);
-```
-
-Esse papel não é criado no `RoleSeeder` padrão; use com cuidado em ambientes controlados.
+Pulse usa o gate `viewPulse` em `AppServiceProvider` (permissão `SystemPermissions::PulseAccess`). Policies de `Activity`/`Media` (models Spatie) estão mapeadas em `AuthServiceProvider::$policies` — ver [Policies](08-policies-e-autorizacao.md).
 
 ## 🎯 Uso prático
 

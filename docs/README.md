@@ -47,9 +47,9 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
    - Roles (`UserRole`)
 
 8. [Policies e Autorização](08-policies-e-autorizacao.md)
-   - Criando Policies
+   - Policies de domínio + Activity/Media (registro manual)
    - Integração com Filament
-   - Métodos de autorização
+   - Gates (Pulse; sem bypass global)
 
 ### Recursos do Laravel
 
@@ -89,10 +89,10 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 ### Configuração e Operação
 
 15. [Panel Provider](15-panel-provider.md)
-    - AdminPanelProvider
+    - AdminPanelProvider e AppPanelProvider
+    - Único painel default (`app`)
+    - Registro explícito de Resources (sem discover)
     - OverrideActions / AppServiceProvider (CreateAction)
-    - Descoberta automática
-    - Grupos de navegação
 
 16. [Exemplos Completos](16-exemplos-completos.md)
     - Exemplo completo: Resource do zero
@@ -100,7 +100,8 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
     - Fluxo completo de desenvolvimento
 
 17. [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
-    - Setup local e scripts (`format` / `lint` via mpac-essentials)
+    - Setup local e scripts (`format` / `lint` via `pint.json`)
+    - Locale `pt_BR`, timezone fixo, vars Docker `APP_IMAGE`/`APP_VERSION`
     - AppServiceProvider (strict models, HTTPS, Pulse, CreateAction)
     - Auth local/LDAP e pitfalls
 
@@ -169,7 +170,7 @@ php artisan make:model-plus Evento --no-filament
 Veja também:
 
 - [Páginas Customizadas](05-paginas-customizadas.md) para autenticação e SettingsPage
-- [Panel Provider](15-panel-provider.md) para configuração do painel admin
+- [Panel Provider](15-panel-provider.md) para painéis `app`/`admin` e registro de Resources
 - [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md) para biblioteca de arquivos e media
 - [Deploy, Docker e CI](18-deploy-docker-e-ci.md) para imagem e pipeline GitLab
 
@@ -190,4 +191,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Outubro 2026
+**Última atualização**: Novembro 2026
