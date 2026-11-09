@@ -102,12 +102,13 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 17. [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
     - Setup local e scripts (`format` / `lint` via mpac-essentials)
     - AppServiceProvider (strict models, HTTPS, Pulse, CreateAction)
-    - Auth local/LDAP e pitfalls
+    - Auth local/LDAP, MySQL SSL (`Pdo\Mysql`), Larastan pin e pitfalls
 
 18. [Deploy, Docker e CI](18-deploy-docker-e-ci.md)
     - Imagem FrankenPHP (Dockerfile multi-stage)
     - Caddy, health check `/up`, autorun
     - Pipeline GitLab (qualidade, MR → `develop`, release por tag)
+    - MySQL SSL CA em container
 
 ## 🚀 Guia Rápido
 
@@ -190,4 +191,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Outubro 2026
+**Última atualização**: Novembro 2026

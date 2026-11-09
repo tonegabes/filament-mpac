@@ -164,6 +164,8 @@ Além da permissão Spatie no item de menu, o Pulse exige o gate `viewPulse` def
 
 ### Registro Condicional (Local x LDAP)
 
+O auto-registro vive em `AppPanelProvider::configureRegistration()` (não no admin):
+
 ```php
 private function configureRegistration(Panel $panel): Panel
 {
@@ -173,7 +175,13 @@ private function configureRegistration(Panel $panel): Panel
         return $panel;
     }
 
-    $canRegister = app(SystemSettings::class)->enable_registration;
+    try {
+        $canRegister = app(SystemSettings::class)->enable_registration;
+    } catch (MissingSettings $e) {
+        return $panel;
+    } catch (QueryException $e) {
+        return $panel;
+    }
 
     if ($canRegister) {
         $panel->registration(Register::class)
@@ -187,10 +195,11 @@ private function configureRegistration(Panel $panel): Panel
 }
 ```
 
-No projeto atual, o controle de registro depende de dois fatores:
+No projeto atual, o controle de registro depende de:
 
 1. O modo de autenticação (`auth.mode`): apenas modo local permite auto-registro.
 2. A flag `enable_registration` em `SystemSettings`.
+3. Soft-fail: se settings ainda não existem (`MissingSettings`) ou o banco falha (`QueryException`), o provider **não** habilita registro — evita quebrar o boot antes de migrate/seed.
 
 ## 🎨 Branding
 

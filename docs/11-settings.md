@@ -54,7 +54,7 @@ Uploads de sistema são integrados com `FileCollection`:
 
 Na página `ManageSystem`, os campos usam `LibraryFileUpload::publicImage(...)`.
 
-Após salvar, o projeto remove arquivos órfãos:
+Após salvar, o projeto remove arquivos órfãos no disco `public`:
 
 ```php
 public function afterSave(): void
@@ -65,6 +65,18 @@ public function afterSave(): void
     SystemSettings::cleanBackgroundsDirectory($settings);
 }
 ```
+
+Como a limpeza funciona (`deleteUnusedPublicFiles`):
+
+1. Monta a lista de paths a **manter** (logos light/dark ou o background atual).
+2. Lista os arquivos em `system/logos` ou `system/backgrounds` via `Storage::disk('public')`.
+3. Apaga qualquer arquivo do diretório que **não** esteja na lista de keep.
+
+Constraints:
+
+- Paths vazios/`null` não entram no keep — o fallback de asset local (`images/logo.png`, etc.) não é um arquivo desses diretórios.
+- A limpeza só roda no `afterSave` da página; uploads órfãos de sessões abortadas só somem no próximo save bem-sucedido.
+- Não misture arquivos manuais nesses diretórios: tudo que não estiver referenciado nas settings será removido.
 
 ## 🧭 Layout de Login
 

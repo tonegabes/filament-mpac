@@ -33,6 +33,7 @@ tests/
 │       ├── RoleSeederTest.php
 │       └── UserSeederTest.php
 └── Unit/
+    ├── DatabaseConfigTest.php   # SSL CA via Pdo\Mysql (config/database.php)
     ├── Enums/
     ├── Models/
     ├── Services/Auth/
@@ -132,6 +133,7 @@ php artisan test --compact
 - Recursos de arquivos (`Document`, `Image`, `Media`) hoje têm foco em listagem/visualização.
 - Não assuma factories de `Document`/`Image` se elas não existirem; use o padrão já adotado nos testes atuais.
 - Para autenticação, há testes dedicados em `LoginTest` e `RegisterTest`.
+- Mudanças em `config/database.php` (ex.: SSL CA) devem preservar `tests/Unit/DatabaseConfigTest.php` — o teste carrega o arquivo de config diretamente e falha se a constante legada `PDO::MYSQL_ATTR_SSL_CA` voltar a emitir deprecation.
 
 ## 🔗 Próximos Passos
 

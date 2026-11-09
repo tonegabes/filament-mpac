@@ -50,11 +50,39 @@ Stack relevante após o bump de dependências:
 | Livewire | v4 (via Filament) |
 | Pest | `^5.0` |
 | PHPUnit | `^13.0` |
+| `larastan/larastan` | `3.14` (versão **exata**, sem `^`) |
 | `directorytree/ldaprecord-laravel` | `^4.0.4` |
 | `spatie/laravel-permission` | `^8.3` |
 | `janczakb/filament-flex-fields` | `^2.7` |
 
 Fonte da verdade: `composer.json` / `composer.lock`.
+
+`composer analyze` usa Larastan via o script do projeto. Ao atualizar análise estática, preserve o pin `3.14` até alguém validar um bump intencional (diff de regras PHPStan pode gerar ruído no CI).
+
+## 🗄️ MySQL / MariaDB e SSL CA
+
+`config/database.php` configura o certificado CA assim (conexões `mysql` e `mariadb`):
+
+```php
+use Pdo\Mysql;
+
+'options' => extension_loaded('pdo_mysql') ? array_filter([
+    Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+]) : [],
+```
+
+Intent: evitar a constante legada `PDO::MYSQL_ATTR_SSL_CA`, deprecada em PHP 8.5. O projeto usa `Pdo\Mysql::ATTR_SSL_CA`.
+
+Uso operacional:
+
+```env
+DB_CONNECTION=mysql
+MYSQL_ATTR_SSL_CA=/caminho/para/ca.pem
+```
+
+Se `MYSQL_ATTR_SSL_CA` estiver vazio, `array_filter` remove a opção e a conexão segue sem SSL CA explícito. Sem a extensão `pdo_mysql`, `options` fica `[]`.
+
+Teste de regressão: `tests/Unit/DatabaseConfigTest.php` (garante a constante nova e ausência de deprecation ao carregar o config).
 
 ## 🔄 Workflow de update de dependências
 
@@ -70,6 +98,8 @@ Fonte da verdade: `composer.json` / `composer.lock`.
 - **Pest 4 → 5** e **PHPUnit 12 → 13**: revise plugins e asserts se algo quebrar na suite.
 - **ldaprecord-laravel 3 → 4**: valide fluxo LDAP (`AUTH_MODE=ldap`) em staging.
 - **spatie/laravel-permission 6 → 8**: seeders/roles atuais usam a API estável do projeto; evite APIs removidas de teams/guards customizados sem checar o changelog do pacote.
+- **larastan `3.14` (pin exato)**: não rode `composer update larastan/larastan` sem alinhar a constraint; o pin evita drift silencioso no CI de análise.
+- **MySQL SSL CA via `Pdo\Mysql`**: após upgrades de PHP, não reintroduza `PDO::MYSQL_ATTR_SSL_CA` em `config/database.php`.
 
 ## 🔐 Auth local vs LDAP
 
@@ -118,6 +148,9 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |
 | CreateAction sem ícone Phosphor esperado | `OverrideActionsProvider` não registrado | confirme `bootstrap/providers.php` e [Panel Provider](15-panel-provider.md) |
 | Lazy loading / attribute exception em local | `Model::shouldBeStrict(true)` fora de produção | corrija a query/atributo; em produção o strict mode está desligado |
+| Deprecation `MYSQL_ATTR_SSL_CA` ao boot/config | uso de `PDO::MYSQL_ATTR_SSL_CA` | use `Pdo\Mysql::ATTR_SSL_CA` (já no `config/database.php`); rode `tests/Unit/DatabaseConfigTest.php` |
+| `composer analyze` diverge do CI | Larastan saiu do pin `3.14` | confira constraint exata em `composer.json` e `composer.lock` |
+| Logo/fundo antigo continua no disco após troca | limpeza de settings não rodou | `ManageSystem::afterSave()` chama `SystemSettings::cleanLogoDirectory` / `cleanBackgroundsDirectory` — ver [Settings](11-settings.md) |
 
 ## 🧪 Verificação mínima após mudanças de auth/deps
 
@@ -125,6 +158,7 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 php artisan test --compact tests/Feature/Filament/LoginTest.php
 php artisan test --compact tests/Feature/Seeders/RoleSeederTest.php
 php artisan test --compact tests/Unit/Services/Auth/
+php artisan test --compact tests/Unit/DatabaseConfigTest.php
 ```
 
 ## 🚢 Deploy / Docker
