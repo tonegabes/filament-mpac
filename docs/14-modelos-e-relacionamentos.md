@@ -37,6 +37,10 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(?Panel $panel): bool
     {
+        if (! $this->is_active) {
+            return false;
+        }
+
         $permission = PanelPermissions::fromPanel($panel);
 
         if ($permission === null) {
@@ -47,6 +51,8 @@ class User extends Authenticatable implements FilamentUser
     }
 }
 ```
+
+Usuário inativo não entra no painel mesmo com permissão `panels.view.*`. O login também bloqueia inativos — ver [Páginas Customizadas](05-paginas-customizadas.md).
 
 ## 📁 Biblioteca de Arquivos
 
@@ -146,12 +152,14 @@ Não use constante `COLLECTION_NAME` — a fonte da verdade é `fileCollection()
 - Modelo: `App\Models\Document`
 - Páginas registradas: `index` e `view`
 - `infolist()` definido no Resource
+- `getEloquentQuery()` faz eager load de `media` (`parent::getEloquentQuery()->with('media')`) para evitar N+1 na listagem/view
 
 ### ImageResource
 
 - Modelo: `App\Models\Image`
 - Páginas registradas: `index` e `view`
 - `infolist()` definido no Resource
+- Mesmo padrão: `getEloquentQuery()` com `->with('media')`
 
 ### MediaResource
 

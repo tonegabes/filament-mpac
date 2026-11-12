@@ -70,6 +70,10 @@ Role padrão para novos usuários (registro local / LDAP sem role): `config('aut
 ```php
 public function canAccessPanel(?Panel $panel): bool
 {
+    if (! $this->is_active) {
+        return false;
+    }
+
     $permission = PanelPermissions::fromPanel($panel);
 
     if ($permission === null) {
@@ -80,15 +84,18 @@ public function canAccessPanel(?Panel $panel): bool
 }
 ```
 
-## 🛡️ Gate global de superusuário
+Ordem importa: usuário inativo é barrado antes da checagem de `panels.view.*`.
 
-No `AuthServiceProvider`, existe bypass por role:
+## 🛡️ Gates no AuthServiceProvider
 
-```php
-Gate::before(fn (User $user) => $user->hasRole('TheOneAboveAll') ? true : null);
-```
+`AuthServiceProvider::configureGates()` está vazio — **não** há `Gate::before` / role `TheOneAboveAll`.
 
-Esse papel não é criado no `RoleSeeder` padrão; use com cuidado em ambientes controlados.
+Policies mapeadas explicitamente em `$policies`:
+
+- `Spatie\Activitylog\Models\Activity` → `ActivityPolicy`
+- `Spatie\MediaLibrary\MediaCollections\Models\Media` → `MediaPolicy`
+
+O gate `viewPulse` fica em `AppServiceProvider` (permissão `SystemPermissions::PulseAccess`).
 
 ## 🎯 Uso prático
 

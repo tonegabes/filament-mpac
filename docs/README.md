@@ -190,4 +190,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Outubro 2026
+**Última atualização**: Novembro 2026
