@@ -16,6 +16,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 class ImageResource extends Resource
@@ -48,6 +49,11 @@ class ImageResource extends Resource
     public static function table(Table $table): Table
     {
         return ImagesTable::configure($table);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('media');
     }
 
     public static function getRelations(): array

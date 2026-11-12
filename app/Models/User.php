@@ -79,6 +79,10 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(?Panel $panel): bool
     {
+        if (! $this->is_active) {
+            return false;
+        }
+
         $permission = PanelPermissions::fromPanel($panel);
 
         if ($permission === null) {

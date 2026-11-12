@@ -65,7 +65,7 @@ return [
      * additional prefix.
      */
     'cache' => [
-        'enabled' => env('SETTINGS_CACHE_ENABLED', false),
+        'enabled' => env('SETTINGS_CACHE_ENABLED', env('APP_ENV') === 'production'),
         'store' => null,
         'prefix' => null,
         'ttl' => null,

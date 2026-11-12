@@ -12,6 +12,7 @@ use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -54,11 +55,15 @@ it('can create a user', function (): void {
             'name' => 'New User',
             'email' => 'newuser@example.com',
             'username' => 'newuser',
+            'password' => 'secret-pass-123',
             'is_active' => true,
             'roles' => [$role->id],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
+
+    $created = User::query()->where('username', 'newuser')->firstOrFail();
+    expect(Hash::check('secret-pass-123', (string) $created->password))->toBeTrue();
 
     $this->assertDatabaseHas(User::class, [
         'name' => 'New User',

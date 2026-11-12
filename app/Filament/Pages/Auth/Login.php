@@ -151,7 +151,9 @@ class Login extends VendorLogin
      */
     public function attemptDefaultAuth(SessionGuard $authGuard, Authenticatable $user, array $credentials, bool $remember): void
     {
-        if (! $authGuard->attemptWhen(credentials: $credentials, remember: $remember)) {
+        $isActive = static fn (Authenticatable $candidate): bool => ! $candidate instanceof User || $candidate->is_active;
+
+        if (! $authGuard->attemptWhen(credentials: $credentials, callbacks: $isActive, remember: $remember)) {
             $this->fireFailedEvent($authGuard, $user, $credentials);
             $this->throwFailureValidationException();
         }
@@ -267,6 +269,10 @@ class Login extends VendorLogin
                 'is_active' => true,
             ],
         );
+
+        if (! $user->is_active) {
+            $this->throwFailureValidationException();
+        }
 
         if ($user->roles()->doesntExist()) {
             $user->syncRoles([Config::string('auth.default_role')]);

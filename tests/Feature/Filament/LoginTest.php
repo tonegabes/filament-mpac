@@ -125,6 +125,39 @@ it('authenticates with ldap credentials when user can access panel', function ()
         ]);
 });
 
+it('blocks local login when user is inactive', function (): void {
+    $user = User::factory()->inactive()->create();
+    $user->givePermissionTo(PanelPermissions::ViewAdmin->value);
+
+    Livewire::test(Login::class)
+        ->set('data.email', $user->email)
+        ->set('data.password', 'password')
+        ->set('data.remember', false)
+        ->call('authenticate')
+        ->assertHasErrors();
+
+    $this->assertGuest();
+});
+
+it('blocks ldap login when local user is inactive and requires_local is false', function (): void {
+    Config::set('auth.mode', 'ldap');
+    Config::set('auth.ldap.requires_local', false);
+
+    User::factory()->inactive()->create(['username' => 'inactive-user']);
+
+    $this->instance(LdapUserService::class, new LoginTestLdapUserService);
+    $this->instance(LdapAuthService::class, new LoginTestLdapAuthService);
+
+    Livewire::test(Login::class)
+        ->set('data.username', 'inactive-user')
+        ->set('data.password', 'password')
+        ->set('data.remember', false)
+        ->call('authenticate')
+        ->assertHasErrors();
+
+    $this->assertGuest();
+});
+
 it('blocks ldap login when user cannot access panel', function (): void {
     Config::set('auth.mode', 'ldap');
     Config::set('auth.ldap.requires_local', true);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Auth;
 
 use App\Traits\HasNotifications;
+use Illuminate\Support\Facades\Log;
 use LdapRecord\LdapRecordException;
 use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 
@@ -23,11 +24,10 @@ class LdapUserService
                 ->first()
             ;
         } catch (LdapRecordException $e) {
-            $this->notify('Erro ao buscar usuário no LDAP: ' . $e->getMessage(), 'danger');
+            Log::error('Erro ao buscar usuário no LDAP.', ['exception' => $e]);
+            $this->notifyError('Não foi possível consultar o serviço de diretório. Tente novamente mais tarde.');
 
             return null;
-        } catch (\Exception $e) {
-            throw $e;
         }
 
         return $result instanceof LdapUser ? $result : null;

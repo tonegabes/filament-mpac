@@ -33,3 +33,11 @@ it('canAccessPanel returns false when panel is null', function (): void {
 
     expect($user->canAccessPanel(null))->toBeFalse();
 });
+
+it('canAccessPanel returns false when user is inactive', function (): void {
+    Permission::firstOrCreate(['name' => PanelPermissions::ViewAdmin->value]);
+    $user = User::factory()->inactive()->create();
+    $user->givePermissionTo(PanelPermissions::ViewAdmin->value);
+
+    expect($user->canAccessPanel(Panel::make()->id('admin')))->toBeFalse();
+});
