@@ -64,6 +64,11 @@ class ProductForm
 
 ### Exemplo Real: UserForm
 
+`UserForm` adapta username/e-mail/senha conforme `config('auth.mode')`:
+
+- **Local**: username e e-mail editáveis; campo `password` via `getPasswordComponents()` (obrigatório no create; no edit, vazio = mantém a senha).
+- **LDAP**: username dispara geração de e-mail com `auth.ldap.email_domain`; e-mail fica readonly; **sem** campo de senha (autenticação no diretório).
+
 ```php
 // app/Filament/Resources/Users/Schemas/UserForm.php
 class UserForm
@@ -81,14 +86,10 @@ class UserForm
                             ->maxLength(255)
                             ->required(),
 
-                        TextInput::make('email')
-                            ->email()
-                            ->maxLength(255)
-                            ->required(),
+                        self::getUsernameComponent(),
+                        self::getEmailComponent(),
 
-                        TextInput::make('username')
-                            ->maxLength(255)
-                            ->required(),
+                        ...self::getPasswordComponents(),
 
                         ToggleButtons::make('is_active')
                             ->label('Ativo')
@@ -110,8 +111,28 @@ class UserForm
                     ]),
             ])->columns(2);
     }
+
+    /** @return list<TextInput> */
+    private static function getPasswordComponents(): array
+    {
+        if (config('auth.mode') !== AuthMode::Local->value) {
+            return [];
+        }
+
+        return [
+            TextInput::make('password')
+                ->label('Senha')
+                ->password()
+                ->revealable()
+                ->minLength(8)
+                ->required(fn (string $operation): bool => $operation === 'create')
+                ->dehydrated(fn (?string $state): bool => filled($state)),
+        ];
+    }
 }
 ```
+
+Constraint: em modo LDAP, criar/editar usuário no painel **não** define senha local — só `is_active`, identidade e roles.
 
 ## 🧩 Componentes de Formulário Comuns
 

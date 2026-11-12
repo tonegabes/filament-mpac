@@ -48,15 +48,16 @@ public static function canViewAny(): bool
 }
 ```
 
-## 🛡️ Gate global
+## 🛡️ Gates e mapeamento
 
-Existe um `Gate::before` para role privilegiada:
+`AuthServiceProvider::configureGates()` está vazio — não há bypass global por role.
 
-```php
-Gate::before(fn (User $user) => $user->hasRole('TheOneAboveAll') ? true : null);
-```
+Policies registradas no provider (além das descobertas por convenção Laravel):
 
-Esse bypass acontece antes das policies.
+- `Activity` → `ActivityPolicy`
+- `Media` → `MediaPolicy`
+
+Gate `viewPulse` fica em `AppServiceProvider` (não no AuthServiceProvider).
 
 ## 🧪 Testes de policy
 
@@ -80,7 +81,7 @@ it('denies user without permission to create users', function (): void {
 
 Crie policy quando um novo módulo precisar de regras de autorização explícitas (ex.: novo Resource com create/edit/delete).
 
-No cenário atual, os Resources de arquivos estão majoritariamente em modo leitura, por isso ainda não há policy dedicada para eles.
+Resources de arquivos têm `DocumentPolicy`, `ImagePolicy` e `MediaPolicy` (esta última mapeada em `AuthServiceProvider`). As páginas costumam ser `index`/`view`, mas a autorização continua passando pelas policies.
 
 ## 🎯 Boas Práticas
 

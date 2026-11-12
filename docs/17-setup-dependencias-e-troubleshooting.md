@@ -92,6 +92,9 @@ Pitfalls:
 - Com `LDAP_AUTH_REQUIRES_LOCAL=true`, usuários LDAP sem registro local ativo falham no login.
 - Username LDAP é normalizado (lowercase, trim, remove domínio se colado no valor).
 - Registro local só existe no modo local e quando o panel provider habilita registration.
+- Usuário com `is_active=false` não autentica (local via `attemptWhen`; LDAP após `handleLocalUserRecord`) e `canAccessPanel()` retorna `false`.
+- Campo de senha no `UserForm` só aparece com `AUTH_MODE=local`.
+- Falha de consulta LDAP: `LdapUserService` registra `Log::error` e notifica mensagem genérica (`notifyError`) — a exception não vai para a UI.
 
 ## 🧭 Painéis
 
@@ -112,7 +115,10 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | PHP-CS-Fixer opcional | `.php-cs-fixer.php` delega para `mpac-essentials` | prefira Pint (`composer format`); CS Fixer só se a ferramenta exigir |
 | Permissões “sumiram” | cache Spatie / seed ausente | `PermissionRegistrar::forgetCachedPermissions()` + reseeding |
 | Login LDAP falha com usuário novo | `requires_local` ou falta de sync | revisar `auth.ldap.requires_local` e criação em `Login::handleLocalUserRecord()` |
-| Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |
+| Credenciais corretas, login falha | usuário inativo (`is_active=false`) | reativar no User Resource ou factory `->inactive()` só em testes |
+| Usuário autenticado sem acesso ao painel | `is_active=false` ou falta `panels.view.*` | conferir flag ativo, `RoleSeeder` e `User::canAccessPanel()` |
+| Settings “atrasados” em produção | cache Spatie Settings ligado | `SETTINGS_CACHE_ENABLED` default `true` em production; limpe cache após mudança |
+| Auth layout sem logo / componente inválido | tag Blade errada | use `<livewire:brand-logomark />` (não `<x-brand-logomark>`) |
 | Testes de role quebrando com `Operator` | rename para `UserRole::User` | atualizar asserts/factories para `User` |
 | Pulse abre mas retorna 403 | falta gate/permissão | `SystemPermissions::PulseAccess` + gate `viewPulse` em `AppServiceProvider` |
 | Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |

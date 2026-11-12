@@ -284,6 +284,18 @@ Config relevante (`.env` / `config/auth.php`):
 - `LDAP_AUTH_REQUIRES_LOCAL` → se `true`, exige usuário local ativo pré-existente
 - `LDAP_AUTH_EMAIL_DOMAIN` → sufixo exibido no input de username
 
+#### Usuários inativos
+
+Login e acesso ao painel rejeitam `is_active = false`:
+
+| Camada | Codepath | Comportamento |
+| --- | --- | --- |
+| Login local | `Login::attemptDefaultAuth()` | `attemptWhen(..., callbacks: $isActive)` — credenciais corretas de usuário inativo falham como login inválido |
+| Login LDAP | `Login::handleLocalUserRecord()` | após sync/create do registro local, se `! $user->is_active` → `throwFailureValidationException()` |
+| Painel | `User::canAccessPanel()` | retorna `false` imediatamente quando `! $this->is_active` |
+
+Testes de referência: `tests/Feature/Filament/LoginTest.php` (local + LDAP com `requires_local=false`) e `tests/Unit/Models/UserTest.php`.
+
 #### Labels e ícones
 
 Customizações atuais na UI de login:
@@ -293,6 +305,11 @@ Customizações atuais na UI de login:
 - botão “Entrar”
 
 Layout visual vem de `UsesConfiguredAuthLayout` + `SystemSettings` (`PageLayouts`).
+
+Views em `resources/views/layouts/auth/{centered,fullpage,split}.blade.php`:
+
+- marca: `<livewire:brand-logomark />` (não use `<x-brand-logomark>`; o componente é Livewire em `App\Livewire\BrandLogomark`)
+- rodapé: `$settings->getFooterBrandName()` (não hardcode o nome da instituição)
 
 ### Register Customizado
 

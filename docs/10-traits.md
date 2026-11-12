@@ -18,13 +18,14 @@ O trait `HasIsActiveScope` encapsula operações sobre o campo booleano `is_acti
 
 | API | Tipo | Uso |
 | --- | --- | --- |
-| `isActive()` | query scope (`#[Scope]`) | `Model::query()->isActive()->get()` |
+| `active()` | query scope (`#[Scope]`) | `Model::query()->active()->get()` |
+| `isActive()` | método de instância | retorna `(bool) $this->is_active` |
+| `isInactive()` | método de instância | negação de `isActive()` |
 | `activate()` | método de instância | marca `is_active = true` |
 | `deactivate()` | método de instância | marca `is_active = false` |
 | `toggleActive()` | método de instância | inverte o valor atual |
-| `countActive(Builder $query)` | helper | conta registros com `is_active = true` |
 
-No MySQL, o scope `isActive()` tenta usar o índice `idx_is_active` quando disponível.
+Não há `countActive()` / `activeCount()`, nem `useIndex('idx_is_active')` no scope — a query é só `where('is_active', true)`.
 
 ### Uso em Models
 
@@ -40,13 +41,17 @@ class User extends Authenticatable
 ### Exemplos
 
 ```php
-$activeUsers = User::query()->isActive()->get();
+$activeUsers = User::query()->active()->get();
 
 $user->activate();
 $user->deactivate();
 $user->toggleActive();
 
-// Preferir o atributo booleano para checagens de instância:
+if ($user->isActive()) {
+    // ...
+}
+
+// Equivalente via atributo:
 if ($user->is_active) {
     // ...
 }
@@ -55,7 +60,8 @@ if ($user->is_active) {
 ### Restrições
 
 - O model precisa ter a coluna `is_active` (cast `boolean` recomendado).
-- O scope é `protected` com atributo `#[Scope]`; chame via query builder (`->isActive()`), não como método público de instância.
+- O scope `active()` é `protected` com atributo `#[Scope]`; chame via query builder (`->active()`).
+- `isActive()` / `isInactive()` são métodos de **instância**, não scopes de query.
 - Não existe mais o trait antigo `HasActiveScope`.
 
 ## 🔔 HasNotifications
@@ -76,6 +82,8 @@ class SomeLivewireComponent
     }
 }
 ```
+
+Em serviços (ex.: `LdapUserService`), prefira `notifyError()` com mensagem genérica ao usuário e `Log::error(...)` com a exception — não exponha detalhes LDAP na UI.
 
 ## 🎯 BetterEnum
 

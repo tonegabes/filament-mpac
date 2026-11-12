@@ -76,6 +76,27 @@ O layout é persistido por `auth_page_layout` e usa o enum `PageLayouts`:
 
 As páginas de auth customizadas consomem esse valor via trait `UsesConfiguredAuthLayout`.
 
+Views de layout (`resources/views/layouts/auth/`):
+
+- Logomarca: `<livewire:brand-logomark />` (`App\Livewire\BrandLogomark` lê `SystemSettings` no `mount()`)
+- Atalho Blade: `resources/views/components/brand-logo.blade.php` apenas re-renderiza o Livewire
+- Rodapé: `{{ $settings->getFooterBrandName() }}` (`app_name` ou `DEFAULT_APP_NAME`)
+
+## ⚡ Cache de Settings
+
+Em `config/settings.php`:
+
+```php
+'cache' => [
+    'enabled' => env('SETTINGS_CACHE_ENABLED', env('APP_ENV') === 'production'),
+    // ...
+],
+```
+
+- **Produção**: cache ligado por padrão (sem precisar setar env).
+- **Local/staging**: desligado por padrão; force com `SETTINGS_CACHE_ENABLED=true` se quiser.
+- Após alterar settings em produção com cache ativo, limpe o cache da aplicação / store configurado para o Spatie Settings refletir imediatamente.
+
 ## 👤 Registro de Usuário
 
 `enable_registration` controla se auto-registro fica disponível no painel.
