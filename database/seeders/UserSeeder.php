@@ -8,11 +8,15 @@ use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use RuntimeException;
 
 final class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->isProduction()) {
+            throw new RuntimeException('UserSeeder cannot be executed in production.');
+        }
         // Developer
         $userDeveloper = User::firstOrCreate(
             [

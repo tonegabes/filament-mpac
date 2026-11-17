@@ -81,3 +81,38 @@ it('denies view when user lacks users.view permission', function (): void {
 
     expect($user->can('view', $target))->toBeFalse();
 });
+
+it('denies self-deletion', function (): void {
+    $user = User::factory()->create();
+    $user->givePermissionTo(UserPermissions::Delete->value);
+
+    expect($user->can('delete', $user))->toBeFalse();
+});
+
+it('denies non-developer from updating or deleting a developer', function (): void {
+    $devRole = App\Models\Role::firstOrCreate(['name' => App\Enums\UserRole::Developer->value]);
+    $admin = User::factory()->create();
+    $admin->givePermissionTo([UserPermissions::Update->value, UserPermissions::Delete->value]);
+
+    $developer = User::factory()->create();
+    $developer->assignRole($devRole);
+
+    expect($admin->can('update', $developer))->toBeFalse()
+        ->and($admin->can('delete', $developer))->toBeFalse();
+});
+
+it('denies deleting the last developer', function (): void {
+    Permission::firstOrCreate(['name' => App\Enums\Permissions\WildcardPermissions::All->value]);
+    $devRole = App\Models\Role::firstOrCreate(['name' => App\Enums\UserRole::Developer->value]);
+    $actor = User::factory()->create();
+    $actor->givePermissionTo([
+        App\Enums\Permissions\WildcardPermissions::All->value,
+        UserPermissions::Delete->value,
+    ]);
+
+    $lastDeveloper = User::factory()->create();
+    $lastDeveloper->assignRole($devRole);
+
+    expect(app(App\Policies\UserPolicy::class)->delete($actor, $lastDeveloper))->toBeFalse()
+        ->and($lastDeveloper->delete())->toBeFalse();
+});

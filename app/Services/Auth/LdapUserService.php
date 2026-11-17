@@ -4,30 +4,31 @@ declare(strict_types=1);
 
 namespace App\Services\Auth;
 
-use App\Traits\HasNotifications;
+use App\Exceptions\DirectoryUnavailableException;
 use Illuminate\Support\Facades\Log;
 use LdapRecord\LdapRecordException;
 use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 
 class LdapUserService
 {
-    use HasNotifications;
-
     /**
      * Find LDAP user by username (samAccountName).
+     *
+     * @throws DirectoryUnavailableException
      */
     public function findUserByUsername(string $username): ?LdapUser
     {
         try {
             $result = LdapUser::query()
                 ->where('samAccountName', $username)
-                ->first()
-            ;
+                ->first();
         } catch (LdapRecordException $e) {
             Log::error('Erro ao buscar usuário no LDAP.', ['exception' => $e]);
-            $this->notifyError('Não foi possível consultar o serviço de diretório. Tente novamente mais tarde.');
 
-            return null;
+            throw new DirectoryUnavailableException(
+                'Não foi possível consultar o serviço de diretório. Tente novamente mais tarde.',
+                previous: $e,
+            );
         }
 
         return $result instanceof LdapUser ? $result : null;
@@ -35,13 +36,23 @@ class LdapUserService
 
     /**
      * Find LDAP user by email.
+     *
+     * @throws DirectoryUnavailableException
      */
     public function findUserByEmail(string $email): ?LdapUser
     {
-        $result = LdapUser::query()
-            ->where('mail', $email)
-            ->first()
-        ;
+        try {
+            $result = LdapUser::query()
+                ->where('mail', $email)
+                ->first();
+        } catch (LdapRecordException $e) {
+            Log::error('Erro ao buscar usuário no LDAP por e-mail.', ['exception' => $e]);
+
+            throw new DirectoryUnavailableException(
+                'Não foi possível consultar o serviço de diretório. Tente novamente mais tarde.',
+                previous: $e,
+            );
+        }
 
         return $result instanceof LdapUser ? $result : null;
     }

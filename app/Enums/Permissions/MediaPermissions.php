@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Enums\Permissions;
 
-enum MediaPermissions: string
+use App\Contracts\ResourcePermissions;
+use App\Traits\ResolvesResourcePermissions;
+
+enum MediaPermissions: string implements ResourcePermissions
 {
+    use ResolvesResourcePermissions;
     case All = 'media.*';
     case ViewAny = 'media.view.any';
     case View = 'media.view';

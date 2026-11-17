@@ -46,10 +46,6 @@ class AppServiceProvider extends ServiceProvider
     private function configureProductionUrl(): void
     {
         URL::forceScheme('https');
-        request()->server->set(
-            'HTTPS',
-            request()->header('X-Forwarded-Proto', 'https') === 'https' ? 'on' : 'off',
-        );
     }
 
     /**

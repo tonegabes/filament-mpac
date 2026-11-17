@@ -30,6 +30,6 @@ final class LocalAuthModeHandler implements AuthModeHandler
      */
     public function authenticate(Login $loginPage, array $data): void
     {
-        $loginPage->attemptLocalAuth($data);
+        $loginPage->authenticate();
     }
 }

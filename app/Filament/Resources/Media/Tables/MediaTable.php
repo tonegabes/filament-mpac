@@ -25,7 +25,7 @@ class MediaTable
             ->columns([
                 ImageColumn::make('preview')
                     ->label('Prévia')
-                    ->state(fn (Media $record): ?string => FileLibrary::isImage($record->mime_type) ? $record->getUrl() : null)
+                    ->state(fn (Media $record): ?string => FileLibrary::isImage($record->mime_type) ? FileLibrary::url($record) : null)
                     ->square()
                     ->toggleable(),
 

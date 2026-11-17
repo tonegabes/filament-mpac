@@ -83,7 +83,7 @@ it('throws exception when auth mode is invalid', function (): void {
     Config::set('auth.mode', 'workos');
 
     expect(fn () => Livewire::test(Login::class))
-        ->toThrow(InvalidArgumentException::class);
+        ->toThrow(Exception::class, 'Invalid auth mode [workos]');
 });
 
 it('authenticates with local credentials when auth mode is local', function (): void {

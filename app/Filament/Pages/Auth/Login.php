@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages\Auth;
 
 use App\Enums\AuthMode;
+use App\Exceptions\DirectoryUnavailableException;
 use App\Filament\Pages\Auth\Concerns\UsesConfiguredAuthLayout;
 use App\Models\User;
 use App\Services\Auth\AuthModeHandler;
@@ -14,18 +15,17 @@ use App\Services\Auth\LdapUserService;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Actions\Action;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
-use Filament\Auth\MultiFactor\Contracts\HasBeforeChallengeHook;
 use Filament\Auth\Pages\Login as VendorLogin;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
-use Filament\Panel;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use Illuminate\Auth\SessionGuard;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Support\Timebox;
 use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 use ToneGabes\Filament\Icons\Enums\Phosphor;
 
@@ -40,9 +40,9 @@ class Login extends VendorLogin
     private ?LdapUserService $ldapUserService = null;
 
     /**
-     * Create a new login page instance.
+     * Resolve auth mode dependencies on Livewire boot.
      */
-    public function __construct()
+    public function boot(): void
     {
         $authMode = AuthMode::fromConfig(Config::string('auth.mode'));
         $this->authModeHandler = app(AuthModeHandlerResolver::class)->resolve($authMode);
@@ -66,6 +66,10 @@ class Login extends VendorLogin
      */
     public function authenticate(): ?LoginResponse
     {
+        if ($this->authModeHandler->mode() === AuthMode::Local) {
+            return parent::authenticate();
+        }
+
         try {
             $this->rateLimit(5);
         } catch (TooManyRequestsException $exception) {
@@ -77,7 +81,17 @@ class Login extends VendorLogin
         /** @var array<string, string> $data */
         $data = $this->form->getState();
 
-        $this->authModeHandler->authenticate($this, $data);
+        try {
+            $this->attemptLdapAuth($data);
+        } catch (DirectoryUnavailableException $exception) {
+            Notification::make()
+                ->danger()
+                ->title('Erro')
+                ->body($exception->getMessage())
+                ->send();
+
+            return null;
+        }
 
         session()->regenerate();
 
@@ -86,108 +100,58 @@ class Login extends VendorLogin
 
     /**
      * @param  array<string, string>  $data
-     */
-    public function attemptLocalAuth(array $data): void
-    {
-        /** @var SessionGuard $authGuard */
-        $authGuard = Filament::auth();
-
-        $authProvider = $authGuard->getProvider();
-        $credentials = $this->getCredentialsFromFormData($data);
-        $user = $authProvider->retrieveByCredentials($credentials);
-
-        if ((! $user) || (! $authProvider->validateCredentials($user, $credentials))) {
-            $this->userUndertakingMultiFactorAuthentication = null;
-
-            $this->fireFailedEvent($authGuard, $user, $credentials);
-            $this->throwFailureValidationException();
-        }
-
-        $this->checkMultiFactorAuthentication($user);
-
-        $this->attemptDefaultAuth(
-            $authGuard,
-            $user,
-            $credentials,
-            (bool) ($data['remember'] ?? false),
-        );
-    }
-
-    /**
-     * Validate if multi-factor authentication is required for the user.
-     */
-    public function checkMultiFactorAuthentication(Authenticatable $user): void
-    {
-        if (
-            filled($this->userUndertakingMultiFactorAuthentication) &&
-            (decrypt($this->userUndertakingMultiFactorAuthentication) === $user->getAuthIdentifier())
-        ) {
-            $this->multiFactorChallengeForm->validate();
-        } else {
-            foreach (Filament::getMultiFactorAuthenticationProviders() as $multiFactorAuthenticationProvider) {
-                if (! $multiFactorAuthenticationProvider->isEnabled($user)) {
-                    continue;
-                }
-
-                $this->userUndertakingMultiFactorAuthentication = encrypt($user->getAuthIdentifier());
-
-                if ($multiFactorAuthenticationProvider instanceof HasBeforeChallengeHook) {
-                    $multiFactorAuthenticationProvider->beforeChallenge($user);
-                }
-
-                break;
-            }
-
-            if (filled($this->userUndertakingMultiFactorAuthentication)) {
-                $this->multiFactorChallengeForm->fill();
-
-                return;
-            }
-        }
-    }
-
-    /**
-     * @param  array<string, mixed>  $credentials
-     */
-    public function attemptDefaultAuth(SessionGuard $authGuard, Authenticatable $user, array $credentials, bool $remember): void
-    {
-        $isActive = static fn (Authenticatable $candidate): bool => ! $candidate instanceof User || $candidate->is_active;
-
-        if (! $authGuard->attemptWhen(credentials: $credentials, callbacks: $isActive, remember: $remember)) {
-            $this->fireFailedEvent($authGuard, $user, $credentials);
-            $this->throwFailureValidationException();
-        }
-    }
-
-    /**
-     * @param  array<string, string>  $data
      *
      * @throws \Illuminate\Validation\ValidationException
+     * @throws DirectoryUnavailableException
      */
     public function attemptLdapAuth(array $data): void
     {
         $username = $this->normalizeUsername($data['username'] ?? null);
         $password = $data['password'] ?? '';
+        $remember = (bool) ($data['remember'] ?? false);
 
-        $ldapUser = $this->getLdapUserService()->findUserByUsername($username);
+        /** @var SessionGuard $authGuard */
+        $authGuard = Filament::auth();
+        $credentials = ['username' => $username, 'password' => $password];
+        $timeboxDuration = (int) config('auth.timebox_duration', 200_000);
 
-        if (! $ldapUser) {
-            $this->throwFailureValidationException();
-        }
+        $user = app(Timebox::class)->call(function (Timebox $timebox) use ($authGuard, $credentials, $username, $password, $remember): User {
+            $this->fireAttemptingEvent($authGuard, $credentials, $remember);
 
-        $validLogin = $this->getLdapAuthService()->authenticate($username, $password);
+            if ($username === '' || $password === '') {
+                $this->fireFailedEvent($authGuard, null, $credentials);
+                $this->throwFailureValidationException();
+            }
 
-        if (! $validLogin) {
-            $this->throwFailureValidationException();
-        }
+            $ldapUser = $this->getLdapUserService()->findUserByUsername($username);
 
-        $user = $this->handleLocalUserRecord($username, $ldapUser);
+            if (! $ldapUser) {
+                $this->fireFailedEvent($authGuard, null, $credentials);
+                $this->throwFailureValidationException();
+            }
 
-        $this->ensurePanelAccess($user);
+            $validLogin = $this->getLdapAuthService()->authenticate($username, $password);
 
-        Filament::auth()->login(
+            if (! $validLogin) {
+                $this->fireFailedEvent($authGuard, null, $credentials);
+                $this->throwFailureValidationException();
+            }
+
+            $user = $this->handleLocalUserRecord($username, $ldapUser);
+
+            if (! $this->isUserAllowedToAccessPanel($user)) {
+                $this->fireFailedEvent($authGuard, $user, $credentials);
+                $this->throwFailureValidationException();
+            }
+
+            $timebox->returnEarly();
+
+            return $user;
+        }, $timeboxDuration);
+
+        $authGuard->login(
             user: $user,
-            remember: (bool) ($data['remember'] ?? false),
+            remember: $remember,
         );
     }
 
@@ -265,7 +229,7 @@ class Login extends VendorLogin
             [
                 'name' => $this->getLdapUserService()->getUserInfo('displayName', $ldapUser),
                 'email' => $this->getLdapUserService()->getUserInfo('mail', $ldapUser),
-                'password' => Hash::make(\Str::random(16)),
+                'password' => Str::random(16),
                 'is_active' => true,
             ],
         );
@@ -334,18 +298,5 @@ class Login extends VendorLogin
     public function makeUsernameLoginFormComponent(): Component
     {
         return $this->getUsernameFormComponent();
-    }
-
-    /**
-     * Ensure that user can access the current panel.
-     */
-    private function ensurePanelAccess(User $user): void
-    {
-        /** @var Panel $panel */
-        $panel = Filament::getCurrentOrDefaultPanel();
-
-        if (! $user->canAccessPanel($panel)) {
-            $this->throwFailureValidationException();
-        }
     }
 }

@@ -15,13 +15,25 @@ class LoginResponse implements VendorLoginResponse
      */
     public function toResponse($request)
     {
-        /** @var \App\Models\User $user */
+        /** @var \App\Models\User|null $user */
         $user = $request->user();
 
-        if (! $user->canAccessPanel(Filament::getCurrentPanel())) {
-            return redirect()->to('/');
+        if ($user === null) {
+            return redirect()->to(url('/'));
         }
 
-        return redirect()->intended(Filament::getDefaultPanel()->getUrl());
+        $currentPanel = Filament::getCurrentPanel();
+
+        if ($currentPanel !== null && $user->canAccessPanel($currentPanel)) {
+            return redirect()->intended($currentPanel->getUrl());
+        }
+
+        foreach (Filament::getPanels() as $panel) {
+            if ($user->canAccessPanel($panel)) {
+                return redirect()->intended($panel->getUrl());
+            }
+        }
+
+        return redirect()->to(url('/'));
     }
 }

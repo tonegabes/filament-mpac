@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Enums\AuthMode;
 use App\Enums\NavGroups;
 use App\Enums\Panels;
 use App\Enums\Permissions\SystemPermissions;
 use App\Filament\Components\Navigation\PanelSwitcher;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\Auth\Password\ResetPasswordAction;
+use App\Filament\Pages\Auth\Password\ResetPasswordRequest;
 use App\Filament\Pages\Settings\ManageSystem;
 use App\Filament\Resources\Activities\ActivityResource;
 use App\Filament\Resources\Documents\DocumentResource;
@@ -17,7 +20,6 @@ use App\Filament\Resources\Media\MediaResource;
 use App\Filament\Resources\Permissions\PermissionResource;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Users\UserResource;
-use Bjanczak\FilamentFlexFields\FilamentFlexFieldsPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -43,6 +45,13 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        if (AuthMode::fromConfig(Config::string('auth.mode'))->allowsLocalRegistration()) {
+            $panel->passwordReset(
+                ResetPasswordRequest::class,
+                ResetPasswordAction::class,
+            );
+        }
+
         return $panel
             ->id(Panels::Admin->value)
             ->path(Panels::Admin->path())
@@ -88,9 +97,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-            ->plugins([
-                FilamentFlexFieldsPlugin::make(),
             ]);
     }
 

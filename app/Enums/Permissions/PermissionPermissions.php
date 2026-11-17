@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Enums\Permissions;
 
-enum PermissionPermissions: string
+use App\Contracts\ResourcePermissions;
+use App\Traits\ResolvesResourcePermissions;
+
+enum PermissionPermissions: string implements ResourcePermissions
 {
+    use ResolvesResourcePermissions;
     case All = 'permissions.*';
     case ViewAny = 'permissions.view.any';
     case View = 'permissions.view';

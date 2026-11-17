@@ -48,7 +48,7 @@ it('can list and search users', function (): void {
 });
 
 it('can create a user', function (): void {
-    $role = Role::query()->firstOrFail();
+    $role = Role::query()->where('name', UserRole::User->value)->firstOrFail();
 
     Livewire::test(CreateUser::class)
         ->fillForm([
@@ -75,7 +75,7 @@ it('can create a user', function (): void {
 
 it('can edit a user', function (): void {
     $user = User::factory()->create(['name' => 'Original Name']);
-    $role = Role::query()->firstOrFail();
+    $role = Role::query()->where('name', UserRole::User->value)->firstOrFail();
     $user->assignRole($role);
 
     Livewire::test(EditUser::class, ['record' => $user->getRouteKey()])
@@ -96,4 +96,43 @@ it('denies list access when operator role lacks users.view.any permission', func
 
     Livewire::test(ListUsers::class)
         ->assertForbidden();
+});
+
+it('prevents admin from assigning developer role when creating a user', function (): void {
+    $developerRole = Role::query()->where('name', UserRole::Developer->value)->firstOrFail();
+
+    Livewire::test(CreateUser::class)
+        ->fillForm([
+            'name' => 'Escalated User',
+            'email' => 'escalated@example.com',
+            'username' => 'escalated',
+            'password' => 'secret-pass-123',
+            'is_active' => true,
+            'roles' => [$developerRole->id],
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['roles']);
+});
+
+it('prevents admin from editing a developer user', function (): void {
+    $developer = User::factory()->create();
+    $developer->assignRole(UserRole::Developer->value);
+
+    Livewire::test(EditUser::class, ['record' => $developer->getRouteKey()])
+        ->assertForbidden();
+});
+
+it('prevents removing the developer role from the last developer', function (): void {
+    $developer = User::factory()->create();
+    $developer->assignRole(UserRole::Developer->value);
+    $adminRole = Role::query()->where('name', UserRole::Admin->value)->firstOrFail();
+
+    $this->actingAs($developer);
+
+    Livewire::test(EditUser::class, ['record' => $developer->getRouteKey()])
+        ->fillForm([
+            'roles' => [$adminRole->id],
+        ])
+        ->call('save')
+        ->assertHasFormErrors(['roles']);
 });

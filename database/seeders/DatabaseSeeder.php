@@ -14,10 +14,14 @@ class DatabaseSeeder extends Seeder
         activity()->disableLogging();
 
         $this->call([
-            PermissionSeeder::class,
-            RoleSeeder::class,
-            UserSeeder::class,
+            ProductionSeeder::class,
         ]);
+
+        if (! app()->isProduction()) {
+            $this->call([
+                DevelopmentSeeder::class,
+            ]);
+        }
 
         activity()->enableLogging();
     }

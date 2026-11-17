@@ -22,12 +22,15 @@ class LdapAuthService
      */
     public function authenticate(string $username, string $password): bool
     {
+        if ($username === '' || $password === '') {
+            return false;
+        }
+
         $ldapLogin = $username . $this->emailDomain;
 
         return (new LdapUser)
             ->getConnection()
             ->auth()
-            ->attempt($ldapLogin, $password)
-        ;
+            ->attempt($ldapLogin, $password);
     }
 }

@@ -43,7 +43,7 @@ class SystemSettings extends Settings
 
     public ?string $auth_page_background = null;
 
-    public bool $enable_registration = true;
+    public bool $enable_registration = false;
 
     /**
      * Return the group name for the settings.

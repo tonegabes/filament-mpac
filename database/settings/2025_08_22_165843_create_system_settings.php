@@ -15,7 +15,7 @@ return new class extends SettingsMigration
         $this->migrator->add('system.app_logo_dark', null);
         $this->migrator->add('system.show_app_logo', true);
 
-        $this->migrator->add('system.enable_registration', true);
+        $this->migrator->add('system.enable_registration', false);
 
         $this->migrator->add('system.auth_page_layout', null);
         $this->migrator->add('system.auth_page_background', null);

@@ -32,3 +32,10 @@ it('builds login string as username plus email domain', function (): void {
 
     expect($ldapLogin)->toBe('johndoe@corp.local');
 });
+
+it('rejects empty username or empty password without attempting ldap bind', function (): void {
+    $service = new LdapAuthService;
+
+    expect($service->authenticate('', 'secret'))->toBeFalse()
+        ->and($service->authenticate('johndoe', ''))->toBeFalse();
+});

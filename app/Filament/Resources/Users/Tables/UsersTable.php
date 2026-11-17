@@ -50,13 +50,13 @@ class UsersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('created_by')
-                    ->numeric()
+                TextColumn::make('creator.name')
+                    ->label('Criado por')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('updated_by')
-                    ->numeric()
+                TextColumn::make('updater.name')
+                    ->label('Atualizado por')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

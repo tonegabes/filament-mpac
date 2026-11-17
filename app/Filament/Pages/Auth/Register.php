@@ -26,7 +26,8 @@ class Register extends VendorRegister
 
         /** @var User $user */
         $user = $this->getUserModel()::create($data);
-        $user->assignRole(UserRole::User);
+        $defaultRole = config('auth.default_role', UserRole::default()->value);
+        $user->assignRole(is_string($defaultRole) && $defaultRole !== '' ? $defaultRole : UserRole::default()->value);
 
         return $user;
     }

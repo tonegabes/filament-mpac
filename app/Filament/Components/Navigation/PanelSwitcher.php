@@ -8,6 +8,8 @@ use App\Enums\Panels;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
+use Filament\Panel;
+use ToneGabes\Filament\Icons\Enums\Phosphor;
 
 final class PanelSwitcher
 {
@@ -18,19 +20,24 @@ final class PanelSwitcher
      */
     public static function userMenuItems(): array
     {
-        return collect(Panels::cases())
-            ->map(fn (Panels $panel): Action => self::toAction($panel))
+        return collect(Filament::getPanels())
+            ->map(fn (Panel $panel): Action => self::toAction($panel))
+            ->values()
             ->all();
     }
 
     /**
-     * Convert a panel enum into a user menu action.
+     * Convert a panel into a user menu action.
      */
-    private static function toAction(Panels $panel): Action
+    private static function toAction(Panel $panel): Action
     {
-        return Action::make('switch_to_' . $panel->value)
-            ->label('Painel ' . $panel->label())
-            ->icon($panel->icon())
+        $knownPanel = Panels::tryFrom($panel->getId());
+        $label = $knownPanel?->label() ?? ucfirst($panel->getId());
+        $icon = $knownPanel?->icon() ?? Phosphor::SquaresFour;
+
+        return Action::make('switch_to_' . $panel->getId())
+            ->label('Painel ' . $label)
+            ->icon($icon)
             ->url(fn (): string => self::panelUrl($panel))
             ->visible(fn (): bool => self::canSwitchTo($panel));
     }
@@ -38,19 +45,21 @@ final class PanelSwitcher
     /**
      * Resolve the destination URL for a panel.
      */
-    private static function panelUrl(Panels $panel): string
+    private static function panelUrl(Panel $panel): string
     {
-        if ($panel->path() === '') {
+        $path = $panel->getPath();
+
+        if ($path === '') {
             return url('/');
         }
 
-        return url($panel->path());
+        return url($path);
     }
 
     /**
      * Check if the authenticated user can switch to the target panel.
      */
-    private static function canSwitchTo(Panels $targetPanel): bool
+    private static function canSwitchTo(Panel $targetPanel): bool
     {
         $user = Filament::auth()->user();
 
@@ -60,12 +69,10 @@ final class PanelSwitcher
 
         $currentPanel = Filament::getCurrentPanel();
 
-        if ($currentPanel?->getId() === $targetPanel->value) {
+        if ($currentPanel?->getId() === $targetPanel->getId()) {
             return false;
         }
 
-        $targetFilamentPanel = Filament::getPanel($targetPanel->value);
-
-        return $user->canAccessPanel($targetFilamentPanel);
+        return $user->canAccessPanel($targetPanel);
     }
 }

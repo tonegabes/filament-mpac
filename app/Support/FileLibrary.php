@@ -50,7 +50,11 @@ class FileLibrary
 
     public static function url(Media $media): string
     {
-        return $media->getUrl();
+        if ($media->disk === 'public') {
+            return $media->getUrl();
+        }
+
+        return route('media.download', $media);
     }
 
     public static function isImage(?string $mimeType): bool

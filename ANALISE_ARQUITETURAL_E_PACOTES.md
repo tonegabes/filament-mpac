@@ -1,438 +1,367 @@
-# Diagnóstico Técnico, Melhorias e Estratégia de Modularização (`filament-mpac`)
+# Análise do Starter Template `filament-mpac`
 
-Este documento apresenta uma auditoria arquitetural completa do projeto `tonegabes/filament-mpac` com foco em seu papel como **Starter Template Oficial da Organização (MPAC)** e define a estratégia para **desmembramento em pacotes (packages/plugins)**, permitindo que múltiplos projetos (novos e legados) recebam atualizações estruturais via `composer update` sem edição manual de código em cada repositório.
-
----
-
-## Sumário Executivo
-
-O projeto já possui uma fundação moderna e excelente maturidade técnica:
-- **Stack de ponta**: PHP 8.4 (`strict_types=1`), Laravel 13, Filament v5, Livewire v4, Pest v5, Tailwind CSS v4.
-- **Qualidade automatizada**: PHPStan nível 8 (`bleedingEdge`), Laravel Pint (PSR-12 customizado), testes de arquitetura e cobertura com Pest, CI/CD em GitLab e containerização multi-stage com FrankenPHP + Caddy.
-- **Ecossistema próprio iniciado**: Já consome `tonegabes/mpac-essentials`, `tonegabes/filament-phosphor-icons`, `tonegabes/filament-better-options` e `tonegabes/laravel-make-model-plus`.
-
-Contudo, **como um template clonado (`git clone` / `composer create-project`)**, cerca de **80% do código hoje presente em `app/`, `resources/` e `database/` é infraestrutura base da organização** (Autenticação LDAP/Local, Gestão de Usuários/Roles/Permissões, Biblioteca de Mídia, Auditoria, Configurações de Sistema, Tema MPAC e Providers de UI). Quando um novo sistema nasce a partir deste template, esse código passa a pertencer ao repositório do app final — tornando qualquer correção de bug no LDAP, ajuste no tema ou evolução no painel Admin um pesadelo de manutenção manual em dezenas de repositórios.
+> Auditoria do projeto como **template oficial para todos os apps Laravel da organização**: falhas, melhorias e plano de desmembramento em pacotes para que mudanças fundamentais cheguem aos apps antigos via `composer update`, sem edição manual repositório por repositório.
+>
+> Data: 16/11/2026 · Base analisada: `HEAD` (`67566a3`) · Suíte: **208 testes passando (587 asserções), 111 s**.
 
 ---
 
-## Parte 1: Falhas e Bugs Identificados no Código Atual
+## Sumário executivo
 
-Abaixo estão os problemas concretos encontrados na auditoria do código-fonte atual, classificados por severidade.
+**O que já está bom:** stack atual (PHP 8.4, Laravel 13, Filament 5, Livewire 4, Pest 5, Tailwind 4), `strict_types` em todo o código, PHPStan nível 8 com `bleedingEdge`, Pint com preset próprio, testes de arquitetura, policies baseadas em enums de permissão, imagem Docker multi-stage com FrankenPHP, pipeline GitLab com análise/estilo/testes/build e uma pasta `docs/` extensa. Vários problemas do diagnóstico anterior já foram corrigidos (bypass de `is_active`, campo de senha no `UserForm`, `<x-brand-logomark>`, eager loading de `media`).
 
-### 🔴 Críticos / Altos (Segurança, Autenticação e Bugs Funcionais)
+**O problema estrutural:** quase todo o código em `app/`, `resources/`, `database/`, `lang/` e `config/` é **infraestrutura da organização** (autenticação LDAP/local, usuários/perfis/permissões, auditoria, biblioteca de arquivos, configurações do sistema, tema, ícones, traduções, CI, Docker). Num template clonado, esse código vira propriedade de cada app no momento do `create-project`. Corrigir um bug de LDAP ou ajustar o tema significa abrir N merge requests manuais, e os apps vão divergindo.
 
-#### 1. Bypass de `is_active` na Autenticação Local e Sessões Ativas
-- **Onde**: `app/Filament/Pages/Auth/Login.php` (`attemptLocalAuth` e `attemptDefaultAuth`) e `app/Models/User.php`.
-- **Problema**:
-  1. No modo **LDAP** (`handleLocalUserRecord`), verifica-se `$user->is_active === false` apenas quando `auth.ldap.requires_local` é `true`. Se `requires_local` for `false` e um usuário já existente no banco local estiver com `is_active = false`, `User::firstOrCreate(['username' => $username], ...)` retorna o usuário inativo existente e permite o login normalmente!
-  2. No modo **Local** (`attemptLocalAuth`), `$authGuard->attemptWhen($credentials, ...)` é chamado **sem callback de verificação de `is_active`**. Um usuário com `is_active = false` consegue logar normalmente via credenciais locais.
-  3. Se um usuário logado for desativado (`is_active = false`), não há verificação no `User::canAccessPanel()` nem em um middleware para encerrar o acesso imediatamente.
-- **Correção**:
-  - Em `User::canAccessPanel(?Panel $panel)`: adicionar `if (! $this->is_active) { return false; }` no topo do método.
-  - Em `Login::attemptDefaultAuth()`: passar closure no `attemptWhen`: `$authGuard->attemptWhen($credentials, fn (User $user): bool => $user->is_active, $remember)`.
-  - Em `Login::handleLocalUserRecord()`: verificar `if (! $user->is_active) { $this->throwFailureValidationException(); }` independentemente da flag `requires_local`.
+**O que fazer, em ordem:**
 
-#### 2. `UserForm` e `CreateUser` não permitem definir senha no modo Local (Quebra de Fluxo / SQL Error ou Usuário Sem Senha)
-- **Onde**: `app/Filament/Resources/Users/Schemas/UserForm.php` e `app/Filament/Resources/Users/Pages/CreateUser.php`.
-- **Problema**: O `UserForm` possui apenas `name`, `username`, `email`, `is_active` e `roles`. Não há campo `password` (nem geração automática de senha/convite) quando `auth.mode === 'local'`. Um usuário criado pelo painel Admin no modo local fica com `password = null` no banco e nunca consegue logar sem pedir redefinição de senha.
-- **Correção**: Exibir campo `TextInput::make('password')->password()->revealable()` (obrigatório no `create`, opcional no `edit` com `->dehydrated(fn ($state) => filled($state))`) quando `AuthMode::Local` estiver ativo, ou disparar fluxo de convite por e-mail.
+1. Corrigir as falhas críticas abaixo **antes** de gerar novos apps (principalmente escalonamento de privilégio e documentos públicos).
+2. Extrair a infraestrutura para **pacotes Composer versionados** (plugins Filament + bibliotecas), publicados no GitLab Package Registry.
+3. Centralizar o que não é PHP (CI, Docker, Pint/PHPStan/Rector, guidelines de IA) em **artefatos referenciados**, não copiados.
+4. Automatizar a propagação: Renovate abrindo MRs nos apps, regras Rector para breaking changes e um comando `mpac:upgrade`.
 
-#### 3. Bug de Componentes Blade / Livewire nos Layouts de Autenticação (`<x-brand-logomark>` inexistente)
-- **Onde**:
-  - `resources/views/layouts/auth/split.blade.php` (linha 17)
-  - `resources/views/layouts/auth/centered.blade.php` (linha 13)
-  - `resources/views/layouts/auth/fullpage.blade.php` (linha 13)
-- **Problema**: Os 3 layouts de autenticação chamam `<x-brand-logomark ... />` como um componente Blade (`resources/views/components/brand-logomark.blade.php`), mas o arquivo existente em `resources/views/components/` chama-se `brand-logo.blade.php` (que por sua vez renderiza `<livewire:brand-logomark />`). Além disso, `BrandLogomark` é um componente Livewire (`app/Livewire/BrandLogomark.php`), não um componente Blade `<x-brand-logomark>`. Quando qualquer página de login/registro tenta renderizar esses layouts em runtime real, o Blade lançará `InvalidArgumentException: Unable to locate a class or view for component [brand-logomark]`.
-- **Correção**: Substituir `<x-brand-logomark ... />` por `<livewire:brand-logomark />` ou `<x-brand-logo />`, ou converter `brand-logomark` em um componente Blade anônimo puro (já que ele não possui ações interativas de Livewire e não precisa do overhead de um componente Livewire stateful em toda página).
-
-#### 4. Resolução Precoce do Container no `__construct()` da Página `Login`
-- **Onde**: `app/Filament/Pages/Auth/Login.php` (linhas 45–54).
-- **Problema**: Componentes Livewire v4 / páginas Filament não devem inicializar propriedades privadas não-hidratadas via `__construct()` dependendo de `Config` e Service Container, pois em requisições subsequentes do Livewire (como `call('authenticate')` ou updates reativos de form) o ciclo de vida do Livewire re-instancia o componente. Além disso, propriedades `private AuthModeHandler $authModeHandler` não persistem entre requests Livewire se não forem resolvidas via `boot()` ou method injection. Funciona por acaso porque `__construct()` roda em toda requisição PHP, mas viola o ciclo de vida oficial do Livewire (`boot()`).
-- **Correção**: Mover a inicialização de `$this->authModeHandler` para o método `boot(AuthModeHandlerResolver $resolver)` do Livewire.
+O objetivo final é que o template vire um **esqueleto fino**: `composer.json`, providers de painel que ligam plugins, `User` com traits e o código de domínio do app.
 
 ---
 
-### 🟠 Médios (Performance, Banco de Dados, Arquitetura e Manutenibilidade)
+## Parte 1 — Falhas encontradas
 
-#### 5. Problema de N+1 Queries em `DocumentResource`, `ImageResource` e `UsersTable`
-- **Onde**:
-  - `app/Filament/Resources/Documents/DocumentResource.php` e `DocumentsTable.php`
-  - `app/Filament/Resources/Images/ImageResource.php` e `ImagesTable.php`
-  - `app/Filament/Resources/Users/UserResource.php` e `UsersTable.php`
-- **Problema**:
-  - Em `DocumentsTable` e `ImagesTable`, as colunas acessam `$record->getUrl()` / `$record->getFileUrl()` (que chama `$this->getFirstMediaUrl()`) e `media.size`, `media.mime_type`, mas `DocumentResource` e `ImageResource` não definem `getEloquentQuery()` com `->with('media')`. Como `Model::shouldBeStrict(! app()->isProduction())` está ativo no `AppServiceProvider`, listar documentos ou imagens em ambiente de desenvolvimento pode disparar `LazyLoadingViolationException` ao chamar `$this->getFirstMediaUrl()`!
-  - Em `UsersTable`, exibe-se `roles.name`, o que o Filament carrega, mas colunas `created_by` e `updated_by` mostram apenas o `int` (ID numérico) em vez do relacionamento `creator.name` / `updater.name`.
-- **Correção**: Adicionar `with(['media'])` nos `getEloquentQuery()` de `DocumentResource` e `ImageResource`.
+Severidade: 🔴 crítica · 🟠 alta · 🟡 média · ⚪ baixa.
 
-#### 6. Colunas `created_by` e `updated_by` Órfãs na Tabela `users`
-- **Onde**: `database/migrations/0001_01_01_000000_create_users_table.php` (linhas 28–36) e `app/Models/User.php`.
-- **Problema**: A migration cria as foreign keys `created_by` e `updated_by` apontando para `users`, e `UsersTable` possui colunas para elas. Porém:
-  1. Não há nenhum Observer ou Trait (`Blameable` / `HasUserAuditing`) preenchendo `created_by` e `updated_by` automaticamente nos models.
-  2. Não existem as relações `createdBy(): BelongsTo` e `updatedBy(): BelongsTo` em `User.php`.
-  3. Se um usuário que criou outro for deletado (`DeleteAction`), o `constrained('users')` sem `nullOnDelete()` causará erro de integridade referencial (`ForeignKeyConstraintViolationException`).
-- **Correção**: Adicionar `->nullOnDelete()` na migration, criar uma trait `HasAuditUsers` (no pacote `mpac-essentials` ou core) que preencha `created_by`/`updated_by` nos eventos `creating`/`updating`, e mapear os relacionamentos.
+### 🔴 1. Escalonamento de privilégio pelo cadastro de usuários
 
-#### 7. Acoplamento Estático em `ActivityLog::subjectTypeOptions()` e `PanelPermissions::fromPanel()`
-- **Onde**: `app/Support/ActivityLog.php` (linhas 44–53) e `app/Enums/Permissions/PanelPermissions.php`.
-- **Problema**:
-  - `ActivityLog::subjectTypeOptions()` tem uma lista hardcoded (`User`, `Document`, `Image`, `Role`, `Permission`). Todo novo Model criado nos sistemas derivados ficará fora do filtro de Logs de Atividade a menos que o desenvolvedor edite manualmente a classe de suporte.
-  - `Panels` e `PanelPermissions` estão engessados em `App` e `Admin`. Se um sistema precisar de um 3º painel (ex: `Portal`, `Corregedoria`, `Atendimento`), é necessário alterar múltiplos enums base.
-- **Correção**: Permitir registro dinâmico de Subject Types via configuração ou descoberta automática de Models que usam a trait `LogsActivity`, e usar convenção `panels.view.{panel_id}` para permissões de painel.
+- **Onde:** `app/Filament/Resources/Users/Schemas/UserForm.php` (campo `roles`, linhas 46–51), `app/Policies/UserPolicy.php`, `database/seeders/RoleSeeder.php`.
+- **Problema:** o perfil *Administrador* recebe `users.*`. O `CheckboxCards::make('roles')->relationship('roles', 'name')` lista **todos** os perfis, inclusive *Desenvolvedor* (que tem `*`). A `UserPolicy::update()` só checa `users.update`, sem olhar quem é o alvo. Resultado: um Administrador pode editar o próprio usuário, marcar *Desenvolvedor* e virar superusuário. No modo local, também pode trocar a senha de um Desenvolvedor e assumir a conta.
+- **Correção:**
+  - Filtrar as opções de perfil: o usuário só pode atribuir perfis cujas permissões sejam subconjunto das suas (ou bloquear perfis "protegidos" via enum/config).
+  - Na policy, negar `update`/`delete` quando o alvo tem um perfil superior ao do ator, e negar auto-exclusão/auto-desativação.
+  - Impedir remover o último Desenvolvedor.
+  - Cobrir com testes de policy e de formulário.
 
-#### 8. Acoplamento de Notificação de UI dentro da Camada de Serviço (`LdapUserService`)
-- **Onde**: `app/Services/Auth/LdapUserService.php` (linhas 13 e 26).
-- **Problema**: `LdapUserService` usa a trait `HasNotifications` e dispara uma notificação visual do Filament (`$this->notify(...)`) dentro de um bloco `catch (LdapRecordException $e)` e retorna `null`.
-  1. Se `LdapUserService` for chamado via CLI (comando Artisan de sincronização de usuários, fila/job ou teste), disparar notificação de sessão do Filament é inadequado.
-  2. Em produção, concatenar `$e->getMessage()` na notificação para o usuário final na tela de login vaza detalhes internos de infraestrutura (IP do servidor AD, Base DN, estrutura LDAP).
-- **Correção**: Logar o erro real com `Log::error('LDAP Error', ['exception' => $e])` e deixar a camada de apresentação (ou um método específico) lidar com feedback amigável ao usuário.
+### 🔴 2. Documentos e imagens servidos publicamente, sem autenticação
 
-#### 9. `SystemSettings` sendo instanciado múltiplas vezes sem Cache Ativo por padrão
-- **Onde**: `config/settings.php` (`'enabled' => env('SETTINGS_CACHE_ENABLED', false)`), `AppPanelProvider.php`, `BrandLogomark.php`, layouts de Auth.
-- **Problema**: Em cada página carregada, `SystemSettings` é consultado no banco de dados (no boot do `AppPanelProvider`, no `BrandLogomark` na topbar, no layout de auth). Como o cache do Spatie Settings vem `false` por padrão no `config/settings.php` e não está no `.env.example`, toda requisição faz query extra na tabela `settings`.
-- **Correção**: Habilitar o cache do `spatie/laravel-settings` em produção por padrão (`env('SETTINGS_CACHE_ENABLED', app()->isProduction())`).
+- **Onde:** `config/filesystems.php` (discos `images` e `documents`, linhas 51–67), `app/Models/Document.php`, `CopyFileUrlAction`.
+- **Problema:** os dois discos ficam em `storage/app/public/...` com `visibility => public` e URL `/storage/documents/...`. A Media Library usa caminhos previsíveis (`{media_id}/{arquivo}`), então qualquer pessoa pode enumerar e baixar documentos sem login. Para um Ministério Público, isso é vazamento de dados.
+- **Correção:** disco `documents` privado (`storage/app/private`), download por rota autenticada que passa pela `DocumentPolicy::view()`, ou `temporaryUrl()`/URL assinada com expiração. Manter público só o que é realmente público (logos e fundos de login). Avaliar o mesmo para `images`.
 
-#### 10. Uso de `env()` fora de arquivos `config/` e Hardcodes Restantes
-- **Onde**:
-  - `app/Filament/Resources/Users/Schemas/UserForm.php`: usa `config('auth.mode')` sem tipagem estrita (`Config::string()`) enquanto o resto do app usa `AuthModeHandlerResolver` ou `Config::string()`.
-  - `resources/views/layouts/auth/*.blade.php`: o rodapé está hardcoded como `© {{ date('Y') }} - Ministério Público do Estado do Acre` em vez de usar `$settings->getFooterBrandName()` que já foi criado em `SystemSettings.php` (linha 114) exatamente para isso e nunca é chamado!
-  - `app/Traits/HasIsActiveScope.php`: força `$query->useIndex('idx_is_active')` quando o driver é `mysql`. Se qualquer outro model além de `User` usar a trait `HasIsActiveScope` e sua migration criar o índice com o nome padrão do Laravel (`{table}_is_active_index` em vez de `idx_is_active`), todas as queries com `->active()` no MySQL quebrarão com erro de SQL (`Key 'idx_is_active' doesn't exist in table`).
+### 🔴 3. `Login` copiou e divergiu do fluxo do Filament (timing attack, MFA quebrado, sem checagem de painel)
+
+- **Onde:** `app/Filament/Pages/Auth/Login.php`, comparado a `vendor/filament/filament/src/Auth/Pages/Login.php` (linhas 71–193).
+- **Problema:** o `authenticate()` customizado reimplementa a lógica do vendor, mas a versão atual do Filament já evoluiu:
+  - Não usa `Timebox`. Respostas de "usuário inexistente" e "senha errada" têm tempos diferentes, o que permite **enumerar usuários** (local e LDAP, onde a busca no diretório acontece antes do bind).
+  - No modo local **não chama `canAccessPanel()`** antes do login (o vendor chama `isUserAllowedToAccessPanel()`). O usuário autentica e só depois leva 403 do middleware.
+  - `checkMultiFactorAuthentication()` usa o formato antigo do Filament (`decrypt(...) === getAuthIdentifier()`). O vendor agora criptografa um array com `identifier` + `userKey`, tem rate limit do desafio MFA e usa `getMultiFactorChallenge()`. Se alguém ativar MFA, o fluxo quebra.
+  - Não dispara o evento `Attempting`.
+  - Dependências são resolvidas no `__construct()` (linhas 45–54). Funciona, mas o ponto de extensão do Livewire é `boot()`.
+- **Correção recomendada:** parar de reimplementar o login.
+  - **Modo local:** delegar para `parent::authenticate()` e customizar só os componentes do formulário.
+  - **Modo LDAP:** usar o provider de autenticação do próprio LdapRecord-Laravel (`'driver' => 'ldap'` com `database` + `sync_attributes`), que faz bind, sincroniza o usuário local e funciona com o `parent::authenticate()` do Filament. A regra `requires_local` e o perfil padrão viram regras/listeners do LdapRecord (`Authenticating`, `Synchronized`).
+  - Isso elimina a maior parte de `Login.php`, `LdapAuthService`, `LdapUserService` e da camada `AuthModeHandler`, e garante que as próximas correções de segurança do Filament cheguem automaticamente.
+
+### 🟠 4. Redefinição de senha só existe quando o registro público está ligado
+
+- **Onde:** `app/Providers/Filament/AppPanelProvider.php`, `configureRegistration()` (linhas 76–101).
+- **Problema:** `->passwordReset()` está dentro do `if ($canRegister)`. No modo local, se o administrador desligar o autorregistro (o caso mais comum em sistemas internos), ninguém mais consegue recuperar a senha. O painel Admin também não registra `passwordReset()`.
+- **Correção:** separar as duas coisas: `passwordReset()` depende só do modo local; `registration()` depende do setting.
+
+### 🟠 5. Registro público ligado por padrão
+
+- **Onde:** `app/Settings/SystemSettings.php` (`$enable_registration = true`), `app/Filament/Pages/Auth/Register.php`.
+- **Problema:** todo app novo em modo local nasce aceitando cadastro anônimo. Além disso, `Register` atribui `UserRole::User` fixo, ignorando `config('auth.default_role')`, e usa o e-mail como `username`.
+- **Correção:** padrão `false`. Usar `config('auth.default_role')`. Considerar verificação de e-mail (`->emailVerification()`) quando o registro estiver ligado.
+
+### 🟠 6. Seeder cria contas com senhas triviais sem checar o ambiente
+
+- **Onde:** `database/seeders/UserSeeder.php`, `DatabaseSeeder.php`.
+- **Problema:** `developer/developer`, `admin/admin` e `user/user` são criados sempre que o seeder roda, inclusive em produção. `DB::prohibitDestructiveCommands()` bloqueia `migrate:fresh`, mas não bloqueia `db:seed`.
+- **Correção:** separar `ProductionSeeder` (permissões e perfis) de `DevelopmentSeeder` (usuários fake), e abortar se `app()->isProduction()`. Em produção, criar o primeiro administrador via comando interativo (`mpac:create-admin`).
+
+### 🟠 7. Formulário de usuário no modo LDAP aceita `username` vazio
+
+- **Onde:** `UserForm::getUsernameComponent()` (linhas 84–103).
+- **Problema:** no ramo LDAP, o campo não tem `required()` nem `maxLength()`. A coluna é `NOT NULL UNIQUE`, então salvar sem username estoura `QueryException` em vez de erro de validação. O e-mail é derivado só do evento `afterStateUpdated` (`live()->debounce(500)`): se o usuário salvar antes do debounce, o e-mail fica errado.
+- **Correção:** `required()->maxLength()->unique(ignoreRecord: true)` nos dois modos e gerar o e-mail no `mutateFormDataBeforeSave/Create`, não no front.
+
+### 🟠 8. `LoginResponse` manda para o painel errado
+
+- **Onde:** `app/Http/Responses/LoginResponse.php`.
+- **Problema:** depois do login, redireciona para `intended(Filament::getDefaultPanel()->getUrl())`. O perfil Administrador semeado só tem `panels.view.admin`. Se ele entrar direto por `/admin/login` (sem URL "intended"), vai para `/` (painel App), onde não tem acesso, e recebe 403.
+- **Correção:** usar `Filament::getCurrentPanel()->getUrl()` como fallback, ou o primeiro painel que o usuário pode acessar.
+
+### 🟡 9. HTTPS e proxies configurados "na mão"
+
+- **Onde:** `AppServiceProvider::configureProductionUrl()` (linhas 46–53).
+- **Problema:** sobrescreve `$_SERVER['HTTPS']` a partir de `X-Forwarded-Proto`, com padrão `'https'` quando o header não existe. Também acessa `request()` no `boot()`, que roda em comandos de console e workers.
+- **Correção:** `->withMiddleware(fn ($m) => $m->trustProxies(at: [...], headers: ...))` em `bootstrap/app.php` mais `URL::forceScheme('https')`. Com isso também `request()->ip()` passa a vir correto para rate limit e auditoria.
+
+### 🟡 10. Colunas `created_by` / `updated_by` órfãs
+
+- **Onde:** migration `0001_01_01_000000_create_users_table.php` (linhas 28–36), `UsersTable.php` (linhas 53–61).
+- **Problema:** nada preenche essas colunas, `User` não tem as relações e a FK não tem `nullOnDelete()`. Excluir um usuário que "criou" outro vai falhar por integridade referencial assim que alguém começar a preencher. A tabela mostra IDs numéricos.
+- **Correção:** trait `HasBlameable` (no pacote de essentials) com `creating`/`updating`, relações `creator()`/`updater()`, `nullOnDelete()` e colunas exibindo `creator.name`. Ou remover as colunas, já que o activity log já registra o causador.
+
+### 🟡 11. Pontos de extensão fixos no código (cada app nova precisa editar a base)
+
+- `ActivityLog::subjectTypeOptions()` (`app/Support/ActivityLog.php`, linhas 44–53): lista fixa de models. Model novo não aparece no filtro de auditoria.
+- `Panels` e `PanelPermissions::fromPanel()`: só existem `app` e `admin`. Um terceiro painel exige editar dois enums e o `PanelSwitcher`. O `AppPanelProvider` ainda usa `'app'` e `''` literais em vez do enum.
+- `FileCollection`: discos, MIME types e diretórios num `match`. Cada app que precisar de uma coleção nova edita o enum base.
+- `RoleSeeder`: permissões dos perfis padrão fixas.
+- **Correção:** registries (`ActivityLog::registerSubject(Model::class, 'Rótulo')` ou interface `HasActivityLabel` no model), permissão de painel por convenção (`panels.view.{id}`) e coleções definidas em config.
+
+### 🟡 12. Duplicação massiva de policies e enums de permissão
+
+- Nove policies com ~100 linhas idênticas (`viewAny`, `view`, `create`, ... `reorder`), mudando só o enum. Nove enums com os mesmos 10 casos.
+- **Correção:** classe base `ResourcePolicy` com `protected static string $permissions = UserPermissions::class` e uma interface/trait `ResourcePermissions` que resolve o caso pela ação. Cada policy nova vira 3 linhas. O seeder de permissões já descobre enums por diretório; trocar por um registry permite que pacotes registrem as próprias permissões.
+
+### 🟡 13. Sincronização de permissões não remove nada e só roda via seeder
+
+- **Onde:** `PermissionSeeder`.
+- **Problema:** `firstOrCreate` por permissão (N queries). Permissões renomeadas ou removidas ficam no banco para sempre. Em apps antigos, permissões novas só chegam se alguém lembrar de rodar o seeder.
+- **Correção:** comando idempotente `mpac:permissions:sync [--prune]`, executado no deploy (automação do container ou job de CI), com `upsert` em lote.
+
+### 🟡 14. Serviços de domínio enviando notificação de UI
+
+- **Onde:** `LdapUserService::findUserByUsername()` usa `HasNotifications::notifyError()`.
+- **Problema:** um serviço de diretório disparando toast do Filament acopla a camada de serviço à UI e quebra em fila/console. `findUserByEmail()` nem trata exceções.
+- **Correção:** o serviço lança uma exceção de domínio (`DirectoryUnavailableException`) e a página decide como exibir.
+
+### 🟡 15. LDAP sem proteção contra senha vazia no serviço
+
+- **Onde:** `LdapAuthService::authenticate()`.
+- **Problema:** um bind LDAP com senha vazia pode ser tratado pelo servidor como bind anônimo/não autenticado e "passar". Hoje o formulário exige senha, mas o serviço não se protege.
+- **Correção:** `if ($password === '') return false;`. Se migrar para o provider do LdapRecord (item 3), isso já é tratado.
+
+### ⚪ 16. Higiene, código morto e configurações frágeis
+
+| Item | Onde | Ação |
+| --- | --- | --- |
+| Traduções sem pacote correspondente | `lang/vendor/banner/` (nenhum pacote "banner" instalado) | Remover |
+| 28 de 35 arquivos `pt_BR` do Filament divergem do vendor | `lang/vendor/filament-panels`, `filament-actions` | Manter só as chaves realmente customizadas; o resto envelhece a cada release do Filament |
+| View e layout sem rota | `resources/views/welcome.blade.php`, `layouts/app.blade.php` | Remover |
+| `janczakb/filament-flex-fields` só registra o plugin, não é usado por nenhum campo, e vários CSS/áudios dele estão versionados em `public/` | `AdminPanelProvider`, `public/` | Remover ou justificar |
+| `FLEX_FIELDS_PLAYGROUND=true` no `.env.example` | `.env.example` | Remover (playground exposto em quem copiar o `.env`) |
+| `laravel/sail` em dev, sem uso (Docker próprio + Laragon) | `composer.json` | Remover |
+| Dois formatadores (Pint + PHP-CS-Fixer) | `.php-cs-fixer.php`, `composer.json` | Ficar só com Pint |
+| `larastan/larastan` travado em `3.14` exato | `composer.json` | Usar `^3.14` |
+| Pacotes da org sob vendor pessoal `tonegabes/*` e template com `name: tonegabes/filament-mpac` | `composer.json` | Migrar para namespace da org (ex.: `mpac/*`) no GitLab Package Registry: reduz dependência de uma pessoa |
+| `lint-staged` roda `composer format` (projeto inteiro) e não re-adiciona os arquivos | `.lintstagedrc` | `"**/*.php": ["vendor/bin/pint"]` (lint-staged passa só os arquivos staged) |
+| `\Str::random` via alias global e `Hash::make` redundante com o cast `hashed` | `Login::handleLocalUserRecord()` | `Str::random()` importado, sem `Hash::make` |
+| `is_active` sem default na migration | migration de `users` | `->default(true)` |
+| `AppPanelProvider` consulta o banco (settings) ao registrar o painel, em toda requisição e todo comando artisan | `configureRegistration()` | Usar cache do `spatie/laravel-settings` (`settings.cache.enabled`) ou checar dentro da página |
 
 ---
 
-### 🟡 Menores / DevX / Infraestrutura
+## Parte 2 — Melhorias recomendadas
 
-1. **Variável indefinida no Dark Mode do Tema CSS**:
-   - Em `resources/css/mpac-theme/index.css` (linha 45): `.dark { --color-bg: var(--color-bg-dark); }`, porém `--color-bg-dark` **não foi declarada** em `:root` nem em `@theme`! Isso faz com que `--color-bg` fique inválida no modo escuro.
-2. **Trait não utilizada em `ImagesTable`**:
-   - `app/Filament/Resources/Images/Tables/ImagesTable.php` (linha 21) declara `use HasNotifications;` dentro de uma classe que só possui o método estático `configure(Table $table)`.
-3. **Configuração de Disco em `Document` vs `Image`**:
-   - Em `Image.php` (linha 29): `->useDisk($collection->disk())`.
-   - Em `Document.php` (linha 29): `->useDisk(FileCollection::Documents->disk())` (deveria usar `$collection->disk()`).
-4. **Husky + Lint-Staged rodando Pint no projeto inteiro a cada commit**:
-   - `.lintstagedrc` está configurado como `"**/*.php": ["composer format"]`. O `lint-staged` passa a lista de arquivos alterados como argumentos para o comando, e `composer format` executa `pint --no-interaction --ansi <arquivos>`. Porém, como `composer.json` também tem `format:dirty`, vale garantir que apenas os arquivos em stage sejam formatados rapidamente e que `phpstan` ou testes rápidos possam ser incluídos ou validados.
-5. **Dependência de Playground em Produção (`janczakb/filament-flex-fields`)**:
-   - `.env.example` traz `FLEX_FIELDS_PLAYGROUND=true`. É importante garantir que em ambientes não-locais isso seja `false` por padrão.
-6. **Fontes externas carregadas via CDN (`fonts.bunny.net`) em `resources/views/components/head/fonts.blade.php`**:
-   - Carrega 4 famílias de fontes externas (Assistant, Plus Jakarta Sans, Crimson Pro, IBM Plex Mono) com todos os pesos (100 a 900), mas o `index.css` só usa `Plus Jakarta Sans` e `IBM Plex Mono`. Em redes corporativas/intranet do MPAC com restrição de saída à internet, o carregamento via `fonts.bunny.net` pode causar lentidão ou falha visual.
+### 2.1 Performance
+
+- **`BrandLogomark` como componente Livewire** (`app/Livewire/BrandLogomark.php`): é renderizado em toda página (sidebar e telas de login), serializa estado e não tem nenhuma interação. Converter em componente Blade anônimo ou de classe.
+- **`SystemSettings::getPublicFileUrl()`** chama `Storage::exists()` a cada render. Em disco S3/MinIO, isso é uma requisição HTTP por logo por página. Guardar o caminho validado no momento do upload e só montar a URL.
+- **Cache de settings:** ativar `settings.cache.enabled` para evitar a query de `system` em toda requisição (painel e layouts de auth leem settings).
+- **Fontes:** `components/head/fonts.blade.php` carrega 4 famílias com até 9 pesos cada de `fonts.bunny.net`, bloqueando a renderização. Em intranet, a CDN externa pode nem estar acessível. Auto-hospedar via Vite (`@fontsource/*`) só com os pesos usados.
+- **Ordenação por `media.size`** em `DocumentsTable` ordena por relação morph. Validar o SQL gerado; se for lento, desnormalizar `size`/`mime_type` no próprio model.
+- **Testes:** 111 s para 208 testes. Rodar `php artisan test --parallel` local e na CI, e usar `LazilyRefreshDatabase`.
+- **Opcional (Laravel 12.8+):** `Model::automaticallyEagerLoadRelationships()` como proteção extra contra N+1 em tabelas Filament.
+
+### 2.2 Segurança e padrões
+
+- `Password::defaults()` centralizado (tamanho, `mixedCase`, `uncompromised()` em produção) e usado em `UserForm`, `Register` e reset de senha.
+- `SESSION_SECURE_COOKIE=true` e `SESSION_ENCRYPT=true` no exemplo de produção.
+- Caddyfile: adicionar `Content-Security-Policy` básica e `Strict-Transport-Security` (se o TLS terminar no proxy, documentar onde configurar).
+- CI: `composer audit` e `npm audit --omit=dev` como jobs de qualidade, mais um limite mínimo de cobertura (`--coverage --min=`).
+- CI: o build de imagem roda só para MR→`develop` e tags. Considerar build também em `main` para detectar quebra de imagem antes da tag.
+- Dockerfile: `composer install --no-scripts` pula `filament:upgrade`. Hoje funciona porque os assets do Filament estão versionados em `public/`. Ao virar pacote, rodar `php artisan filament:assets` no stage de build e parar de versionar `public/js|css/filament`.
+- Confirmar qual driver o `spatie/laravel-pdf` usa: `poppler-utils` na imagem não atende Browsershot (precisa de Chromium) nem DOMPDF.
+
+### 2.3 Configuração enxuta
+
+O Laravel 11+ não precisa de todos os arquivos em `config/`. Cada arquivo copiado congela os defaults da época do `create-project`. Rodar um diff contra `vendor/laravel/framework/config` e **manter só os arquivos com alterações reais** (provavelmente `auth.php`, `filesystems.php`, `permission.php`, `settings.php`). Valores da org devem vir dos pacotes via `mergeConfigFrom`.
+
+### 2.4 Testes
+
+- Faltam testes de autorização "negativos" com perfis reais (Admin tentando promover a si mesmo, editar Desenvolvedor, excluir a si mesmo).
+- Falta teste de acesso anônimo a `/storage/documents/...` (vai falhar hoje, o que é o objetivo).
+- Testes de arquitetura podem crescer com presets do Pest (`arch()->preset()->laravel()`, `->security()`) e regras da org (policies estendem `ResourcePolicy`, enums em `App\Enums\Permissions` implementam `ResourcePermissions`).
 
 ---
 
-## Parte 2: Arquitetura de Desmembramento em Packages (Como Escalar e Atualizar Fácil)
+## Parte 3 — Desmembramento em pacotes
 
-### O Problema Central do Modelo Atual ("Copy-Paste Starter Kit")
+### 3.1 Princípio
 
-Hoje, o `filament-mpac` funciona como um **Template Clássico**:
-1. Você cria o **App A** em 2026 clonando o `filament-mpac`.
-2. Você cria o **App B** em 2027 clonando o `filament-mpac`.
-3. Em 2028, o servidor LDAP do MPAC muda a regra de busca, ou o Filament lança uma atualização, ou você descobre o bug do `is_active` no `Login.php`, ou quer adicionar 2FA / SSO (Keycloak / Gov.br) em todos os sistemas.
-4. **Consequência atual**: Você precisa abrir PR manual no App A, App B, App C, App D... porque `Login.php`, `LdapAuthService.php`, `UserResource.php`, `SystemSettings.php` e `mpac-theme` estão copiados dentro da pasta `app/` de cada projeto.
-
-### A Solução: Arquitetura "Thin App Skeleton + Core Packages"
-
-Para que você possa manter dezenas de aplicações Laravel na organização e atualizá-las com um simples `composer update tonegabes/*`, o repositório da aplicação final deve ser um **Thin Skeleton (Esqueleto Magro)** que contém **apenas o domínio de negócio daquele sistema** (ex: Processos, Promotorias, Eventos, Patrimônio), enquanto toda a fundação MPAC vem de **Packages Versionados via Composer**.
+**Tudo que deve ser igual em todos os apps vai para um pacote versionado. Tudo que é específico do app fica no app.** O app *consome* comportamento por configuração, plugins e contratos, e *nunca* edita código de infraestrutura.
 
 ```mermaid
-flowchart TD
-    subgraph App["Aplicação Derivada (ex: sis-eventos, sis-patrimonio)"]
-        Domain["Domínio do App (Models, Resources e Regras próprias)"]
-        AppPanel["AppPanelProvider (Painel de Negócio)"]
+flowchart TB
+    subgraph app["App derivado (esqueleto fino)"]
+        A1["Providers de painel<br/>(ligam plugins)"]
+        A2["User model<br/>(usa traits)"]
+        A3["Domínio do app<br/>(models, resources, policies)"]
     end
 
-    subgraph Packages["Ecossistema de Pacotes Internos (Composer / GitLab Registry)"]
-        FilamentCore["1. tonegabes/filament-mpac-core (Plugin Filament Base, Tema, Settings, Logs, Media)"]
-        AuthPkg["2. tonegabes/filament-mpac-auth (LDAP, Local, SSO, RBAC, Users/Roles/Permissions UI)"]
-        Essentials["3. tonegabes/mpac-essentials (Helpers, Masks, Money, Docs, Traits Eloquent)"]
-        DevTools["4. tonegabes/mpac-dev-tools (Pint Preset, PHPStan Rules, CI Templates, MakeModelPlus)"]
+    subgraph filament["Plugins Filament"]
+        P1["mpac/filament-core<br/>(meta-pacote + mpac:install)"]
+        P2["mpac/filament-auth"]
+        P3["mpac/filament-access-control"]
+        P4["mpac/filament-activity-log"]
+        P5["mpac/filament-file-library"]
+        P6["mpac/filament-branding"]
     end
 
-    App --> FilamentCore
-    App --> AuthPkg
-    App --> Essentials
-    App -.->|require-dev| DevTools
-    FilamentCore --> Essentials
-    AuthPkg --> FilamentCore
+    subgraph base["Bibliotecas base"]
+        B1["mpac/laravel-essentials"]
+        B2["mpac/filament-phosphor-icons"]
+        B3["mpac/filament-better-options"]
+    end
+
+    subgraph dev["Dev / infraestrutura"]
+        D1["mpac/coding-standard"]
+        D2["mpac/testing"]
+        D3["mpac/upgrade (Rector)"]
+        D4["ci-templates (GitLab include)"]
+        D5["imagem Docker base"]
+    end
+
+    app --> P1
+    P1 --> P2 & P3 & P4 & P5 & P6
+    P2 & P3 & P4 & P5 & P6 --> B1
+    P6 --> B2
+    P3 --> B3
+    app -. dev .-> D1 & D2 & D3
+    app -. CI/CD .-> D4 & D5
 ```
 
----
+### 3.2 Mapa de pacotes (o que sai de onde)
 
-### Detalhamento dos Pacotes para Desmembramento
+| Pacote | Conteúdo extraído do template | Pontos de extensão para o app |
+| --- | --- | --- |
+| **`mpac/laravel-essentials`** (evolução do `tonegabes/mpac-essentials`) | Helpers atuais (Mask, Money, Document, DateTime), `BetterEnum`, `HasIsActiveScope`, `HasBlameable` (novo), `HasNotifications`, hardening de produção hoje no `AppServiceProvider` (`shouldBeStrict`, `prohibitDestructiveCommands`, `forceScheme`, trust proxies, `Password::defaults()`) | Config `mpac-essentials.php` para ligar/desligar cada hardening |
+| **`mpac/filament-auth`** | `AuthMode`, login local/LDAP (sobre o provider do LdapRecord), `Register`, reset de senha, `LoginResponse`, `ResetPasswordNotification` pt-BR, layouts de auth (`split`, `centered`, `fullpage`), `UsesConfiguredAuthLayout`, rota `/entrar` | `MpacAuthPlugin::make()->registration()->passwordReset()`; config `mpac-auth.php` (modo, domínio LDAP, `requires_local`, perfil padrão); eventos `UserProvisionedFromLdap` |
+| **`mpac/filament-access-control`** | `Role`, `Permission`, `UserResource`, `RoleResource`, `PermissionResource`, `ResourcePolicy` base, `ResourcePermissions`, `PanelPermissions` por convenção, `PanelSwitcher`, `PermissionRegistry`, `mpac:permissions:sync`, `mpac:create-admin`, perfis padrão, proteção contra escalonamento (item 1) | `->userResource(MyUserResource::class)`, `->userFormSchema(fn)`; `PermissionRegistry::register(MyPermissions::class)` no provider do app; config de perfis protegidos |
+| **`mpac/filament-activity-log`** | `ActivityResource`, `ActivitiesRelationManager`, `ViewActivitiesAction`, `ActivityLog` (rótulos), `ActivityPolicy`, permissões de auditoria, migration da tabela | Interface `HasActivityLabel` no model, ou `ActivityLog::registerSubject()`; tradução de atributos por model |
+| **`mpac/filament-file-library`** | `Document`, `Image`, `MediaResource`, `DocumentResource`, `ImageResource`, `LibraryFileUpload`, `CopyFileUrlAction`, `HasFileUrl`, `FileLibrary`, discos, rota de download autenticado, policies e permissões | Config de coleções (disco, MIME, diretório, visibilidade) substituindo o `match` do `FileCollection`; resources liga/desliga no plugin |
+| **`mpac/filament-branding`** | `SystemSettings` + migration de settings, `ManageSystem`, componente de logo (Blade), tema CSS (`resources/css/mpac-theme`), fontes auto-hospedadas, `BaseIconsProvider`, `OverrideActionsProvider`, render hooks, traduções pt-BR do Filament realmente customizadas | `MpacBrandingPlugin::make()->primaryColor()`; o app importa o CSS do pacote no `theme.css` e pode sobrescrever variáveis |
+| **`mpac/filament-core`** | Meta-pacote que depende dos plugins acima, mais `MpacPlugin` que registra tudo com defaults da org e o comando `mpac:install` | `MpacPlugin::make()->withoutFileLibrary()` etc. |
+| **`mpac/coding-standard`** (dev) | `pint.json`, `phpstan.neon` base (níveis, extensões, ignores comuns), `rector.php` base, `.editorconfig`, presets de arquitetura do Pest | O app tem só `includes:` / `--config` apontando para o vendor |
+| **`mpac/testing`** (dev) | Helpers Pest (`actingAsDeveloper()`, `actingAsAdmin()`), factories de usuário com perfis, datasets de permissões, smoke test do painel | Uso direto nos testes do app |
+| **`mpac/upgrade`** (dev) | Regras Rector por versão (`rector-v2.php`), comando `mpac:upgrade` | Executado quando um pacote sobe de major |
 
-Abaixo está o plano exato do que deve sair do `filament-mpac` e para qual pacote deve ir.
+`tonegabes/filament-phosphor-icons` e `tonegabes/filament-better-options` já são pacotes; basta movê-los para o namespace da org. `laravel-make-model-plus` pode virar o gerador oficial com stubs que já criam policy herdando de `ResourcePolicy` e enum de permissões registrado.
 
----
-
-#### 📦 Pacote 1: `tonegabes/mpac-essentials` (Já existe — Expandir)
-**Objetivo**: Utilitários puros de PHP/Laravel e Eloquent (sem dependência obrigatória de Filament). Pode ser usado inclusive em APIs ou microsserviços Laravel da organização que não usem Filament.
-
-**O que já está nele**:
-- `MpacDocument`, `MpacMask`, `MpacMoney`, `DateTime`, `Arr`, `BetterEnum`.
-
-**O que mover do `filament-mpac` para o `mpac-essentials`**:
-1. **`HasIsActiveScope`** (`app/Traits/HasIsActiveScope.php`) — refatorado sem o `useIndex('idx_is_active')` hardcoded (ou tornando o nome do índice opcional).
-2. **`HasAuditUsers` (Novo)** — Trait para preencher automaticamente `created_by` e `updated_by` no Eloquent.
-3. **`ProductionSafetyServiceProvider` (ou métodos em `EssentialsServiceProvider`)**:
-   - A lógica de `AppServiceProvider.php`: `Model::shouldBeStrict(! app()->isProduction())`, `DB::prohibitDestructiveCommands()`, e `URL::forceScheme('https')` com tratamento de `X-Forwarded-Proto`. Assim, nenhum app da organização esquece essas travas de segurança.
-
----
-
-#### 📦 Pacote 2: `tonegabes/filament-mpac-ui` (ou `tonegabes/filament-mpac-theme`)
-**Objetivo**: Identidade visual MPAC, configurações globais de componentes Filament, ícones padrão e layouts. Se o design do MPAC mudar no futuro, basta atualizar este pacote e todos os sistemas mudam de cara automaticamente.
-
-**O que mover do `filament-mpac` para este pacote**:
-1. **Providers de UI Globais**:
-   - `app/Providers/Filament/BaseIconsProvider.php` (mapeamento completo de aliases do Filament para Phosphor Icons).
-   - `app/Providers/Filament/OverrideActionsProvider.php` (padronização global de `CreateAction`, `EditAction`, `DeleteAction`).
-   - `app/Providers/Filament/RenderHooksProvider.php` (injeção de fontes e hooks de head/footer).
-2. **Tema CSS e Assets**:
-   - `resources/css/mpac-theme/index.css` e `resources/css/mpac-theme/components/sidebar.css`.
-   - `public/images/logo.png`, `logo-dark.png`, `background.avif` (publicados via `php artisan vendor:publish` ou servidos via pacote).
-   - Views de componentes visuais: `resources/views/components/head/*`, `resources/views/components/forms/*`, `resources/views/components/section/auth.blade.php`, `resources/views/layouts/auth/*`.
-3. **Trait `HasNotifications`** (`app/Traits/HasNotifications.php`).
-4. **Componente `PanelSwitcher`** (`app/Filament/Components/Navigation/PanelSwitcher.php`) — tornado dinâmico para descobrir todos os painéis registrados via `Filament::getPanels()` em vez de depender de um Enum fixo!
-
----
-
-#### 📦 Pacote 3: `tonegabes/filament-mpac-auth` (O Mais Importante para Manutenção Centralizada)
-**Objetivo**: Concentrar 100% da inteligência de Autenticação (Local, LDAP e futuro SSO/Gov.br/OAuth) e Controle de Acesso (RBAC com Spatie Permission).
-> **Por que separar?** A autenticação institucional e o RBAC são as partes mais críticas de qualquer órgão público. Se amanhã o MPAC adotar login único (Keycloak/SAML/OAuth2) ou mudar a estrutura do Active Directory, você atualiza **apenas este pacote** e todos os sistemas antigos passam a suportar o novo método sem tocar em uma linha de código dos projetos!
-
-**O que mover do `filament-mpac` para este pacote**:
-1. **Serviços de Autenticação**:
-   - `app/Enums/AuthMode.php`
-   - `app/Services/Auth/AuthModeHandler.php`
-   - `app/Services/Auth/AuthModeHandlerResolver.php`
-   - `app/Services/Auth/LocalAuthModeHandler.php`
-   - `app/Services/Auth/LdapAuthModeHandler.php`
-   - `app/Services/Auth/LdapAuthService.php`
-   - `app/Services/Auth/LdapUserService.php`
-   - `app/Http/Responses/LoginResponse.php`
-   - `app/Notifications/ResetPasswordNotification.php` e `OverrideNotificationsProvider.php`
-2. **Páginas Filament de Auth**:
-   - `app/Filament/Pages/Auth/Login.php`
-   - `app/Filament/Pages/Auth/Register.php`
-   - `app/Filament/Pages/Auth/Password/ResetPasswordAction.php`
-   - `app/Filament/Pages/Auth/Password/ResetPasswordRequest.php`
-   - `app/Filament/Pages/Auth/Concerns/UsesConfiguredAuthLayout.php`
-   - Views blade de auth (`resources/views/filament/pages/auth/*`).
-3. **Models Base / Contracts & RBAC**:
-   - `MpacAuthenticatable` (Model base `User` ou Trait `HasMpacAuth` que o `App\Models\User` do projeto estende/usa).
-   - `Role` e `Permission` models (`app/Models/Role.php`, `app/Models/Permission.php`).
-   - Enums de Permissão Base: `UserRole`, `WildcardPermissions`, `UserPermissions`, `RolePermissions`, `PermissionPermissions`, `PanelPermissions`.
-   - Policies: `UserPolicy`, `RolePolicy`, `PermissionPolicy`.
-   - Filament Resources prontos (registrados via Filament Plugin `MpacAuthPlugin::make()`):
-     - `UserResource` (Pages, Schemas, Tables)
-     - `RoleResource` (Pages, Schemas, Tables)
-     - `PermissionResource` (Pages, Schemas, Tables)
-   - `PermissionSeeder` (capaz de ler tanto as permissões do pacote quanto a pasta `app/Enums/Permissions` do projeto filho!).
-
----
-
-#### 📦 Pacote 4: `tonegabes/filament-mpac-admin` (ou `filament-mpac-core` unificado)
-**Objetivo**: Fornecer como um **Filament Plugin** (`MpacAdminPlugin::make()`) todas as funcionalidades administrativas de suporte que hoje poluem a pasta `app/Filament/Resources` de todo sistema novo: Configurações do Sistema, Logs de Auditoria e Biblioteca de Arquivos/Mídia.
-
-**O que mover do `filament-mpac` para este pacote**:
-1. **Módulo de Auditoria (Activity Log)**:
-   - `app/Support/ActivityLog.php` (com registro dinâmico de models em vez de array fixo).
-   - `app/Filament/Actions/ViewActivitiesAction.php`.
-   - `app/Filament/RelationManagers/ActivitiesRelationManager.php`.
-   - `app/Filament/Resources/Activities/*` (`ActivityResource`, `ActivityInfolist`, `ActivitiesTable`, Pages).
-   - `app/Policies/ActivityPolicy.php` e `ActivityPermissions.php`.
-2. **Módulo de Configurações (`SystemSettings`)**:
-   - `app/Settings/SystemSettings.php` + migration de settings.
-   - `app/Filament/Pages/Settings/ManageSystem.php`.
-   - `app/Enums/PageLayouts.php` e `SystemPermissions.php`.
-3. **Módulo de Biblioteca de Arquivos (`FileLibrary` — Opcional por App)**:
-   - `app/Contracts/HasFileUrl.php`, `app/Enums/FileCollection.php`, `app/Support/FileLibrary.php`, `app/Filament/Support/LibraryFileUpload.php`, `app/Filament/Actions/CopyFileUrlAction.php`.
-   - Models `Document` e `Image`, Policies (`DocumentPolicy`, `ImagePolicy`, `MediaPolicy`) e Resources (`DocumentResource`, `ImageResource`, `MediaResource`).
-   - *Vantagem enorme*: Nem todo sistema precisa de `DocumentResource` e `ImageResource` no menu lateral. Sendo um plugin, o projeto derivado pode fazer:
-     ```php
-     MpacAdminPlugin::make()
-         ->withActivityLog()
-         ->withSystemSettings()
-         ->withFileLibrary(enabled: false) // Desliga se o app não precisar!
-     ```
-
----
-
-#### 📦 Pacote 5: `tonegabes/mpac-dev-tools` (ou expansão do `laravel-make-model-plus`)
-**Objetivo**: Padronizar regras de lint, análise estática e CI/CD sem duplicar arquivos de configuração que ficam defasados entre projetos.
-
-**Como fazer**:
-1. **`pint.json` compartilhado**: Manter o `pint.json` centralizado no pacote e usar um comando wrapper ou script composer que aponte `--config=vendor/tonegabes/mpac-dev-tools/pint.json`. Se a regra de code style mudar, muda em todos os projetos ao atualizar o pacote.
-2. **`phpstan.base.neon` compartilhado**: No pacote, fornecer `vendor/tonegabes/mpac-dev-tools/phpstan.base.neon`. No projeto filho, o `phpstan.neon` da raiz tem apenas 4 linhas:
-   ```neon
-   includes:
-       - vendor/tonegabes/mpac-dev-tools/phpstan.base.neon
-   parameters:
-       paths:
-           - app
-   ```
-3. **GitLab CI Template Centralizado (`include:`)**:
-   - Hoje o `.gitlab-ci.yml` tem **216 linhas** copiadas em todo repositório. Se você mudar a versão do `docker:27.5.1-cli`, a regra de cache ou o healthcheck do container no MR, terá que editar `.gitlab-ci.yml` em todos os repositórios da organização.
-   - **Melhoria**: Criar um repositório no GitLab do MPAC (ex: `sistemas/ci-templates`) e nos projetos usar apenas:
-     ```yaml
-     include:
-       - project: 'sistemas/ci-templates'
-         ref: v1.0.0
-         file: '/laravel-filament.gitlab-ci.yml'
-     ```
-
----
-
-### Quantidade de Pacotes Recomendada (Consolidação Pragmática)
-
-Para não criar micro-pacotes demais para manter, a divisão ideal e mais pragmática para a sua organização é ter **apenas 3 pacotes no ecossistema** além do template:
-
-| Pacote | Tipo | Responsabilidade |
-| :--- | :--- | :--- |
-| **`tonegabes/mpac-essentials`** | Library (já existe) | Helpers (CPF/CNPJ, Máscaras, Moeda), Traits de Model (`BetterEnum`, `HasIsActiveScope`, `HasAuditUsers`), Segurança de Boot (`AppServiceProvider` configs). |
-| **`tonegabes/filament-mpac-core`** | Filament Plugin (novo) | Junta os conceitos dos Pacotes 2, 3 e 4 acima: **Auth (Local/LDAP)**, **RBAC (Users/Roles/Permissions)**, **SystemSettings**, **ActivityLog**, **FileLibrary**, **Tema MPAC + Ícones Phosphor** e **Actions Globais**. |
-| **`tonegabes/laravel-make-model-plus`** | Dev Library (já existe) | Gerador de código (`make:model-plus`), preset do Pint (`pint.json`) e configuração base do PHPStan (`phpstan.base.neon`). |
-
----
-
-### Como Ficará um Projeto Derivado Após essa Mudança?
-
-Em vez de ter **90+ classes em `app/`** logo no primeiro dia, um novo sistema criado a partir do `filament-mpac` terá em `app/` **apenas**:
-
-```text
-app/
-├── Enums/
-│   └── Permissions/          # Apenas permissões dos Models de negócio deste app!
-├── Filament/
-│   └── Resources/            # Apenas Resources de negócio deste app!
-├── Models/
-│   └── User.php              # Estende MpacUser do pacote (permite adicionar relações do app)
-├── Policies/                 # Apenas Policies de negócio deste app!
-└── Providers/
-    ├── AppServiceProvider.php
-    └── Filament/
-        ├── AdminPanelProvider.php  # Registra ->plugin(MpacAdminPlugin::make())
-        └── AppPanelProvider.php    # Registra ->plugin(MpacAppPlugin::make())
-```
-
-E o `AdminPanelProvider.php` do projeto filho passará de 133 linhas para:
+### 3.3 Como o app fica depois
 
 ```php
+// app/Providers/Filament/AdminPanelProvider.php
 public function panel(Panel $panel): Panel
 {
     return $panel
         ->id('admin')
         ->path('admin')
-        ->plugin(
-            MpacAdminPlugin::make()
-                ->withUsersAndRoles()
-                ->withSystemSettings()
-                ->withActivityLog()
-                ->withMediaLibrary()
-        )
+        ->plugins([
+            MpacPlugin::make()
+                ->auth(fn (MpacAuthPlugin $auth) => $auth->passwordReset())
+                ->accessControl()
+                ->activityLog()
+                ->fileLibrary()
+                ->branding(),
+        ])
         ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources');
 }
 ```
 
-**Como funcionará a atualização em projetos antigos?**
-Quando você melhorar o fluxo LDAP, criar suporte a Gov.br/SSO, corrigir um bug no `ManageSystem` ou atualizar do Filament v5 para v6:
-1. Você altera apenas no `tonegabes/filament-mpac-core` e lança uma tag (ex: `v1.4.0`).
-2. Nos projetos antigos, roda-se apenas:
-   ```bash
-   composer update tonegabes/filament-mpac-core
-   php artisan migrate
-   ```
-3. Zero conflito de merge, zero edição manual em arquivos de `app/`.
-
----
-
-## Parte 3: Melhorias de Arquitetura no Próprio Starter Template
-
-Independentemente da extração para pacotes (ou durante ela), recomendamos aplicar as seguintes melhorias no código atual:
-
-### 1. Criar Base Policy (`AbstractMpacPolicy` ou Trait `ChecksPermissionEnum`)
-Hoje, `UserPolicy`, `RolePolicy`, `PermissionPolicy`, `DocumentPolicy`, `ImagePolicy` e `MediaPolicy` possuem **exatamente as mesmas 108 linhas de código**, mudando apenas a classe do Enum (`UserPermissions::ViewAny`, `DocumentPermissions::ViewAny`, etc.).
-- **Melhoria**: Criar uma classe base ou Trait onde a Policy filha define apenas:
-  ```php
-  final class DocumentPolicy extends BaseResourcePolicy
-  {
-      protected static string $permissionEnum = DocumentPermissions::class;
-  }
-  ```
-  Caso a Policy precise de regra customizada em um método (ex: `update`), basta sobrescrever apenas aquele método. Isso elimina ~500 linhas de código duplicado.
-
-### 2. Substituir `BrandLogomark` (Livewire) por Blade Component + View Caching
-`app/Livewire/BrandLogomark.php` é um componente Livewire completo apenas para exibir uma tag `<img>` e dois `<span>` estáticos com o nome e sigla do sistema.
-- Cada componente Livewire na página adiciona payload JSON de hidratação/snapshot no HTML e processamento no backend.
-- **Melhoria**: Transformar em um Blade Component simples (`<x-brand-logomark />`) que lê o `SystemSettings` (com cache ativo). Isso também corrige imediatamente o bug #3 nos layouts `split`, `centered` e `fullpage`.
-
-### 3. Padronizar `created_by` / `updated_by` com Trait `Blameable`
-- Criar uma trait `HasAuditColumns` que registra um Model Observer/boot trait para preencher `created_by = Auth::id()` e `updated_by = Auth::id()`.
-- Criar uma macro no `Blueprint` do Laravel (dentro do `mpac-essentials`):
-  ```php
-  Blueprint::macro('auditColumns', function () {
-      $this->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-      $this->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-  });
-  ```
-  Assim, qualquer migration de qualquer sistema da org basta chamar `$table->auditColumns();`.
-
-### 4. Internacionalização / Textos e Mensagens Consistentes
-- Há mistura de inglês e português em textos voltados ao usuário/banco:
-  - `DocumentForm.php`: `'Document Name Not Set'`
-  - `ImageForm.php`: `'Image Name Not Set'`
-  - `UserRole.php`: `description()` está em inglês (`'Full system access with development privileges'`), enquanto os `value` estão em português (`'Desenvolvedor'`).
-- **Melhoria**: Padronizar 100% das strings de UI e descrições em `pt_BR`.
-
-### 5. Testes de Arquitetura Mais Abrangentes (`tests/Unit/ArchitectureTest.php`)
-O `ArchitectureTest.php` atual é ótimo, mas pode garantir muito mais governança para os times que usarem o template:
 ```php
-arch('controllers and services do not use env() directly')
-    ->expect(['App', 'Database'])
-    ->not()->toUse(['env']);
-
-arch('enums are backed enums')
-    ->expect('App\Enums')
-    ->toBeEnums();
-
-arch('policies end with Policy suffix')
-    ->expect('App\Policies')
-    ->toHaveSuffix('Policy');
-
-arch('models extend Eloquent Model')
-    ->expect('App\Models')
-    ->toExtend(Illuminate\Database\Eloquent\Model::class);
+// app/Models/User.php
+class User extends Authenticatable implements FilamentUser, MpacUser
+{
+    use HasFactory, Notifiable;
+    use InteractsWithMpacAccess; // HasRoles + canAccessPanel por convenção + is_active + activity log
+}
 ```
 
-### 6. Proteção de Rotas de Mídia Privada vs Pública
-- Hoje `images` e `documents` estão configurados em `config/filesystems.php` dentro de `storage/app/public/{images,documents}` com `'visibility' => 'public'`.
-- Apesar do `CopyFileUrlAction` checar `$user->can('view', $record)` para mostrar o botão no painel, a URL gerada (`/storage/documents/...`) é **100% pública e acessível sem autenticação** por qualquer pessoa que tenha o link ou adivinhe o caminho incremental (`/storage/documents/1/arquivo.pdf`).
-- **Melhoria para Órgão Público (MPAC)**: Para documentos internos/sigilosos, utilizar o gerador de Path não-sequencial (UUID) do Spatie MediaLibrary (`PathGenerator`) ou suportar uma coleção `PrivateDocuments` servida via rota assinada (`temporaryUrl` ou controller autenticado).
+```php
+// app/Policies/ProcessoPolicy.php
+final class ProcessoPolicy extends ResourcePolicy
+{
+    protected static string $permissions = ProcessoPermissions::class;
+}
+```
+
+Hoje cada uma dessas áreas tem dezenas de arquivos no app. Depois, um bug no login LDAP é corrigido uma vez em `mpac/filament-auth`, sai como `1.4.1` e chega a todos os apps com `composer update`.
+
+### 3.4 Regras de projeto para os pacotes
+
+1. **Plugins Filament de verdade** (`Filament\Contracts\Plugin`), com `register(Panel)` e `boot(Panel)`, para que o app escolha por painel o que ligar.
+2. **Classes trocáveis por config ou plugin.** Todo resource, model e page do pacote é referenciado por uma chave (`config('mpac-access.resources.user')`). O app estende a classe do pacote e troca a referência, sem copiar o arquivo.
+3. **Models resolvidos por config**, nunca `App\Models\User` hardcoded (hoje a migration de `users` e o `config/auth.php` referenciam `App\Models\User`).
+4. **Migrations carregadas pelo pacote** (`loadMigrationsFrom`), não publicadas. Assim, migrations novas chegam com o `composer update`. Para apps antigos que já têm as tabelas (`activity_log`, `media`, `permissions`, `settings`), as migrations do pacote devem ser idempotentes (`if (! Schema::hasTable(...))`) ou ter um comando `mpac:adopt` que marca as migrations como executadas.
+5. **Settings migrations** do `spatie/laravel-settings` também carregadas a partir do pacote (`settings.migrations_paths`).
+6. **Views e traduções com namespace** (`mpac-auth::`), publicáveis só se o app quiser sobrescrever. A regra é "não publique": cada arquivo publicado é um arquivo que para de receber atualização.
+7. **Sem `vendor:publish` obrigatório.** O `mpac:install` só deve criar o que for inevitável (providers de painel, `theme.css` que importa o tema do pacote).
+8. **Testados isoladamente** com Orchestra Testbench + Pest, com matriz de Laravel/Filament suportados.
 
 ---
 
-## Parte 4: Roadmap Recomendado de Execução
+## Parte 4 — Como atualizar apps antigos sem editar código manualmente
 
-Para realizar essa evolução sem interromper o trabalho atual, siga esta ordem de prioridade:
+Os pacotes resolvem o PHP. O resto precisa de mecanismos próprios.
 
-### Fase 1: Correções Imediatas no Repositório Atual (1 a 2 dias)
-1. [ ] Corrigir a validação de `is_active` no `User::canAccessPanel()`, `Login::attemptDefaultAuth()` e `Login::handleLocalUserRecord()`.
-2. [ ] Corrigir a tag `<x-brand-logomark>` quebrada em `resources/views/layouts/auth/{split,centered,fullpage}.blade.php` e usar `$settings->getFooterBrandName()` no rodapé.
-3. [ ] Adicionar campo `password` condicional ao modo `AuthMode::Local` no `UserForm.php`.
-4. [ ] Adicionar `getEloquentQuery()` com `->with('media')` em `DocumentResource` e `ImageResource`.
-5. [ ] Remover `$this->useIndex('idx_is_active')` fixo de `HasIsActiveScope` (ou parametrizá-lo).
-6. [ ] Corrigir a variável `--color-bg-dark` ausente em `resources/css/mpac-theme/index.css`.
-7. [ ] Remover a chamada de `notify()` com `$e->getMessage()` de dentro de `LdapUserService` e adicionar `Log::error()`.
-8. [ ] Habilitar cache em `config/settings.php` para produção.
+### 4.1 Distribuição e versionamento
 
-### Fase 2: Consolidação Interna e Redução de Duplicação (2 a 3 dias)
-1. [ ] Refatorar o `__construct()` de `Login.php` para usar `boot()` do Livewire.
-2. [ ] Criar `BaseResourcePolicy` para eliminar código repetido nas 6 Policies.
-3. [ ] Tornar `ActivityLog::subjectTypeOptions()` e `PanelSwitcher` dinâmicos (sem listas hardcoded).
-4. [ ] Implementar a trait `HasAuditUsers` para popular `created_by` e `updated_by` automaticamente + `nullOnDelete()` na migration.
+- **Registry:** GitLab Package Registry (Composer) num grupo da org. Cada app declara o repositório uma vez no `composer.json`.
+- **SemVer estrito:** patch = correção, minor = novidade compatível, major = breaking change com regra Rector correspondente.
+- **`CHANGELOG.md` e `UPGRADE.md` em cada pacote.** Deprecar por pelo menos um minor antes de remover.
+- **Constraints `^X.Y` nos apps**, nunca versões fixas, para que patches entrem sozinhos.
 
-### Fase 3: Extração dos Pacotes (`filament-mpac-core`) (1 a 2 semanas)
-1. [ ] Mover `HasIsActiveScope`, `HasAuditUsers` e configurações de segurança do `AppServiceProvider` para `tonegabes/mpac-essentials`.
-2. [ ] Criar o pacote **`tonegabes/filament-mpac-core`** contendo:
-   - Os Service Providers de Ícones, Actions, Notifications e RenderHooks;
-   - Todo o fluxo de Auth (`Login`, `Register`, `LdapAuthService`, `LdapUserService`, `AuthMode`);
-   - Os plugins `MpacAdminPlugin` e `MpacAppPlugin` registrando `UserResource`, `RoleResource`, `PermissionResource`, `ActivityResource`, `ManageSystem` e `FileLibrary`;
-   - O tema CSS (`mpac-theme`) e layouts de autenticação publicáveis/carregáveis via `loadViewsFrom()`.
-3. [ ] Extrair `.gitlab-ci.yml` para um repositório de templates de CI do GitLab (`include:`).
-4. [ ] Limpar o repositório `filament-mpac` para que ele consuma o `tonegabes/filament-mpac-core`, tornando-o um template enxuto, limpo e 100% atualizável via Composer.
+### 4.2 Propagação automática
+
+- **Renovate** (self-hosted, rodando como job agendado no GitLab) sobre todos os repositórios de apps. Ele abre MRs de atualização dos pacotes `mpac/*` (e do resto). A pipeline do app roda testes e análise. Patches e minors podem ter automerge com pipeline verde.
+- **Breaking changes:** o pacote publica `vendor/mpac/upgrade/rector-vX.php`. O Renovate (via `postUpgradeTasks`) ou o dev roda `vendor/bin/rector process --config vendor/mpac/upgrade/rector-v2.php`, e o código do app é ajustado automaticamente (renomeações de classe, assinatura de método, troca de trait).
+- **`php artisan mpac:upgrade`:** comando que executa os passos não-PHP de uma major (sincronizar permissões, rodar migrations de adoção, limpar arquivos publicados obsoletos, avisar sobre overrides de view que divergiram).
+
+### 4.3 Arquivos que não são PHP
+
+| Artefato | Hoje | Proposta | Como o app referencia |
+| --- | --- | --- | --- |
+| Pipeline CI | `.gitlab-ci.yml` com ~230 linhas copiadas | Repositório `sistemas/ci-templates` com tags (`v1`, `v1.2`) | `include: { project: 'sistemas/ci-templates', ref: 'v1', file: '/laravel-app.yml' }`; o app só define variáveis |
+| Docker | `Dockerfile` completo, `Caddyfile`, `docker/php/opcache.ini` | Imagem base da org (`registry.mpac.mp.br/sistemas/docker-images/laravel-frankenphp:8.4`) com extensões, Caddyfile, opcache e usuário | `Dockerfile` do app com ~15 linhas (`FROM` base, `composer install`, `npm run build`) |
+| Pint / PHPStan / Rector | `pint.json` (180 linhas), `phpstan.neon`, `.php-cs-fixer.php` | `mpac/coding-standard` | `phpstan.neon`: `includes: [vendor/mpac/coding-standard/phpstan.neon]`; scripts: `pint --config vendor/mpac/coding-standard/pint.json` |
+| Tema CSS | `resources/css/mpac-theme/*` | `mpac/filament-branding` | `@import '../../../vendor/mpac/filament-branding/resources/css/theme.css';` e `@source` para as views do vendor |
+| Guidelines de IA | `AGENTS.md`, `.cursor/skills`, `GEMINI.md`, `boost.json` | Guidelines e skills dentro dos pacotes (`resources/boost/guidelines/*.blade.php`), que o Laravel Boost agrega automaticamente | `php artisan boost:update` regenera o `AGENTS.md` de cada app com as regras da org |
+| Hooks Git | `.husky`, `.lintstagedrc` | Manter no esqueleto (são pequenos e estáveis) | — |
+
+### 4.4 O que inevitavelmente fica no app
+
+Algumas coisas sempre vão morar no repositório do app: `bootstrap/app.php`, `bootstrap/providers.php`, `composer.json`, `.env.example`, providers de painel, `User.php`. Para manter esses arquivos alinhados ao template sem edição manual, há duas opções:
+
+- **Copier** (`copier copy` / `copier update`): gera o app a partir do template e depois aplica as mudanças do template com merge de 3 vias, respeitando as alterações locais. O template guarda as respostas (nome do app, modo de auth, painéis) em `.copier-answers.yml`.
+- **Manter esses arquivos mínimos** para que quase nunca mudem. Por exemplo, `bootstrap/app.php` chamando `Mpac::configure($middleware, $exceptions)` em vez de listar middlewares.
+
+A segunda opção já resolve quase tudo. Copier vale se o esqueleto continuar mudando com frequência.
+
+---
+
+## Parte 5 — Roteiro sugerido
+
+| Fase | Entregas | Resultado |
+| --- | --- | --- |
+| **0. Correções urgentes** (no template atual) | Itens 1, 2, 3 (pelo menos `Timebox` e checagem de painel), 4, 5, 6, 7; testes negativos de autorização | Template seguro para gerar apps novos já |
+| **1. Fundação** | Namespace `mpac/*` no GitLab Package Registry; `mpac/coding-standard`; `ci-templates`; imagem Docker base; Renovate configurado | CI, Docker e estilo atualizáveis em todos os apps imediatamente, mesmo antes de extrair código PHP |
+| **2. Bibliotecas base** | `mpac/laravel-essentials` (absorve traits e hardening), `ResourcePolicy`, `PermissionRegistry`, `mpac:permissions:sync`, `mpac/testing` | Menos código duplicado no app; permissões sincronizadas no deploy |
+| **3. Plugins Filament** | Na ordem de menor acoplamento: `branding` → `activity-log` → `file-library` → `access-control` → `auth`; depois `filament-core` + `mpac:install` | Template vira esqueleto fino |
+| **4. Adoção pelos apps antigos** | `mpac:adopt` (marca migrations existentes, remove arquivos duplicados), regras Rector para trocar `App\...` pelas classes do pacote, MR guiado por app | Apps legados passam a receber updates por `composer update` |
+| **5. Operação contínua** | SemVer + changelog, Renovate com automerge de patch, matriz de testes por versão do Laravel/Filament | Mudança fundamental = 1 release + MRs automáticos |
+
+Recomendação de ordem dentro da fase 3: começar por **branding**, porque é o mais visível, tem menos lógica e valida toda a cadeia (registry, Renovate, import de CSS do vendor, views com namespace) com baixo risco. **Auth** fica por último porque é o mais sensível e se beneficia de já ter `access-control` como dependência.
+
+---
+
+## Apêndice — Itens do diagnóstico anterior
+
+| Item | Situação |
+| --- | --- |
+| Bypass de `is_active` no login local/LDAP e em `canAccessPanel()` | ✅ Corrigido |
+| `UserForm` sem campo de senha no modo local | ✅ Corrigido |
+| Layouts de auth usando `<x-brand-logomark>` inexistente | ✅ Corrigido (agora `<livewire:brand-logomark />`; ver item 2.1 sobre trocar por Blade) |
+| N+1 / lazy loading de `media` em Documentos e Imagens | ✅ Corrigido (`->with('media')`) |
+| Resolução de dependências no `__construct()` do `Login` | ❌ Pendente (item 3) |
+| `created_by` / `updated_by` órfãos | ❌ Pendente (item 10) |
+| `ActivityLog` e `PanelPermissions` fixos no código | ❌ Pendente (item 11) |

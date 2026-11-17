@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Enums\Permissions;
 
-enum ImagePermissions: string
+use App\Contracts\ResourcePermissions;
+use App\Traits\ResolvesResourcePermissions;
+
+enum ImagePermissions: string implements ResourcePermissions
 {
+    use ResolvesResourcePermissions;
     case All = 'images.*';
     case ViewAny = 'images.view.any';
     case View = 'images.view';

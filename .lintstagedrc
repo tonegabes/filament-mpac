@@ -1,3 +1,3 @@
 {
-  "**/*.php": ["composer format"]
+  "**/*.php": ["vendor/bin/pint"]
 }

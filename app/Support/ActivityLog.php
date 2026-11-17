@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Contracts\HasActivityLabel;
 use App\Models\Document;
 use App\Models\Image;
 use App\Models\Permission;
@@ -39,6 +40,29 @@ final class ActivityLog
     }
 
     /**
+     * @var array<class-string<Model>, string>
+     */
+    private static array $registeredSubjects = [];
+
+    /**
+     * @param  class-string<Model>  $modelClass
+     */
+    public static function registerSubject(string $modelClass, string $label): void
+    {
+        self::$registeredSubjects[$modelClass] = $label;
+    }
+
+    /**
+     * @param  array<class-string<Model>, string>  $subjects
+     */
+    public static function registerSubjects(array $subjects): void
+    {
+        foreach ($subjects as $modelClass => $label) {
+            self::registerSubject($modelClass, $label);
+        }
+    }
+
+    /**
      * @return array<class-string<Model>, string>
      */
     public static function subjectTypeOptions(): array
@@ -49,6 +73,7 @@ final class ActivityLog
             Image::class => 'Imagem',
             Role::class => 'Perfil',
             Permission::class => 'Permissão',
+            ...self::$registeredSubjects,
         ];
     }
 
@@ -78,7 +103,15 @@ final class ActivityLog
             return '—';
         }
 
-        return self::subjectTypeOptions()[$type] ?? class_basename($type);
+        if (isset(self::subjectTypeOptions()[$type])) {
+            return self::subjectTypeOptions()[$type];
+        }
+
+        if (is_a($type, HasActivityLabel::class, true)) {
+            return $type::activityLabel();
+        }
+
+        return class_basename($type);
     }
 
     public static function subjectLabel(Activity $activity): string
