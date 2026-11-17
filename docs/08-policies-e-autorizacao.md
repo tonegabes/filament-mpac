@@ -4,42 +4,94 @@ Este documento mostra como a autorização está aplicada hoje no projeto e como
 
 ## 📚 Policies existentes
 
-Atualmente existem policies para:
+| Model | Policy | Registro |
+| --- | --- | --- |
+| `User` | `UserPolicy` | convenção |
+| `Role` | `RolePolicy` | convenção |
+| `Permission` | `PermissionPolicy` | convenção |
+| `Document` | `DocumentPolicy` | convenção |
+| `Image` | `ImagePolicy` | convenção |
+| `Spatie\…\Media` | `MediaPolicy` | **mapa** em `AuthServiceProvider` |
+| `Spatie\Activitylog\Models\Activity` | `ActivityPolicy` | **mapa** em `AuthServiceProvider` |
 
-- `User` (`UserPolicy`)
-- `Role` (`RolePolicy`)
-- `Permission` (`PermissionPolicy`)
+`Activity` e `Media` precisam do mapa explícito porque o model não segue a convenção `App\Models\{Name}` → `App\Policies\{Name}Policy`.
 
-No estado atual, não existem policies dedicadas para `Document`, `Image` ou `Media`.
+## 🧱 ResourcePolicy (padrão atual)
 
-## 🔐 Padrão utilizado
-
-As policies usam enums de permissões para cada ação:
+Quase todas as policies estendem `App\Policies\ResourcePolicy`:
 
 ```php
-// app/Policies/UserPolicy.php
-public function viewAny(User $user): bool
+abstract class ResourcePolicy
 {
-    return $user->can(UserPermissions::All);
-}
+    /** @var class-string<ResourcePermissions&BackedEnum> */
+    protected static string $permissions;
 
-public function update(User $user, User $model): bool
-{
-    return $user->can(UserPermissions::Update);
+    protected function allows(User $user, string $action): bool
+    {
+        $permission = static::$permissions::forAction($action);
+
+        if ($permission === null) {
+            return false;
+        }
+
+        return $user->can($permission);
+    }
+
+    // viewAny, view, create, update, delete, restore, forceDelete,
+    // deleteAny, restoreAny, forceDeleteAny, replicate, reorder
 }
 ```
 
+`forAction()` vem do contrato `ResourcePermissions` + trait `ResolvesResourcePermissions` no enum.
+
+### Policy mínima de módulo
+
+```php
+class DocumentPolicy extends ResourcePolicy
+{
+    protected static string $permissions = DocumentPermissions::class;
+}
+```
+
+### Exceções em UserPolicy
+
+`UserPolicy` herda o padrão e endurece `update` / `delete` / `forceDelete`:
+
+- exige `canManageUser($target)`
+- impede autoexclusão
+- impede excluir o último `Developer` (`isLastDeveloper()`)
+
 ## 🔎 Descoberta de policy
 
-O Laravel resolve policies por convenção (`Model` -> `Policy`) automaticamente.
+O Laravel resolve policies por convenção (`Model` → `Policy`) automaticamente.
 
-Registro manual em `AuthServiceProvider` só é necessário em casos fora da convenção.
+Registro manual em `AuthServiceProvider::$policies` só para `Activity` e `Media`.
+
+## 🛡️ Gates
+
+`AuthServiceProvider::configureGates()` está vazio — **não** há `Gate::before` / role `TheOneAboveAll`.
+
+Gate de produto existente:
+
+- `viewPulse` em `AppServiceProvider` → `SystemPermissions::PulseAccess`
+
+## 📥 Downloads autorizados
+
+Rotas autenticadas em `routes/web.php` usam `FileDownloadController`:
+
+| Rota | Policy |
+| --- | --- |
+| `documents.download` | `Gate::authorize('view', $document)` |
+| `images.download` | `Gate::authorize('view', $image)` |
+| `media.download` | `Gate::authorize('view', $media)` |
+
+Discos `images` e `documents` são **privados** (`storage/app/private/...`); o download streama via controller, não via URL pública de storage.
 
 ## 🧩 Integração com Filament
 
 Filament consome as policies automaticamente para ações do Resource e páginas (`List`, `Create`, `Edit`, `View`).
 
-Se precisar de um check explícito:
+Check explícito quando necessário:
 
 ```php
 public static function canViewAny(): bool
@@ -47,16 +99,6 @@ public static function canViewAny(): bool
     return auth()->user()?->can('viewAny', User::class) ?? false;
 }
 ```
-
-## 🛡️ Gate global
-
-Existe um `Gate::before` para role privilegiada:
-
-```php
-Gate::before(fn (User $user) => $user->hasRole('TheOneAboveAll') ? true : null);
-```
-
-Esse bypass acontece antes das policies.
 
 ## 🧪 Testes de policy
 
@@ -78,19 +120,22 @@ it('denies user without permission to create users', function (): void {
 
 ## 🚧 Quando criar novas policies
 
-Crie policy quando um novo módulo precisar de regras de autorização explícitas (ex.: novo Resource com create/edit/delete).
-
-No cenário atual, os Resources de arquivos estão majoritariamente em modo leitura, por isso ainda não há policy dedicada para eles.
+1. Crie o enum em `app/Enums/Permissions` implementando `ResourcePermissions`.
+2. Rode `php artisan mpac:permissions:sync` e atualize `RoleSeeder` se Admin/User precisarem das permissões.
+3. Crie `XPolicy extends ResourcePolicy` com `protected static string $permissions = XPermissions::class`.
+4. Se o model for de vendor (fora de `App\Models`), registre em `AuthServiceProvider::$policies`.
+5. Cubra com testes de feature.
 
 ## 🎯 Boas Práticas
 
 1. Mantenha regras de autorização nas policies, não em controllers/pages.
-2. Use enums para permissão em vez de strings soltas.
-3. Evite lógica complexa no Resource se ela pertence ao domínio de acesso.
+2. Prefira `ResourcePolicy` + enum em vez de copiar métodos CRUD.
+3. Lógica de hierarquia de usuários fica no model (`canManageUser`, etc.) e a policy só orquestra.
 4. Cubra cada policy com testes de feature.
-5. Sempre validar impacto do `Gate::before` em cenários de segurança.
+5. Não reintroduza bypass global via `Gate::before` sem decisão explícita de segurança.
 
 ## 🔗 Próximos Passos
 
 - [Sistema de Permissões](07-sistema-permissoes.md)
+- [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md)
 - [Testes](13-testes.md)

@@ -15,16 +15,17 @@ O projeto atualmente trabalha com:
 
 ## 👤 User
 
-`User` implementa `FilamentUser`, usa `HasRoles`, `HasIsActiveScope` e `LogsActivity`.
+`User` implementa `FilamentUser` e usa `HasRoles`, `HasIsActiveScope`, `HasBlameable` e `HasActivity` (Spatie Activitylog).
 
 ```php
 // app/Models/User.php
 class User extends Authenticatable implements FilamentUser
 {
+    use HasActivity;
+    use HasBlameable;
     use HasFactory;
     use HasIsActiveScope;
     use HasRoles;
-    use LogsActivity;
     use Notifiable;
 
     protected $fillable = [
@@ -37,16 +38,21 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(?Panel $panel): bool
     {
-        $permission = PanelPermissions::fromPanel($panel);
-
-        if ($permission === null) {
+        if (! $this->is_active || $panel === null) {
             return false;
         }
+
+        $panelPermission = PanelPermissions::fromPanel($panel);
+        $permission = $panelPermission !== null
+            ? $panelPermission->value
+            : "panels.view.{$panel->getId()}";
 
         return $this->can($permission);
     }
 }
 ```
+
+Helpers de hierarquia (usados por `UserPolicy` e formulários): `isSuperAdmin()`, `canAssignRole()`, `canManageUser()`, `isLastDeveloper()`. Colunas `created_by` / `updated_by` vêm de `HasBlameable` — ver [Traits](10-traits.md).
 
 ## 📁 Biblioteca de Arquivos
 
@@ -163,11 +169,19 @@ Não use constante `COLLECTION_NAME` — a fonte da verdade é `fileCollection()
 
 Configuração atual em `config/filesystems.php`:
 
-- Disco `images`: `storage/app/public/images`, URL `/storage/images`
-- Disco `documents`: `storage/app/public/documents`, URL `/storage/documents`
-- Disco `public`: usado por logos/fundos do sistema
+- Disco `images`: `storage/app/private/images`, `visibility => private`
+- Disco `documents`: `storage/app/private/documents`, `visibility => private`
+- Disco `public`: logos/fundos do sistema (`system/logos`, `system/backgrounds`)
 
-Quando o arquivo precisar de acesso público, mantenha `visibility => public`.
+Arquivos de biblioteca **não** são servidos por URL pública de storage. Use as rotas autenticadas:
+
+| Nome | Path | Controller |
+| --- | --- | --- |
+| `documents.download` | `/documents/{document}/download` | `FileDownloadController@document` |
+| `images.download` | `/images/{image}/download` | `FileDownloadController@image` |
+| `media.download` | `/media/{media}/download` | `FileDownloadController@media` |
+
+Cada action autoriza `view` via Gate/policy e streama o media do disco. Teste: `tests/Feature/Http/Controllers/FileDownloadControllerTest.php`.
 
 ## 📝 Activity Log
 
@@ -184,7 +198,17 @@ public function getActivitylogOptions(): LogOptions
 }
 ```
 
-Em `User` / `Image`, o padrão atual é `logOnly($this->fillable)`.
+`User` registra `name`, `username`, `email`, `is_active` (com `dontLogEmptyChanges()`).
+
+### Rótulos de subject
+
+`App\Support\ActivityLog::subjectTypeLabel()` resolve o label assim:
+
+1. Registro interno (`registerSubject` / mapa conhecido)
+2. Model que implementa `App\Contracts\HasActivityLabel` → `activityLabel()`
+3. Fallback: `class_basename($type)`
+
+A interface existe para extensibilidade; implemente no model quando o basename não for legível na UI de auditoria.
 
 ## 🎯 Boas Práticas
 
