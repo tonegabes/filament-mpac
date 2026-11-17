@@ -7,24 +7,27 @@ Este documento explica os Traits disponíveis no projeto e como usá-los.
 ```text
 app/Traits/
 ├── HasIsActiveScope.php
-└── HasNotifications.php
+├── HasNotifications.php
+├── HasBlameable.php
+└── ResolvesResourcePermissions.php
 ```
 
 ## ✅ HasIsActiveScope
 
-O trait `HasIsActiveScope` encapsula operações sobre o campo booleano `is_active`.
+O trait `HasIsActiveScope` encapsula o campo booleano `is_active`.
 
 ### O que oferece
 
 | API | Tipo | Uso |
 | --- | --- | --- |
-| `isActive()` | query scope (`#[Scope]`) | `Model::query()->isActive()->get()` |
-| `activate()` | método de instância | marca `is_active = true` |
-| `deactivate()` | método de instância | marca `is_active = false` |
-| `toggleActive()` | método de instância | inverte o valor atual |
-| `countActive(Builder $query)` | helper | conta registros com `is_active = true` |
+| `active()` | query scope (`#[Scope]`) | `Model::query()->active()->get()` |
+| `isActive()` | método de **instância** | `(bool) $model->is_active` |
+| `isInactive()` | método de instância | inverso de `isActive()` |
+| `activate()` | método de instância | `is_active = true` |
+| `deactivate()` | método de instância | `is_active = false` |
+| `toggleActive()` | método de instância | inverte o valor |
 
-No MySQL, o scope `isActive()` tenta usar o índice `idx_is_active` quando disponível.
+Não existem helpers `activeCount()` / `countActive()`, nem hint de índice MySQL `useIndex('idx_is_active')`.
 
 ### Uso em Models
 
@@ -40,14 +43,13 @@ class User extends Authenticatable
 ### Exemplos
 
 ```php
-$activeUsers = User::query()->isActive()->get();
+$activeUsers = User::query()->active()->get();
 
 $user->activate();
 $user->deactivate();
 $user->toggleActive();
 
-// Preferir o atributo booleano para checagens de instância:
-if ($user->is_active) {
+if ($user->isActive()) {
     // ...
 }
 ```
@@ -55,8 +57,53 @@ if ($user->is_active) {
 ### Restrições
 
 - O model precisa ter a coluna `is_active` (cast `boolean` recomendado).
-- O scope é `protected` com atributo `#[Scope]`; chame via query builder (`->isActive()`), não como método público de instância.
+- O scope de query é `active()` (protegido + `#[Scope]`); **não** chame `isActive()` no builder — esse nome é só de instância.
 - Não existe mais o trait antigo `HasActiveScope`.
+
+## 🧾 HasBlameable
+
+Preenche automaticamente `created_by` / `updated_by` com o usuário autenticado e expõe relações:
+
+```php
+use App\Traits\HasBlameable;
+
+class User extends Authenticatable
+{
+    use HasBlameable;
+}
+
+$model->creator; // BelongsTo User via created_by
+$model->updater; // BelongsTo User via updated_by
+```
+
+Comportamento:
+
+- Em `creating`: preenche `created_by` e `updated_by` se ainda forem `null` e houver `Auth::id()`.
+- Em `updating`: sempre atualiza `updated_by` quando houver usuário autenticado.
+- Sem usuário autenticado (console, jobs sem actor), os campos não são forçados.
+
+Requer colunas `created_by` / `updated_by` na tabela (presentes em `users`).
+
+## 🧭 ResolvesResourcePermissions
+
+Trait para enums backed que implementam `App\Contracts\ResourcePermissions`:
+
+```php
+enum DocumentPermissions: string implements ResourcePermissions
+{
+    use ResolvesResourcePermissions;
+
+    case ViewAny = 'documents.view.any';
+    case View = 'documents.view';
+    // ...
+}
+
+DocumentPermissions::forAction('viewAny'); // DocumentPermissions::ViewAny
+DocumentPermissions::forAction('deleteAny'); // DocumentPermissions::Delete
+DocumentPermissions::forAction('unknown'); // null
+```
+
+Mapeamento interno: `viewAny`→`ViewAny`, `delete`/`deleteAny`→`Delete`, `restore`/`restoreAny`→`Restore`, `forceDelete`/`forceDeleteAny`→`ForceDelete`, etc. Usado por `ResourcePolicy`.
 
 ## 🔔 HasNotifications
 
@@ -96,6 +143,8 @@ Status::values();   // ['active', 'inactive']
 Status::options();  // ['active' => 'Active', 'inactive' => 'Inactive']
 ```
 
+Não use mais um `BetterEnum` local em `app/Traits` — foi removido.
+
 ## 🔧 Criando um Trait Customizado
 
 1. Coloque em `app/Traits/`.
@@ -107,4 +156,5 @@ Status::options();  // ['active' => 'Active', 'inactive' => 'Inactive']
 ## 🔗 Próximos Passos
 
 - [Modelos e Relacionamentos](14-modelos-e-relacionamentos.md)
+- [Sistema de Permissões](07-sistema-permissoes.md)
 - [Enums e Convenções](09-enums-e-convencoes.md)

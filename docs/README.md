@@ -42,14 +42,14 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 ### Autorização e Permissões
 
 7. [Sistema de Permissões](07-sistema-permissoes.md)
-   - Spatie Laravel Permission
-   - Enums de Permissões
-   - Roles (`UserRole`)
+   - Spatie Laravel Permission + enums
+   - `mpac:permissions:sync` / `mpac:create-admin`
+   - Roles (`UserRole`) e `ResourcePermissions`
 
 8. [Policies e Autorização](08-policies-e-autorizacao.md)
-   - Criando Policies
-   - Integração com Filament
-   - Métodos de autorização
+   - `ResourcePolicy` + mapa Activity/Media
+   - Hierarquia de usuários (`canManageUser`)
+   - Downloads autorizados
 
 ### Recursos do Laravel
 
@@ -59,9 +59,9 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
    - Convenções de uso
 
 10. [Traits](10-traits.md)
-    - HasIsActiveScope
-    - HasNotifications
-    - BetterEnum (`tonegabes/mpac-essentials`)
+    - HasIsActiveScope / HasBlameable
+    - ResolvesResourcePermissions
+    - HasNotifications / BetterEnum (`mpac-essentials`)
 
 11. [Settings](11-settings.md)
     - Spatie Laravel Settings
@@ -101,8 +101,8 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
 
 17. [Setup, Dependências e Troubleshooting](17-setup-dependencias-e-troubleshooting.md)
     - Setup local e scripts (`format` / `lint` via mpac-essentials)
-    - AppServiceProvider (strict models, HTTPS, Pulse, CreateAction)
-    - Auth local/LDAP e pitfalls
+    - Auth local/LDAP, `DirectoryUnavailableException`
+    - Bootstrap: sync de permissões e `mpac:create-admin`
 
 18. [Deploy, Docker e CI](18-deploy-docker-e-ci.md)
     - Imagem FrankenPHP (Dockerfile multi-stage)
@@ -159,12 +159,12 @@ php artisan make:model-plus Evento --no-filament
 
 ## 🧩 Funcionalidades do Projeto Atual
 
-- Autenticação com modos **Local** e **LDAP**
+- Autenticação com modos **Local** e **LDAP** (erro de diretório tipado)
 - Painéis **app** e **admin** com `PanelSwitcher`
-- Recursos de arquivos: **Document**, **Image** e **Media**
+- Recursos de arquivos: **Document**, **Image** e **Media** (discos privados + download autenticado)
 - Configurações do sistema com **Spatie Settings**
-- Permissões e roles com **Spatie Permission** (`UserRole`: Developer, Admin, User)
-- Logs de atividade com **Spatie Activitylog**
+- Permissões e roles com **Spatie Permission** (`ResourcePolicy`, sync via Artisan)
+- Logs de atividade com **Spatie Activitylog** (`HasActivityLabel` opcional)
 
 Veja também:
 
@@ -190,4 +190,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Outubro 2026
+**Última atualização**: Novembro 2026

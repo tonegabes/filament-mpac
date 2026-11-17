@@ -9,9 +9,14 @@ composer install
 cp .env.example .env
 php artisan key:generate
 php artisan migrate --seed
+# Em produção (sem DevelopmentSeeder): sync + criar admin
+# php artisan mpac:permissions:sync
+# php artisan mpac:create-admin
 npm install
 npm run build   # ou: npm run dev / composer run dev
 ```
+
+Seeders: `ProductionSeeder` (permissions + roles) sempre; `DevelopmentSeeder` (`UserSeeder`) só fora de produção. Ver [Sistema de Permissões](07-sistema-permissoes.md).
 
 Comandos úteis do `composer.json`:
 
@@ -84,14 +89,25 @@ LDAP_AUTH_EMAIL_DOMAIN=@mpdomain.br
 Codepaths:
 
 - Resolução: `AuthModeHandlerResolver` → `LocalAuthModeHandler` / `LdapAuthModeHandler`
-- Página: `App\Filament\Pages\Auth\Login`
+- Página: `App\Filament\Pages\Auth\Login` (`boot()` resolve handlers; local → `parent::authenticate()`)
 - Serviços LDAP: `LdapAuthService`, `LdapUserService`
+- Indisponibilidade LDAP: `DirectoryUnavailableException` (log + notification genérica na UI)
 
 Pitfalls:
 
 - Com `LDAP_AUTH_REQUIRES_LOCAL=true`, usuários LDAP sem registro local ativo falham no login.
+- Usuário local/LDAP com `is_active = false` não acessa painel (`canAccessPanel`); LDAP também falha no `handleLocalUserRecord`.
 - Username LDAP é normalizado (lowercase, trim, remove domínio se colado no valor).
 - Registro local só existe no modo local e quando o panel provider habilita registration.
+- Erros de conexão LDAP não devem expor stack/exceção bruta ao usuário — só a mensagem de `DirectoryUnavailableException`.
+
+### Comandos de bootstrap de acesso
+
+```bash
+php artisan mpac:permissions:sync
+php artisan mpac:permissions:sync --prune   # remove permissões órfãs
+php artisan mpac:create-admin               # Admin; use --developer para Admin+Developer
+```
 
 ## 🧭 Painéis
 
@@ -110,11 +126,15 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 | ViteException / manifesto | frontend não buildado | `npm run build` ou `npm run dev` |
 | Estilo diferente entre `pint` na CLI e o CI | Pint sem config usa preset Laravel | use sempre `pint.json` na raiz ou `composer format`; evite `pint` sem config em outro diretório |
 | PHP-CS-Fixer opcional | `.php-cs-fixer.php` delega para `mpac-essentials` | prefira Pint (`composer format`); CS Fixer só se a ferramenta exigir |
-| Permissões “sumiram” | cache Spatie / seed ausente | `PermissionRegistrar::forgetCachedPermissions()` + reseeding |
+| Permissões “sumiram” | cache Spatie / enum novo sem sync | `php artisan mpac:permissions:sync` (já limpa cache) ou reseeding |
+| Permissão antiga ainda no banco | enum removido sem prune | `mpac:permissions:sync --prune` (revisar impacto antes) |
+| Login LDAP com “serviço de diretório” | LDAP down / misconfig | checar conectividade/logs; UI usa `DirectoryUnavailableException` |
 | Login LDAP falha com usuário novo | `requires_local` ou falta de sync | revisar `auth.ldap.requires_local` e criação em `Login::handleLocalUserRecord()` |
-| Usuário autenticado sem acesso ao painel | falta `panels.view.*` | conferir `RoleSeeder` e `User::canAccessPanel()` |
+| Usuário autenticado sem acesso ao painel | inativo ou falta `panels.view.*` | conferir `is_active`, `RoleSeeder` e `User::canAccessPanel()` |
+| Download 403/404 de documento/imagem | disco privado + policy | rotas `*.download` + `view` policy; não use URL `/storage/...` |
 | Testes de role quebrando com `Operator` | rename para `UserRole::User` | atualizar asserts/factories para `User` |
 | Pulse abre mas retorna 403 | falta gate/permissão | `SystemPermissions::PulseAccess` + gate `viewPulse` em `AppServiceProvider` |
+| Ambiente prod sem usuário admin | `UserSeeder` não roda em prod | `php artisan mpac:create-admin` após sync/seed de roles |
 | Botão “Criar” só mostra ícone `+` / label some | `CreateAction::configureUsing(...->iconButton())` em `AppServiceProvider` | esperado; use `->button()` na instância ou ajuste `configureComponents()` — ver [Actions](12-actions-customizadas.md) |
 | CreateAction sem ícone Phosphor esperado | `OverrideActionsProvider` não registrado | confirme `bootstrap/providers.php` e [Panel Provider](15-panel-provider.md) |
 | Lazy loading / attribute exception em local | `Model::shouldBeStrict(true)` fora de produção | corrija a query/atributo; em produção o strict mode está desligado |
@@ -123,7 +143,9 @@ Troca no menu do usuário: `PanelSwitcher::userMenuItems()`.
 
 ```bash
 php artisan test --compact tests/Feature/Filament/LoginTest.php
-php artisan test --compact tests/Feature/Seeders/RoleSeederTest.php
+php artisan test --compact tests/Feature/Console/CreateAdminCommandTest.php
+php artisan test --compact tests/Feature/Console/SyncPermissionsCommandTest.php
+php artisan test --compact tests/Feature/Policies/UserPolicyTest.php
 php artisan test --compact tests/Unit/Services/Auth/
 ```
 

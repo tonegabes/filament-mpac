@@ -244,28 +244,32 @@ class ProductInfolist
 
 ### Login Customizado
 
-`app/Filament/Pages/Auth/Login.php` estende o login do Filament e resolve o modo via `AuthModeHandlerResolver`:
+`app/Filament/Pages/Auth/Login.php` estende o login do Filament e resolve o modo via `AuthModeHandlerResolver` no `boot()` Livewire (não no construtor):
 
 ```php
 class Login extends VendorLogin
 {
     use UsesConfiguredAuthLayout;
 
-    public function __construct()
+    public function boot(): void
     {
         $authMode = AuthMode::fromConfig(Config::string('auth.mode'));
         $this->authModeHandler = app(AuthModeHandlerResolver::class)->resolve($authMode);
-        // Em modo LDAP, também resolve LdapAuthService / LdapUserService
+
+        if ($authMode === AuthMode::Ldap) {
+            $this->ldapAuthService = app(LdapAuthService::class);
+            $this->ldapUserService = app(LdapUserService::class);
+        }
     }
 
     public function authenticate(): ?LoginResponse
     {
-        $this->rateLimit(5);
-        $data = $this->form->getState();
-        $this->authModeHandler->authenticate($this, $data);
-        session()->regenerate();
+        if ($this->authModeHandler->mode() === AuthMode::Local) {
+            return parent::authenticate();
+        }
 
-        return app(LoginResponse::class);
+        // LDAP: rate limit → attemptLdapAuth → LoginResponse
+        // DirectoryUnavailableException → Notification de erro (sem stack no UI)
     }
 }
 ```
@@ -274,8 +278,8 @@ class Login extends VendorLogin
 
 | Modo (`AUTH_MODE`) | Handler | Campo de login | Comportamento |
 | --- | --- | --- | --- |
-| `local` | `LocalAuthModeHandler` | e-mail | `attemptLocalAuth()` + MFA se habilitado |
-| `ldap` | `LdapAuthModeHandler` | username + suffix de domínio | busca LDAP, autentica, sincroniza usuário local |
+| `local` | `LocalAuthModeHandler` | e-mail | delega para `parent::authenticate()` do Filament; acesso ao painel ainda exige `User::canAccessPanel()` (`is_active` + `panels.view.*`) |
+| `ldap` | fluxo em `Login` + serviços LDAP | username + suffix de domínio | busca LDAP, autentica, sincroniza/valida usuário local (`is_active`), faz login na sessão |
 
 Config relevante (`.env` / `config/auth.php`):
 
@@ -283,6 +287,10 @@ Config relevante (`.env` / `config/auth.php`):
 - `auth.default_role` → role atribuída a usuários LDAP sem papel
 - `LDAP_AUTH_REQUIRES_LOCAL` → se `true`, exige usuário local ativo pré-existente
 - `LDAP_AUTH_EMAIL_DOMAIN` → sufixo exibido no input de username
+
+#### Falha de diretório LDAP
+
+`LdapUserService` envolve `LdapRecordException` em `App\Exceptions\DirectoryUnavailableException` (mensagem genérica para o usuário; exception original só no log). A página `Login` captura essa exception e dispara uma `Notification` de erro — não vaza detalhes de infraestrutura na UI.
 
 #### Labels e ícones
 

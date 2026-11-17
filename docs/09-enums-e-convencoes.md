@@ -20,6 +20,8 @@ app/Enums/
     ├── SystemPermissions.php
     ├── DocumentPermissions.php
     ├── ImagePermissions.php
+    ├── MediaPermissions.php
+    ├── ActivityPermissions.php
     └── WildcardPermissions.php
 ```
 
@@ -74,8 +76,8 @@ FileCollection::Documents->disk(); // documents
 FileCollection::SystemLogos->directory(); // system/logos
 
 // Em models com Spatie Media Library:
-Post::mediaCollection()->value;
-Image::mediaCollection()->disk();
+Document::fileCollection()->value;
+Image::fileCollection()->disk();
 ```
 
 Se um arquivo importar também `Spatie\MediaLibrary\MediaCollections\MediaCollection`, use alias:
@@ -127,12 +129,13 @@ Usado em `SystemSettings` e na página `ManageSystem`.
 Enums de permissões:
 
 - `PanelPermissions`
-- `UserPermissions`
-- `RolePermissions`
-- `PermissionPermissions`
-- `SystemPermissions`
+- `UserPermissions` / `RolePermissions` / `PermissionPermissions`
+- `DocumentPermissions` / `ImagePermissions` / `MediaPermissions`
+- `ActivityPermissions` (view-only)
+- `SystemPermissions` (`system.settings.manage`, `system.pulse.access`, …)
+- `WildcardPermissions` (`*`)
 
-Cada enum é usado por policies, seeders e checks de acesso no painel.
+Enums de recurso CRUD implementam `App\Contracts\ResourcePermissions` e usam `ResolvesResourcePermissions` para `forAction()` — base do `ResourcePolicy`. Sync: `php artisan mpac:permissions:sync` (ver [Sistema de Permissões](07-sistema-permissoes.md)).
 
 ## 🔧 BetterEnum
 
