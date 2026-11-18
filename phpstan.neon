@@ -1,11 +1,5 @@
 includes:
-    - phar://phpstan.phar/conf/bleedingEdge.neon
-    - vendor/calebdw/larastan-livewire/extension.neon
-    - vendor/larastan/larastan/extension.neon
-    - vendor/nesbot/carbon/extension.neon
-    - vendor/pestphp/pest-plugin-phpstan/extension.neon
-    - vendor/phpstan/phpstan-phpunit/extension.neon
-    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/mpac/php-quality/phpstan.neon
 
 parameters:
     parallel:
@@ -16,12 +10,8 @@ parameters:
         - bootstrap
         - config
         - database
-        - resources/views
-        - public
         - routes
         - tests
-
-    level: 8
 
     ignoreErrors:
         -
@@ -32,12 +22,7 @@ parameters:
             path: config/pulse.php
 
     excludePaths:
-      - _ide_helper*.php
-      - bootstrap/cache
+        - _ide_helper*.php
+        - bootstrap/cache
 
-
-#        - ./*/*/FileToBeExcluded.php
-#
-#    checkMissingIterableValueType: false
-
-    tmpDir: /tmp/phpstan
+    tmpDir: .phpstan.cache

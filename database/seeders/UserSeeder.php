@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Mpac\FilamentAccessControl\Enums\UserRole;
 use RuntimeException;
 
 final class UserSeeder extends Seeder
@@ -17,6 +17,7 @@ final class UserSeeder extends Seeder
         if (app()->isProduction()) {
             throw new RuntimeException('UserSeeder cannot be executed in production.');
         }
+
         // Developer
         $userDeveloper = User::firstOrCreate(
             [
@@ -27,11 +28,11 @@ final class UserSeeder extends Seeder
                 'name' => 'Desenvolvedor',
                 'password' => Hash::make('developer'),
                 'is_active' => true,
-            ]
+            ],
         );
         $userDeveloper->syncRoles([
-            UserRole::Developer,
-            UserRole::Admin,
+            UserRole::Developer->value,
+            UserRole::Admin->value,
         ]);
 
         // Admin
@@ -44,10 +45,10 @@ final class UserSeeder extends Seeder
                 'name' => 'Administrador',
                 'password' => Hash::make('admin'),
                 'is_active' => true,
-            ]
+            ],
         );
         $userAdmin->syncRoles([
-            UserRole::Admin,
+            UserRole::Admin->value,
         ]);
 
         // User
@@ -62,7 +63,6 @@ final class UserSeeder extends Seeder
                 'is_active' => true,
             ],
         );
-        $userUser->syncRoles([UserRole::User]);
-
+        $userUser->syncRoles([UserRole::User->value]);
     }
 }

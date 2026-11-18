@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Enums\UserRole;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mpac\FilamentAccessControl\Enums\UserRole;
 use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);

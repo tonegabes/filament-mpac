@@ -2,7 +2,8 @@
 
 > Auditoria do projeto como **template oficial para todos os apps Laravel da organização**: falhas, melhorias e plano de desmembramento em pacotes para que mudanças fundamentais cheguem aos apps antigos via `composer update`, sem edição manual repositório por repositório.
 >
-> Data: 16/11/2026 · Base analisada: `HEAD` (`67566a3`) · Suíte: **208 testes passando (587 asserções), 111 s**.
+> Data da auditoria: 16/11/2026 · Base original analisada: `HEAD` (`67566a3`) · Suíte monolítica original: **208 testes passando (587 asserções), 111 s**.
+> **Status em 18/11/2026:** ✅ **Desmembramento local implementado e validado** em `e:\codes\packages\*` (10 pacotes `mpac/*`) e template `filament-mpac` refatorado para esqueleto fino (`5` arquivos PHP em `app/`, `composer lint` + `composer analyze` com 0 erros, `composer test` com `13 passed / 152 assertions`). Restam apenas etapas externas de infraestrutura GitLab (Registry remoto, CI templates, imagem Docker base, pacote Rector `mpac/upgrade` e Renovate).
 
 ---
 
@@ -362,6 +363,29 @@ Recomendação de ordem dentro da fase 3: começar por **branding**, porque é o
 | `UserForm` sem campo de senha no modo local | ✅ Corrigido |
 | Layouts de auth usando `<x-brand-logomark>` inexistente | ✅ Corrigido (agora `<livewire:brand-logomark />`; ver item 2.1 sobre trocar por Blade) |
 | N+1 / lazy loading de `media` em Documentos e Imagens | ✅ Corrigido (`->with('media')`) |
-| Resolução de dependências no `__construct()` do `Login` | ❌ Pendente (item 3) |
-| `created_by` / `updated_by` órfãos | ❌ Pendente (item 10) |
-| `ActivityLog` e `PanelPermissions` fixos no código | ❌ Pendente (item 11) |
+| Resolução de dependências no `__construct()` do `Login` | ✅ Corrigido (`Login::boot()` em `mpac/filament-auth`) |
+| `created_by` / `updated_by` órfãos | ✅ Corrigido (`HasBlameable` em `mpac/laravel-essentials` + `nullOnDelete()`) |
+| `ActivityLog` e `PanelPermissions` fixos no código | ✅ Corrigido (`ActivityLog::registerSubject()`, `HasActivityLabel`, fallback `panels.view.{id}`) |
+
+---
+
+## Parte 6 — Consolidação da Implementação Realizada (`18/11/2026`)
+
+O plano detalhado em [PLANO_DESMEMBRAMENTO_PACOTES.md](file:///e:/laragon/www/filament-mpac/PLANO_DESMEMBRAMENTO_PACOTES.md) foi executado nos repositórios locais em `e:\codes\packages\*` e integrado no template `filament-mpac`:
+
+- **Pacotes implementados e validados com Pint (`--test`), PHPStan Nível 8 (`bleedingEdge`) e Pest:**
+  - `mpac/php-quality` (`e:\codes\packages\php-quality`) — preset compartilhado Pint/PHPStan (equivalente ao `mpac/coding-standard` proposto).
+  - `mpac/laravel-essentials` (`e:\codes\packages\laravel-essentials`) — `4 passed (27 assertions)`.
+  - `mpac/filament-auth` (`e:\codes\packages\filament-auth`) — `11 passed (44 assertions)`.
+  - `mpac/filament-auth-external` (`e:\codes\packages\filament-auth-external`) — autenticação externa OAuth2/OIDC via Socialite — `4 passed (27 assertions)`.
+  - `mpac/filament-access-control` (`e:\codes\packages\filament-access-control`) — `3 passed (24 assertions)`.
+  - `mpac/filament-activity-log` (`e:\codes\packages\filament-activity-log`) — `3 passed (17 assertions)`.
+  - `mpac/filament-file-library` (`e:\codes\packages\filament-file-library`) — `3 passed (22 assertions)`.
+  - `mpac/filament-branding` (`e:\codes\packages\filament-branding`) — `4 passed (30 assertions)`.
+  - `mpac/filament-core` (`e:\codes\packages\filament-core`) — `MpacPlugin`, `mpac:install` e `mpac:adopt` — `3 passed (30 assertions)`.
+  - `mpac/testing` (`e:\codes\packages\testing`) — `MpacTestCase` e `InteractsWithMpacUsers` — `3 passed (15 assertions)`.
+- **Template `filament-mpac` (Esqueleto Fino):**
+  - `app/` enxugado de 95 arquivos PHP para **5 arquivos** (`Controller.php`, `User.php`, `AppServiceProvider.php`, `AdminPanelProvider.php`, `AppPanelProvider.php`).
+  - `bootstrap/providers.php` reduzido para **3 providers**; `database/migrations/` para **4 migrations**; `resources/views/` para **1 view** (`vendor/pulse/dashboard.blade.php`).
+  - Validado no template com `composer lint` (`passed`), `composer analyze` (`0 erros`) e `composer test` (`13 passed (152 assertions)`).
+- **Pendências de infraestrutura externa (fora do código local):** publicação de tags no GitLab Composer Package Registry, criação dos repositórios `sistemas/ci-templates` e `sistemas/docker-images`, pacote Rector `mpac/upgrade`, atualização do `mpac/laravel-make-model-plus` e configuração do Renovate Bot.

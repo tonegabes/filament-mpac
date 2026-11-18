@@ -109,6 +109,11 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
     - Caddy, health check `/up`, autorun
     - Pipeline GitLab (qualidade, MR → `develop`, release por tag)
 
+19. [Pacotes Internos MPAC (`mpac/*`)](19-pacotes-internos-mpac.md)
+    - Mapa dos 10 pacotes internos e links para README/Docs
+    - Customização dos plugins nos PanelProviders
+    - Governança automática de CHANGELOG e documentação
+
 ## 🚀 Guia Rápido
 
 ### Para começar a desenvolver:

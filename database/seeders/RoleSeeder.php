@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\Permissions\ActivityPermissions;
-use App\Enums\Permissions\DocumentPermissions;
-use App\Enums\Permissions\ImagePermissions;
-use App\Enums\Permissions\MediaPermissions;
-use App\Enums\Permissions\PanelPermissions;
-use App\Enums\Permissions\UserPermissions;
-use App\Enums\Permissions\WildcardPermissions;
-use App\Enums\UserRole;
-use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Mpac\FilamentAccessControl\Enums\Permissions\PanelPermissions;
+use Mpac\FilamentAccessControl\Enums\Permissions\UserPermissions;
+use Mpac\FilamentAccessControl\Enums\Permissions\WildcardPermissions;
+use Mpac\FilamentAccessControl\Enums\UserRole;
+use Mpac\FilamentAccessControl\Models\Role;
+use Mpac\FilamentAudit\Enums\Permissions\ActivityPermissions;
+use Mpac\FilamentFileLibrary\Enums\Permissions\DocumentPermissions;
+use Mpac\FilamentFileLibrary\Enums\Permissions\ImagePermissions;
+use Mpac\FilamentFileLibrary\Enums\Permissions\MediaPermissions;
 
 final class RoleSeeder extends Seeder
 {
@@ -26,16 +26,16 @@ final class RoleSeeder extends Seeder
         $roleDeveloper->syncPermissions([WildcardPermissions::All->value]);
 
         $roleAdmin->syncPermissions([
-            PanelPermissions::ViewAdmin,
-            UserPermissions::All,
-            DocumentPermissions::All,
-            ImagePermissions::All,
-            MediaPermissions::All,
-            ActivityPermissions::All,
+            PanelPermissions::ViewAdmin->value,
+            UserPermissions::All->value,
+            DocumentPermissions::All->value,
+            ImagePermissions::All->value,
+            MediaPermissions::All->value,
+            ActivityPermissions::All->value,
         ]);
 
         $roleUser->syncPermissions([
-            PanelPermissions::ViewApp,
+            PanelPermissions::ViewApp->value,
         ]);
     }
 }

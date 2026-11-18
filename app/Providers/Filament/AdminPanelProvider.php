@@ -4,31 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Enums\AuthMode;
-use App\Enums\NavGroups;
-use App\Enums\Panels;
-use App\Enums\Permissions\SystemPermissions;
-use App\Filament\Components\Navigation\PanelSwitcher;
-use App\Filament\Pages\Auth\Login;
-use App\Filament\Pages\Auth\Password\ResetPasswordAction;
-use App\Filament\Pages\Auth\Password\ResetPasswordRequest;
-use App\Filament\Pages\Settings\ManageSystem;
-use App\Filament\Resources\Activities\ActivityResource;
-use App\Filament\Resources\Documents\DocumentResource;
-use App\Filament\Resources\Images\ImageResource;
-use App\Filament\Resources\Media\MediaResource;
-use App\Filament\Resources\Permissions\PermissionResource;
-use App\Filament\Resources\Roles\RoleResource;
-use App\Filament\Resources\Users\UserResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
-use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -36,54 +17,28 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use ToneGabes\Filament\Icons\Enums\Phosphor;
+use Mpac\FilamentAccessControl\Enums\Panels;
+use Mpac\FilamentAuthExternal\FilamentAuthExternalPlugin;
+use Mpac\FilamentCore\FilamentCorePlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        if (AuthMode::fromConfig(Config::string('auth.mode'))->allowsLocalRegistration()) {
-            $panel->passwordReset(
-                ResetPasswordRequest::class,
-                ResetPasswordAction::class,
-            );
-        }
-
         return $panel
             ->id(Panels::Admin->value)
             ->path(Panels::Admin->path())
-            ->login(Login::class)
-            ->sidebarWidth('16rem')
             ->profile()
-            ->brandLogo(fn () => view('components.brand-logo'))
-            ->unsavedChangesAlerts()
-            ->sidebarCollapsibleOnDesktop()
-            ->colors([
-                'primary' => Color::Emerald,
-            ])
             ->viteTheme('resources/css/mpac-theme/index.css')
-            ->resources([
-                DocumentResource::class,
-                ImageResource::class,
-                MediaResource::class,
-                UserResource::class,
-                RoleResource::class,
-                PermissionResource::class,
-                ActivityResource::class,
-            ])
-            ->pages([
-                ManageSystem::class,
+            ->plugins([
+                FilamentCorePlugin::make(),
+                FilamentAuthExternalPlugin::make(),
             ])
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
-            ->userMenuItems(PanelSwitcher::userMenuItems())
-            ->navigationGroups($this->configureNavigationGroups())
-            ->navigationItems($this->configureNavigationItems())
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -98,42 +53,5 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
-    }
-
-    /**
-     * Configure the navigation groups.
-     *
-     * @return NavigationGroup[]
-     */
-    private function configureNavigationGroups(): array
-    {
-        return [
-            NavigationGroup::make(NavGroups::Files->value)
-                ->collapsed(true),
-
-            NavigationGroup::make(NavGroups::Authorization->value)
-                ->collapsed(true),
-
-            NavigationGroup::make(NavGroups::Settings->value)
-                ->collapsed(true),
-
-            NavigationGroup::make(NavGroups::Tools->value)
-                ->collapsed(true),
-        ];
-    }
-
-    /**
-     * @return NavigationItem[]
-     */
-    private function configureNavigationItems(): array
-    {
-        return [
-            NavigationItem::make('Pulse')
-                ->group(NavGroups::Tools->value)
-                ->icon(Phosphor::Pulse)
-                ->url('/' . Config::string('pulse.path'))
-                ->openUrlInNewTab()
-                ->visible(fn () => Auth::user()?->can(SystemPermissions::PulseAccess)),
-        ];
     }
 }

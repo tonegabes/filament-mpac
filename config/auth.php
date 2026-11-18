@@ -1,9 +1,9 @@
 <?php
 
 declare(strict_types=1);
-use App\Enums\AuthMode;
-use App\Enums\UserRole;
 use App\Models\User;
+use Mpac\FilamentAccessControl\Enums\UserRole;
+use Mpac\FilamentAuth\Enums\AuthMode;
 
 return [
     /*
@@ -129,11 +129,13 @@ return [
     | Authentication Mode
     |--------------------------------------------------------------------------
     |
-    | Supported: local, ldap
+    | Supported: local, ldap, hybrid
     |
     */
 
-    'mode' => env('AUTH_MODE', AuthMode::Local->value),
+    'mode' => env('AUTH_MODE', AuthMode::Hybrid->value),
+
+    'default_tab' => env('AUTH_DEFAULT_TAB', AuthMode::Ldap->value),
 
     /*
     |--------------------------------------------------------------------------

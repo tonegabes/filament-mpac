@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Settings\SystemSettings;
+use Mpac\FilamentBranding\Settings\SystemSettings;
 
 return [
 

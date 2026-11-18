@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
+            $table->string('auth_driver')->default('local');
             $table->boolean('is_active')->default(true);
             $table->index('is_active', 'idx_is_active');
             $table->rememberToken();

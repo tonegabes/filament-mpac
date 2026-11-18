@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Mpac\Testing\MpacTestCase;
 
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends MpacTestCase
 {
 }

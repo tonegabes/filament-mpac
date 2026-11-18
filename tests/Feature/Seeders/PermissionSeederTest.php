@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-use App\Enums\Permissions\ActivityPermissions;
-use App\Enums\Permissions\DocumentPermissions;
-use App\Enums\Permissions\ImagePermissions;
-use App\Enums\Permissions\MediaPermissions;
-use App\Enums\Permissions\PanelPermissions;
-use App\Enums\Permissions\PermissionPermissions;
-use App\Enums\Permissions\RolePermissions;
-use App\Enums\Permissions\SystemPermissions;
-use App\Enums\Permissions\UserPermissions;
-use App\Enums\Permissions\WildcardPermissions;
-use App\Models\Permission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use Mpac\FilamentAccessControl\Enums\Permissions\PanelPermissions;
+use Mpac\FilamentAccessControl\Enums\Permissions\PermissionPermissions;
+use Mpac\FilamentAccessControl\Enums\Permissions\RolePermissions;
+use Mpac\FilamentAccessControl\Enums\Permissions\UserPermissions;
+use Mpac\FilamentAccessControl\Enums\Permissions\WildcardPermissions;
+use Mpac\FilamentAccessControl\Models\Permission;
+use Mpac\FilamentAudit\Enums\Permissions\ActivityPermissions;
+use Mpac\FilamentBranding\Enums\SystemPermissions;
+use Mpac\FilamentFileLibrary\Enums\Permissions\DocumentPermissions;
+use Mpac\FilamentFileLibrary\Enums\Permissions\ImagePermissions;
+use Mpac\FilamentFileLibrary\Enums\Permissions\MediaPermissions;
 
 uses(RefreshDatabase::class);
 
@@ -26,16 +26,16 @@ it('creates all permissions from enums', function (): void {
     $this->seed(Database\Seeders\PermissionSeeder::class);
 
     $expected = array_merge(
-        array_map(fn ($c) => $c->value, WildcardPermissions::cases()),
-        array_map(fn ($c) => $c->value, PanelPermissions::cases()),
-        array_map(fn ($c) => $c->value, SystemPermissions::cases()),
-        array_map(fn ($c) => $c->value, UserPermissions::cases()),
-        array_map(fn ($c) => $c->value, RolePermissions::cases()),
-        array_map(fn ($c) => $c->value, PermissionPermissions::cases()),
-        array_map(fn ($c) => $c->value, DocumentPermissions::cases()),
-        array_map(fn ($c) => $c->value, ImagePermissions::cases()),
-        array_map(fn ($c) => $c->value, MediaPermissions::cases()),
-        array_map(fn ($c) => $c->value, ActivityPermissions::cases()),
+        array_map(fn ($c): string => $c->value, WildcardPermissions::cases()),
+        array_map(fn ($c): string => $c->value, PanelPermissions::cases()),
+        array_map(fn ($c): string => $c->value, SystemPermissions::cases()),
+        array_map(fn ($c): string => $c->value, UserPermissions::cases()),
+        array_map(fn ($c): string => $c->value, RolePermissions::cases()),
+        array_map(fn ($c): string => $c->value, PermissionPermissions::cases()),
+        array_map(fn ($c): string => $c->value, DocumentPermissions::cases()),
+        array_map(fn ($c): string => $c->value, ImagePermissions::cases()),
+        array_map(fn ($c): string => $c->value, MediaPermissions::cases()),
+        array_map(fn ($c): string => $c->value, ActivityPermissions::cases()),
     );
 
     foreach ($expected as $name) {
@@ -46,6 +46,8 @@ it('creates all permissions from enums', function (): void {
 });
 
 it('discovers permission enums automatically', function (): void {
+    File::ensureDirectoryExists(app_path('Enums/Permissions'));
+
     File::put(app_path('Enums/Permissions/GeneratedSeederPermissions.php'), <<<'PHP'
 <?php
 
