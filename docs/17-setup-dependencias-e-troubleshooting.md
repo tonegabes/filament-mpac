@@ -53,8 +53,11 @@ Stack relevante após o bump de dependências:
 | `directorytree/ldaprecord-laravel` | `^4.0.4` |
 | `spatie/laravel-permission` | `^8.3` |
 | `janczakb/filament-flex-fields` | `^2.7` |
+| `laravel/octane` | `^2.25` (server `frankenphp` em produção) |
 
 Fonte da verdade: `composer.json` / `composer.lock`.
+
+`OCTANE_SERVER=frankenphp` está em `.env.example`. O runtime Octane é o **CMD do Docker** de produção; `composer run dev` local segue com `php artisan serve`. Detalhes e pitfalls de worker: [Deploy, Docker e CI](18-deploy-docker-e-ci.md).
 
 ## 🔄 Workflow de update de dependências
 
@@ -133,8 +136,8 @@ Ambiente de produção e CI estão documentados em [Deploy, Docker e CI](18-depl
 
 Resumo rápido:
 
-- Imagem: FrankenPHP 8.4 Alpine (`serversideup/php`)
-- Health: `GET /up` (porta 8080)
+- Imagem: `serversideup/php:8.4-frankenphp` + **Laravel Octane** (`octane:start --server=frankenphp --port=8080`)
+- Health: `GET /up` via `curl` (porta 8080)
 - MR image build só com target `develop`
 - Migrations não rodam no boot do container
 
