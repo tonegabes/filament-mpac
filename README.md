@@ -61,7 +61,7 @@ Pacote: `tonegabes/laravel-make-model-plus`.
 
 ## Docker / CI
 
-Imagem FrankenPHP e pipeline GitLab: [docs/18-deploy-docker-e-ci.md](docs/18-deploy-docker-e-ci.md). Variáveis `APP_IMAGE` e `APP_VERSION` no `.env` são usadas pelo `docker-compose.yml` de build — ajuste ao publicar a imagem do projeto derivado.
+Produção: **Laravel Octane + FrankenPHP** (imagem `serversideup/php:8.4-frankenphp`). Runbook e pipeline GitLab: [docs/18-deploy-docker-e-ci.md](docs/18-deploy-docker-e-ci.md). Variáveis `APP_IMAGE` e `APP_VERSION` no `.env` são usadas pelo `docker-compose.yml` de build — ajuste ao publicar a imagem do projeto derivado.
 
 ## Licença
 

@@ -105,8 +105,8 @@ Bem-vindo à documentação do Filament MPAC. Use estes guias para entender a ar
     - Auth local/LDAP e pitfalls
 
 18. [Deploy, Docker e CI](18-deploy-docker-e-ci.md)
-    - Imagem FrankenPHP (Dockerfile multi-stage)
-    - Caddy, health check `/up`, autorun
+    - Laravel Octane + FrankenPHP (Dockerfile multi-stage)
+    - Caddy worker mode, health check `/up`, autorun
     - Pipeline GitLab (qualidade, MR → `develop`, release por tag)
 
 ## 🚀 Guia Rápido
@@ -165,6 +165,7 @@ php artisan make:model-plus Evento --no-filament
 - Configurações do sistema com **Spatie Settings**
 - Permissões e roles com **Spatie Permission** (`UserRole`: Developer, Admin, User)
 - Logs de atividade com **Spatie Activitylog**
+- Produção em container com **Laravel Octane** + **FrankenPHP**
 
 Veja também:
 
@@ -190,4 +191,4 @@ Ao adicionar novas features, certifique-se de:
 
 ---
 
-**Última atualização**: Outubro 2026
+**Última atualização**: Novembro 2026

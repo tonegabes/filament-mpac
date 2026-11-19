@@ -185,8 +185,9 @@ Arquivos de imagem e CI (fora de `app/`):
 
 | Arquivo | Papel |
 | --- | --- |
-| `Dockerfile` | Build multi-stage (PHP + Node assets) |
-| `Caddyfile` | Proxy/static do FrankenPHP na porta 8080 |
+| `Dockerfile` | Build multi-stage; `CMD` = Octane + FrankenPHP `:8080` |
+| `Caddyfile` | FrankenPHP worker mode (`frankenphp-worker.php`) na porta 8080 |
+| `config/octane.php` | Server, listeners, GC e watch do Laravel Octane |
 | `docker/php/opcache.ini` | Opcache de produção |
 | `.dockerignore` | Contexto enxuto do build |
 | `.gitlab-ci.yml` | Qualidade + build de imagem (MR/`develop`, tags) |
