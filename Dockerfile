@@ -1,4 +1,4 @@
-FROM serversideup/php:8.4-frankenphp-alpine AS base
+FROM serversideup/php:8.4-frankenphp AS base
 
 ARG CI_PROJECT_URL
 ARG CI_COMMIT_SHA
@@ -27,8 +27,9 @@ RUN install-php-extensions \
     gd
 
 # Utilizado para gerar PDF de relatórios
-RUN apk add --no-cache \
-    poppler-utils
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
 
 USER www-data
 
@@ -117,4 +118,6 @@ HEALTHCHECK \
     --timeout=3s \
     --start-period=30s \
     --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/up || exit 1
+    CMD curl -fsS http://localhost:8080/up > /dev/null || exit 1
+
+CMD ["php", "artisan", "octane:start", "--server=frankenphp", "--port=8080", "--caddyfile=/etc/frankenphp/Caddyfile"]

@@ -1,16 +1,20 @@
 {
     auto_https off
-    admin off
+    admin {$CADDY_SERVER_ADMIN_HOST:localhost}:{$CADDY_SERVER_ADMIN_PORT:2019}
+
+    frankenphp {
+        worker {
+            file "{$APP_PUBLIC_PATH:/var/www/html/public}/frankenphp-worker.php"
+            {$CADDY_SERVER_WORKER_DIRECTIVE}
+            {$CADDY_SERVER_WATCH_DIRECTIVES}
+        }
+    }
 }
 
 :8080 {
-    encode gzip zstd
+    encode zstd gzip
 
-    root * /var/www/html/public
-
-    php_server
-
-    file_server
+    root * "{$APP_PUBLIC_PATH:/var/www/html/public}"
 
     # Cache forte apenas para assets versionados pelo Vite
     header /build/* Cache-Control "public, max-age=31536000, immutable"
@@ -24,6 +28,9 @@
         Permissions-Policy "geolocation=(), microphone=(), camera=()"
     }
 
-    # Redireciona tudo pro Laravel (fallback)
-    try_files {path} /index.php
+    php_server {
+        index frankenphp-worker.php
+        try_files {path} frankenphp-worker.php
+        resolve_root_symlink
+    }
 }

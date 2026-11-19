@@ -39,3 +39,7 @@ boost.json
 npm-debug.log
 opencode.json
 yarn-error.log
+
+**/caddy
+frankenphp
+frankenphp-worker.php

@@ -20,6 +20,7 @@
     "filament/spatie-laravel-media-library-plugin": "~5.0",
     "filament/spatie-laravel-settings-plugin": "~5.0",
     "laravel/framework": "^13.0",
+    "laravel/octane": "^2.25",
     "laravel/pulse": "^1.7",
     "laravel/tinker": "^3.0",
     "spatie/laravel-activitylog": "^5.0",
